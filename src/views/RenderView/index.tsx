@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type CSSProperties } from 'react';
 import { useScroll, useSpring, motion } from 'framer-motion';
 import { useBuilderStore } from '../../store/builderStore';
 import { AnimatedBlock } from '../../components/blocks/AnimatedBlock';
@@ -44,7 +44,7 @@ export function RenderView() {
       {!startsWithHero && article.blocks.length > 0 && (
         <header className="mx-auto max-w-2xl px-6 py-16 text-center">
           <h1 className="text-4xl font-bold leading-tight tracking-tight md:text-5xl">
-            {article.title || 'Untitled article'}
+            {article.title || 'Namnlös artikel'}
           </h1>
         </header>
       )}
@@ -53,7 +53,7 @@ export function RenderView() {
       <main>
         {article.blocks.length === 0 ? (
           <div className="mx-auto max-w-2xl px-6 py-24 text-center text-gray-400">
-            <p className="text-lg">No content yet.</p>
+            <p className="text-lg">Inget innehåll ännu.</p>
           </div>
         ) : (
           article.blocks.map((block) => <BlockWrapper key={block.id} block={block} />)
@@ -66,7 +66,7 @@ export function RenderView() {
           href="#/"
           className="fixed bottom-5 right-5 z-50 rounded-full bg-gray-900/80 px-4 py-2 text-xs font-medium text-white opacity-50 backdrop-blur hover:opacity-100 transition-opacity"
         >
-          ← Edit
+          ← Redigera
         </a>
       )}
     </div>
@@ -74,25 +74,32 @@ export function RenderView() {
 }
 
 function BlockWrapper({ block }: { block: Block }) {
+  const sizeStyle: CSSProperties = block.maxWidth
+    ? { maxWidth: block.maxWidth, marginLeft: 'auto', marginRight: 'auto' }
+    : {};
+
   if (
     block.type === 'hero' ||
     block.type === 'sticky' ||
     block.type === 'annotated' ||
     block.type === 'scrollmedia'
   ) {
+    if (block.maxWidth) {
+      return <div style={sizeStyle}><AnimatedBlock block={block} /></div>;
+    }
     return <AnimatedBlock block={block} />;
   }
 
   if (block.type === 'image' || block.type === 'video') {
     return (
-      <div className="my-12">
+      <div className="my-12" style={sizeStyle}>
         <AnimatedBlock block={block} />
       </div>
     );
   }
 
   return (
-    <div className="mx-auto max-w-2xl px-6 py-6">
+    <div className="mx-auto max-w-2xl px-6 py-6" style={sizeStyle}>
       <AnimatedBlock block={block} />
     </div>
   );

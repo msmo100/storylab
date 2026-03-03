@@ -13,13 +13,14 @@ interface Props {
 
 const BLOCK_LABELS: Record<Block['type'], string> = {
   text: 'Text',
-  image: 'Image',
+  image: 'Bild',
   video: 'Video',
-  quote: 'Quote',
+  quote: 'Citat',
   hero: 'Hero',
-  sticky: 'Sticky',
-  annotated: 'Annotated',
-  scrollmedia: 'Scroll media',
+  sticky: 'Klistrad',
+  annotated: 'Annoterad',
+  scrollmedia: 'Scrollmedia',
+  timeline: 'Tidslinje',
 };
 
 const BLOCK_COLORS: Record<Block['type'], string> = {
@@ -31,20 +32,23 @@ const BLOCK_COLORS: Record<Block['type'], string> = {
   sticky: 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/40 dark:text-indigo-300',
   annotated: 'bg-teal-100 text-teal-800 dark:bg-teal-900/40 dark:text-teal-300',
   scrollmedia: 'bg-orange-100 text-orange-800 dark:bg-orange-900/40 dark:text-orange-300',
+  timeline: 'bg-cyan-100 text-cyan-800 dark:bg-cyan-900/40 dark:text-cyan-300',
 };
 
 function blockPreview(block: Block): string {
-  if (block.type === 'text') return block.content || 'Empty text block';
-  if (block.type === 'image') return block.src || 'No image URL set';
-  if (block.type === 'video') return block.src || 'No video URL set';
-  if (block.type === 'quote') return block.text || 'Empty quote';
-  if (block.type === 'hero') return block.heading || 'No heading set';
+  if (block.type === 'text') return block.content || 'Tomt textblock';
+  if (block.type === 'image') return block.src || 'Ingen bild-URL angiven';
+  if (block.type === 'video') return block.src || 'Ingen video-URL angiven';
+  if (block.type === 'quote') return block.text || 'Tomt citat';
+  if (block.type === 'hero') return block.heading || 'Ingen rubrik angiven';
   if (block.type === 'sticky')
-    return block.overlays.length ? `${block.overlays.length} overlay(s)` : 'No overlays';
+    return block.overlays.length ? `${block.overlays.length} överlager` : 'Inga överlager';
   if (block.type === 'annotated')
-    return block.annotations.length ? `${block.annotations.length} annotation(s)` : 'No annotations';
+    return block.annotations.length ? `${block.annotations.length} annoteringar` : 'Inga annoteringar';
   if (block.type === 'scrollmedia')
-    return block.images.length ? `${block.images.length} image(s) — ${block.textPosition} text` : 'No images';
+    return block.images.length ? `${block.images.length} ${block.images.length === 1 ? 'bild' : 'bilder'} — ${block.textPosition} text` : 'Inga bilder';
+  if (block.type === 'timeline')
+    return block.entries.length ? `${block.entries.length} ${block.entries.length === 1 ? 'händelse' : 'händelser'}` : 'Inga händelser';
   return '';
 }
 
@@ -55,7 +59,7 @@ export function BlockCard({ block }: Props) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: block.id,
   });
-
+ 
   const style: React.CSSProperties = {
     transform: CSS.Transform.toString(transform),
     transition,
@@ -75,7 +79,7 @@ export function BlockCard({ block }: Props) {
         <button
           {...attributes}
           {...listeners}
-          aria-label="Drag to reorder"
+          aria-label="Dra för att sortera om"
           className="cursor-grab active:cursor-grabbing text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 p-1 -ml-1 touch-none"
         >
           <DragIcon />
@@ -96,13 +100,13 @@ export function BlockCard({ block }: Props) {
           onClick={() => setExpanded((v) => !v)}
           aria-expanded={expanded}
         >
-          {expanded ? 'Close' : 'Edit'}
+          {expanded ? 'Stäng' : 'Redigera'}
         </Button>
         <Button
           variant="danger"
           size="sm"
           onClick={() => removeBlock(block.id)}
-          aria-label="Remove block"
+          aria-label="Ta bort block"
         >
           ✕
         </Button>

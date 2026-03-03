@@ -13,31 +13,31 @@ type BlockOption = {
 const BLOCK_OPTIONS: BlockOption[] = [
   {
     label: 'Text',
-    description: 'A paragraph of body text',
+    description: 'Ett stycke brödtext',
     emoji: '¶',
     defaultBlock: { type: 'text', animation: 'fade', animationDelay: 0, content: '' },
   },
   {
-    label: 'Image',
-    description: 'A full-width photo with optional caption',
+    label: 'Bild',
+    description: 'Ett heltäckande foto med valfri bildtext',
     emoji: '⬜',
     defaultBlock: { type: 'image', animation: 'fade', animationDelay: 0, src: '', alt: '', caption: '' },
   },
   {
     label: 'Video',
-    description: 'A video that autoplays in viewport',
+    description: 'En video som spelas upp automatiskt i vyport',
     emoji: '▶',
     defaultBlock: { type: 'video', animation: 'none', animationDelay: 0, src: '', autoplay: true },
   },
   {
-    label: 'Quote',
-    description: 'A pull quote with optional attribution',
+    label: 'Citat',
+    description: 'Ett lyftat citat med valfri källa',
     emoji: '❝',
     defaultBlock: { type: 'quote', animation: 'slide-up', animationDelay: 0, text: '', attribution: '' },
   },
   {
     label: 'Hero',
-    description: 'Full-screen opening section with background',
+    description: 'Helskärmsöppning med bakgrund',
     emoji: '◼',
     defaultBlock: {
       type: 'hero',
@@ -49,8 +49,8 @@ const BLOCK_OPTIONS: BlockOption[] = [
     },
   },
   {
-    label: 'Sticky section',
-    description: 'Background stays fixed as text scrolls over it',
+    label: 'Klistrad sektion',
+    description: 'Bakgrunden sitter fast medan texten rullar förbi',
     emoji: '📌',
     defaultBlock: {
       type: 'sticky',
@@ -62,8 +62,8 @@ const BLOCK_OPTIONS: BlockOption[] = [
     },
   },
   {
-    label: 'Annotated media',
-    description: 'Pin text labels to specific points on an image or video',
+    label: 'Annoterat media',
+    description: 'Fäst textetiketter på specifika punkter på en bild eller video',
     emoji: '🔍',
     defaultBlock: {
       type: 'annotated',
@@ -75,8 +75,8 @@ const BLOCK_OPTIONS: BlockOption[] = [
     },
   },
   {
-    label: 'Scroll media',
-    description: 'Text stays fixed while images scroll past beside it',
+    label: 'Scrollmedia',
+    description: 'Texten sitter fast medan bilder rullar förbi bredvid',
     emoji: '↕',
     defaultBlock: {
       type: 'scrollmedia',
@@ -86,6 +86,17 @@ const BLOCK_OPTIONS: BlockOption[] = [
       textEntrance: 'none',
       mediaType: 'image',
       images: [],
+    },
+  },
+  {
+    label: 'Tidslinje',
+    description: 'Händelser med rubrik, tid och text längs en vertikal linje',
+    emoji: '⏱',
+    defaultBlock: {
+      type: 'timeline',
+      animation: 'fade',
+      animationDelay: 0,
+      entries: [],
     },
   },
 ];
@@ -115,7 +126,7 @@ export function AddBlockMenu() {
   return (
     <div ref={menuRef} className="relative">
       <Button variant="primary" onClick={() => setOpen((v) => !v)}>
-        <span aria-hidden="true">+</span> Add block
+        <span aria-hidden="true">+</span> Lägg till block
       </Button>
 
       {open && (

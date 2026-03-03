@@ -8,6 +8,7 @@ import { HeroBlock } from './HeroBlock';
 import { StickyBlock } from './StickyBlock';
 import { AnnotatedBlock } from './AnnotatedBlock';
 import { ScrollMediaBlock } from './ScrollMediaBlock';
+import { TimelineBlock } from './TimelineBlock';
 
 type Variants = {
   hidden: Record<string, number | string>;
@@ -60,7 +61,7 @@ export function AnimatedBlock({ block }: Props) {
     <motion.div
       initial="hidden"
       whileInView="visible"
-      viewport={{ once: true, margin: '-8% 0px' }}
+      viewport={{ once: true, amount: 0.1 }}
       variants={variants}
       transition={{ duration: 0.55, delay: prefersReducedMotion ? 0 : (block.animationDelay ?? 0), ease: [0.25, 0, 0.25, 1] }}
     >
@@ -68,6 +69,7 @@ export function AnimatedBlock({ block }: Props) {
       {block.type === 'image' && <ImageBlock block={block} />}
       {block.type === 'video' && <VideoBlock block={block} />}
       {block.type === 'quote' && <QuoteBlock block={block} />}
+      {block.type === 'timeline' && <TimelineBlock block={block} />}
     </motion.div>
   );
 }

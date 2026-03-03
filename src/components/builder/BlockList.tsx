@@ -27,8 +27,8 @@ export function BlockList() {
   if (blocks.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-700 py-16 text-center text-gray-400 dark:text-gray-500">
-        <p className="text-sm font-medium">No blocks yet</p>
-        <p className="text-xs mt-1">Use the button below to add your first block</p>
+        <p className="text-sm font-medium">Inga block ännu</p>
+        <p className="text-xs mt-1">Använd knappen ovan för att lägga till ditt första block</p>
       </div>
     );
   }

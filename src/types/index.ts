@@ -1,4 +1,4 @@
-export type BlockType = 'text' | 'image' | 'video' | 'quote' | 'hero' | 'sticky' | 'annotated' | 'scrollmedia';
+export type BlockType = 'text' | 'image' | 'video' | 'quote' | 'hero' | 'sticky' | 'annotated' | 'scrollmedia' | 'timeline';
 
 export type AnimationPreset = 'none' | 'fade' | 'slide-up' | 'slide-left' | 'zoom';
 
@@ -11,6 +11,8 @@ export interface BaseBlock {
   animation: AnimationPreset;
   /** Entrance animation delay in seconds. Optional for backwards-compat with saved articles. */
   animationDelay?: number;
+  /** CSS max-width value (e.g. '800px', '60vw'). Undefined = automatic. */
+  maxWidth?: string;
 }
 
 export interface TextBlock extends BaseBlock {
@@ -101,6 +103,26 @@ export interface ScrollMediaBlock extends BaseBlock {
   images: ScrollImage[];
 }
 
+export type TimelineDotStyle = 'filled' | 'ring' | 'solid' | 'diamond' | 'none';
+
+/** A single entry in a timeline block. */
+export interface TimelineEntry {
+  id: string;
+  title: string;
+  time: string;
+  text: string;
+  showDot?: boolean;
+  dotStyle?: TimelineDotStyle;
+}
+
+/** Vertical timeline with a connecting line and entries showing title/time then body text. */
+export interface TimelineBlock extends BaseBlock {
+  type: 'timeline';
+  lineWidth?: number;
+  entryAnimation?: boolean;
+  entries: TimelineEntry[];
+}
+
 export type Block =
   | TextBlock
   | ImageBlock
@@ -109,7 +131,8 @@ export type Block =
   | HeroBlock
   | StickyBlock
   | AnnotatedBlock
-  | ScrollMediaBlock;
+  | ScrollMediaBlock
+  | TimelineBlock;
 
 // Distributive Omit — correctly strips 'id' from each union member
 export type BlockWithoutId =
@@ -120,7 +143,8 @@ export type BlockWithoutId =
   | Omit<HeroBlock, 'id'>
   | Omit<StickyBlock, 'id'>
   | Omit<AnnotatedBlock, 'id'>
-  | Omit<ScrollMediaBlock, 'id'>;
+  | Omit<ScrollMediaBlock, 'id'>
+  | Omit<TimelineBlock, 'id'>;
 
 export interface Article {
   id: string;

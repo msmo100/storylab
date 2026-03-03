@@ -7,7 +7,7 @@ import { cn } from '../../utils/cn';
 type Device = 'mobile' | 'tablet' | 'desktop';
 
 const DEVICES: { id: Device; label: string; width: number | null; icon: string }[] = [
-  { id: 'mobile',  label: 'Mobile',  width: 390,  icon: '▯' },
+  { id: 'mobile',  label: 'Mobil',   width: 390,  icon: '▯' },
   { id: 'tablet',  label: 'iPad',    width: 768,  icon: '▭' },
   { id: 'desktop', label: 'Desktop', width: null, icon: '▬' },
 ];
@@ -57,9 +57,9 @@ export function BuilderView() {
             <div className="flex items-center gap-2">
               <button
                 onClick={toggleDarkMode}
-                title={darkMode ? 'Switch to light mode' : 'Switch to dark mode'}
+                title={darkMode ? 'Växla till ljusläge' : 'Växla till mörkt läge'}
                 className="text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors text-base leading-none px-1"
-                aria-label="Toggle dark mode"
+                aria-label="Växla mörkt läge"
               >
                 {darkMode ? '☀' : '☽'}
               </button>
@@ -70,8 +70,8 @@ export function BuilderView() {
             type="text"
             value={article.title}
             onChange={(e) => setTitle(e.target.value)}
-            placeholder="Article title…"
-            aria-label="Article title"
+            placeholder="Artikeltitel…"
+            aria-label="Artikeltitel"
             className="w-full text-sm font-medium text-gray-800 dark:text-gray-200 placeholder-gray-400 dark:placeholder-gray-600 bg-transparent rounded px-1.5 py-0.5 -mx-1.5 hover:bg-gray-100 dark:hover:bg-gray-800 focus:bg-gray-100 dark:focus:bg-gray-800 focus:outline-none transition-colors"
           />
         </header>
@@ -83,8 +83,8 @@ export function BuilderView() {
 
         {/* Footer */}
         <footer className="flex-shrink-0 border-t border-gray-100 dark:border-gray-700 px-4 py-2.5 flex items-center justify-between text-xs text-gray-400 dark:text-gray-500">
-          <span>{blockCount} block{blockCount !== 1 ? 's' : ''}</span>
-          <span>Saved {new Date(article.updatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+          <span>{blockCount} block</span>
+          <span>Sparad {new Date(article.updatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
         </footer>
       </div>
 
@@ -119,7 +119,7 @@ export function BuilderView() {
               onClick={copyEmbedCode}
               className="text-xs px-3 py-1.5 rounded-md border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-400 font-medium transition-colors"
             >
-              {copied ? 'Copied!' : 'Copy embed code'}
+              {copied ? 'Kopierat!' : 'Kopiera inbäddningskod'}
             </button>
             <a
               href={previewSrc}
@@ -127,7 +127,7 @@ export function BuilderView() {
               rel="noopener noreferrer"
               className="text-xs px-3 py-1.5 rounded-md bg-gray-900 dark:bg-gray-100 hover:bg-gray-700 dark:hover:bg-gray-200 text-white dark:text-gray-900 font-medium transition-colors"
             >
-              Open ↗
+              Öppna ↗
             </a>
           </div>
         </div>
@@ -138,7 +138,7 @@ export function BuilderView() {
           <iframe
             src={previewSrc}
             className="flex-1 w-full border-none"
-            title="Article preview"
+            title="Förhandsgranskning av artikel"
             allow="autoplay"
           />
         ) : (
@@ -146,7 +146,7 @@ export function BuilderView() {
           <div className="flex-1 overflow-auto bg-gray-100 dark:bg-gray-950 flex justify-center py-6">
             <iframe
               src={previewSrc}
-              title="Article preview"
+              title="Förhandsgranskning av artikel"
               allow="autoplay"
               style={{
                 width: activeDevice.width!,

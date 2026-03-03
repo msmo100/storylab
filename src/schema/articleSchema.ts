@@ -79,6 +79,24 @@ const scrollMediaBlockSchema = baseBlockSchema.extend({
   images: z.array(scrollImageSchema),
 });
 
+const timelineDotStyleSchema = z.enum(['filled', 'ring', 'solid', 'diamond', 'none']);
+
+const timelineEntrySchema = z.object({
+  id: z.string(),
+  title: z.string(),
+  time: z.string(),
+  text: z.string(),
+  showDot: z.boolean().optional(),
+  dotStyle: timelineDotStyleSchema.optional(),
+});
+
+const timelineBlockSchema = baseBlockSchema.extend({
+  type: z.literal('timeline'),
+  lineWidth: z.number().min(1).max(5).optional(),
+  entryAnimation: z.boolean().optional(),
+  entries: z.array(timelineEntrySchema),
+});
+
 export const blockSchema = z.discriminatedUnion('type', [
   textBlockSchema,
   imageBlockSchema,
@@ -88,6 +106,7 @@ export const blockSchema = z.discriminatedUnion('type', [
   stickyBlockSchema,
   annotatedBlockSchema,
   scrollMediaBlockSchema,
+  timelineBlockSchema,
 ]);
 
 export const articleSchema = z.object({
