@@ -1,5 +1,5 @@
 import { useBuilderStore } from '../../store/builderStore';
-import type { Block, Annotation, ScrollImage, TextEntrance, TimelineEntry, TimelineDotStyle } from '../../types';
+import type { Block, ScrollImage, TextEntrance, TimelineEntry, TimelineDotStyle, ChatMessage } from '../../types';
 import { generateId } from '../../utils/generateId';
 import { Input } from '../ui/Input';
 import { Textarea } from '../ui/Textarea';
@@ -21,9 +21,9 @@ export function BlockEditor({ block }: Props) {
 
   const update = (fields: Partial<Block>) => updateBlock(block.id, fields);
 
-  // Hero, sticky, annotated, and scrollmedia blocks have built-in scroll behavior — animation preset unused
+  // Hero, sticky, and scrollmedia blocks have built-in scroll behavior — animation preset unused
   const showAnimationSelect =
-    block.type !== 'hero' && block.type !== 'sticky' && block.type !== 'annotated' && block.type !== 'scrollmedia' && block.type !== 'timeline';
+    block.type !== 'hero' && block.type !== 'sticky' && block.type !== 'scrollmedia' && block.type !== 'timeline' && block.type !== 'chat';
 
   return (
     <div className="mt-3 flex flex-col gap-3 border-t border-gray-200 dark:border-gray-700 pt-3">
@@ -219,129 +219,6 @@ export function BlockEditor({ block }: Props) {
           </div>
         </>
       )}
-      {block.type === 'annotated' && (
-        <>
-          <Select
-            label="Bakgrundstyp"
-            value={block.backgroundType}
-            options={backgroundTypeOptions}
-            onChange={(e) =>
-              update({ backgroundType: e.target.value as 'image' | 'video' } as Partial<Block>)
-            }
-          />
-          <Input
-            label="Bakgrunds-URL"
-            value={block.backgroundSrc}
-            placeholder="https://… (bild eller .mp4)"
-            onChange={(e) => update({ backgroundSrc: e.target.value } as Partial<Block>)}
-          />
-          <Input
-            label="Bakgrundens alt-text (valfri)"
-            value={block.backgroundAlt ?? ''}
-            placeholder="Beskriv bakgrunden för skärmläsare"
-            onChange={(e) => update({ backgroundAlt: e.target.value } as Partial<Block>)}
-          />
-
-          <div className="flex flex-col gap-2">
-            <span className="text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wide">
-              Annoteringar
-            </span>
-            <p className="text-xs text-gray-400 dark:text-gray-500">
-              Varje annotering visas vid sin position på bilden när du scrollar. Använd X/Y (0–100%) för att placera den.
-            </p>
-
-            {block.annotations.map((ann, i) => (
-              <div key={ann.id} className="rounded-lg border border-gray-200 dark:border-gray-700 p-3 flex flex-col gap-2">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-medium text-gray-600 dark:text-gray-400">Annotering {i + 1}</span>
-                  <Button
-                    variant="danger"
-                    size="sm"
-                    onClick={() =>
-                      update({
-                        annotations: block.annotations.filter((a) => a.id !== ann.id),
-                      } as Partial<Block>)
-                    }
-                  >
-                    ✕
-                  </Button>
-                </div>
-                <input
-                  type="text"
-                  value={ann.text}
-                  placeholder="Beskriv vad du pekar på…"
-                  onChange={(e) =>
-                    update({
-                      annotations: block.annotations.map((a) =>
-                        a.id === ann.id ? { ...a, text: e.target.value } : a
-                      ),
-                    } as Partial<Block>)
-                  }
-                  className="w-full rounded-md border border-gray-300 dark:border-gray-600 px-3 py-1.5 text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 bg-white dark:bg-gray-800 focus:border-gray-500 focus:outline-none focus:ring-1 focus:ring-gray-500"
-                />
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="flex flex-col gap-1">
-                    <label className="text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wide">
-                      X — {ann.x}% från vänster
-                    </label>
-                    <input
-                      type="range"
-                      min={0}
-                      max={100}
-                      value={ann.x}
-                      onChange={(e) =>
-                        update({
-                          annotations: block.annotations.map((a) =>
-                            a.id === ann.id ? { ...a, x: Number(e.target.value) } : a
-                          ),
-                        } as Partial<Block>)
-                      }
-                      className="w-full accent-gray-900 dark:accent-gray-400"
-                    />
-                  </div>
-                  <div className="flex flex-col gap-1">
-                    <label className="text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wide">
-                      Y — {ann.y}% från toppen
-                    </label>
-                    <input
-                      type="range"
-                      min={0}
-                      max={100}
-                      value={ann.y}
-                      onChange={(e) =>
-                        update({
-                          annotations: block.annotations.map((a) =>
-                            a.id === ann.id ? { ...a, y: Number(e.target.value) } : a
-                          ),
-                        } as Partial<Block>)
-                      }
-                      className="w-full accent-gray-900 dark:accent-gray-400"
-                    />
-                  </div>
-                </div>
-              </div>
-            ))}
-
-            <Button
-              variant="secondary"
-              size="sm"
-              className="self-start"
-              onClick={() => {
-                const newAnnotation: Annotation = {
-                  id: generateId(),
-                  text: '',
-                  x: 50,
-                  y: 50,
-                };
-                update({ annotations: [...block.annotations, newAnnotation] } as Partial<Block>);
-              }}
-            >
-              + Lägg till annotering
-            </Button>
-          </div>
-        </>
-      )}
-
       {block.type === 'scrollmedia' && (
         <>
           <Select
@@ -606,6 +483,139 @@ export function BlockEditor({ block }: Props) {
             }}
           >
             + Lägg till händelse
+          </Button>
+        </div>
+      )}
+
+      {block.type === 'chat' && (
+        <div className="flex flex-col gap-2">
+          <Input
+            label="Avsändarens namn (valfri)"
+            value={block.senderName ?? ''}
+            placeholder="Du"
+            onChange={(e) => update({ senderName: e.target.value || undefined } as Partial<Block>)}
+          />
+          <Input
+            label="Mottagarens namn (valfri)"
+            value={block.receiverName ?? ''}
+            placeholder="Kontakt"
+            onChange={(e) => update({ receiverName: e.target.value || undefined } as Partial<Block>)}
+          />
+
+          <span className="text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wide mt-1">
+            Visa element
+          </span>
+          {(
+            [
+              { field: 'showPhoneFrame', label: 'Telefonram' },
+              { field: 'showStatusBar', label: 'Statusrad' },
+              { field: 'showContactHeader', label: 'Kontakthuvud' },
+              { field: 'showInputBar', label: 'Inmatningsfält' },
+              { field: 'showNames', label: 'Visa namn' },
+            ] as { field: 'showPhoneFrame' | 'showStatusBar' | 'showContactHeader' | 'showInputBar' | 'showNames'; label: string }[]
+          ).map(({ field, label }) => (
+            <label key={field} className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300 cursor-pointer select-none">
+              <input
+                type="checkbox"
+                checked={block[field] !== false}
+                onChange={(e) => update({ [field]: e.target.checked } as Partial<Block>)}
+                className="rounded border-gray-300"
+              />
+              {label}
+            </label>
+          ))}
+
+          <span className="text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wide mt-1">
+            Meddelanden
+          </span>
+
+          {block.messages.map((msg, i) => (
+            <div key={msg.id} className="rounded-lg border border-gray-200 dark:border-gray-700 p-3 flex flex-col gap-2">
+              <div className="flex items-center justify-between">
+                <Select
+                  label="Roll"
+                  value={msg.role}
+                  options={[
+                    { value: 'receiver', label: 'Mottagare (vänster)' },
+                    { value: 'sender', label: 'Avsändare (höger)' },
+                  ]}
+                  onChange={(e) =>
+                    update({
+                      messages: block.messages.map((m) =>
+                        m.id === msg.id ? { ...m, role: e.target.value as 'sender' | 'receiver' } : m
+                      ),
+                    } as Partial<Block>)
+                  }
+                />
+                <Button
+                  variant="danger"
+                  size="sm"
+                  className="mt-4 shrink-0"
+                  onClick={() =>
+                    update({ messages: block.messages.filter((m) => m.id !== msg.id) } as Partial<Block>)
+                  }
+                >
+                  ✕
+                </Button>
+              </div>
+              <Textarea
+                label="Text"
+                rows={2}
+                value={msg.text}
+                placeholder={`Meddelande ${i + 1}…`}
+                onChange={(e) =>
+                  update({
+                    messages: block.messages.map((m) =>
+                      m.id === msg.id ? { ...m, text: e.target.value } : m
+                    ),
+                  } as Partial<Block>)
+                }
+              />
+              <label className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300 cursor-pointer select-none">
+                <input
+                  type="checkbox"
+                  checked={msg.animate ?? false}
+                  onChange={(e) =>
+                    update({
+                      messages: block.messages.map((m) =>
+                        m.id === msg.id ? { ...m, animate: e.target.checked } : m
+                      ),
+                    } as Partial<Block>)
+                  }
+                  className="rounded border-gray-300"
+                />
+                Tona in vid scroll
+              </label>
+              {msg.animate && (
+                <Input
+                  label="Fördröjning (sekunder)"
+                  type="number"
+                  min={0}
+                  max={5}
+                  step={0.1}
+                  value={msg.animationDelay ?? 0}
+                  onChange={(e) =>
+                    update({
+                      messages: block.messages.map((m) =>
+                        m.id === msg.id ? { ...m, animationDelay: Math.max(0, Number(e.target.value)) } : m
+                      ),
+                    } as Partial<Block>)
+                  }
+                />
+              )}
+            </div>
+          ))}
+
+          <Button
+            variant="secondary"
+            size="sm"
+            className="self-start"
+            onClick={() => {
+              const newMsg: ChatMessage = { id: generateId(), role: 'receiver', text: '' };
+              update({ messages: [...block.messages, newMsg] } as Partial<Block>);
+            }}
+          >
+            + Lägg till meddelande
           </Button>
         </div>
       )}

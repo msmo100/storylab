@@ -48,21 +48,6 @@ const stickyBlockSchema = baseBlockSchema.extend({
   overlays: z.array(z.string()),
 });
 
-const annotationSchema = z.object({
-  id: z.string(),
-  text: z.string(),
-  x: z.number().min(0).max(100),
-  y: z.number().min(0).max(100),
-});
-
-const annotatedBlockSchema = baseBlockSchema.extend({
-  type: z.literal('annotated'),
-  backgroundType: z.enum(['image', 'video']),
-  backgroundSrc: z.string(),
-  backgroundAlt: z.string().optional(),
-  annotations: z.array(annotationSchema),
-});
-
 const scrollImageSchema = z.object({
   id: z.string(),
   src: z.string(),
@@ -97,6 +82,26 @@ const timelineBlockSchema = baseBlockSchema.extend({
   entries: z.array(timelineEntrySchema),
 });
 
+const chatMessageSchema = z.object({
+  id: z.string(),
+  role: z.enum(['sender', 'receiver']),
+  text: z.string(),
+  animate: z.boolean().optional(),
+  animationDelay: z.number().min(0).optional(),
+});
+
+const chatBlockSchema = baseBlockSchema.extend({
+  type: z.literal('chat'),
+  senderName: z.string().optional(),
+  receiverName: z.string().optional(),
+  showPhoneFrame: z.boolean().optional(),
+  showStatusBar: z.boolean().optional(),
+  showContactHeader: z.boolean().optional(),
+  showInputBar: z.boolean().optional(),
+  showNames: z.boolean().optional(),
+  messages: z.array(chatMessageSchema),
+});
+
 export const blockSchema = z.discriminatedUnion('type', [
   textBlockSchema,
   imageBlockSchema,
@@ -104,9 +109,9 @@ export const blockSchema = z.discriminatedUnion('type', [
   quoteBlockSchema,
   heroBlockSchema,
   stickyBlockSchema,
-  annotatedBlockSchema,
   scrollMediaBlockSchema,
   timelineBlockSchema,
+  chatBlockSchema,
 ]);
 
 export const articleSchema = z.object({

@@ -62,19 +62,6 @@ const BLOCK_OPTIONS: BlockOption[] = [
     },
   },
   {
-    label: 'Annoterat media',
-    description: 'Fäst textetiketter på specifika punkter på en bild eller video',
-    emoji: '🔍',
-    defaultBlock: {
-      type: 'annotated',
-      animation: 'none',
-      backgroundType: 'image',
-      backgroundSrc: '',
-      backgroundAlt: '',
-      annotations: [],
-    },
-  },
-  {
     label: 'Scrollmedia',
     description: 'Texten sitter fast medan bilder rullar förbi bredvid',
     emoji: '↕',
@@ -97,6 +84,17 @@ const BLOCK_OPTIONS: BlockOption[] = [
       animation: 'fade',
       animationDelay: 0,
       entries: [],
+    },
+  },
+  {
+    label: 'Chatt',
+    description: 'iPhone-liknande chattkonversation med avsändare och mottagare',
+    emoji: '💬',
+    defaultBlock: {
+      type: 'chat',
+      animation: 'fade',
+      animationDelay: 0,
+      messages: [],
     },
   },
 ];

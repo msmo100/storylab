@@ -1,4 +1,4 @@
-export type BlockType = 'text' | 'image' | 'video' | 'quote' | 'hero' | 'sticky' | 'annotated' | 'scrollmedia' | 'timeline';
+export type BlockType = 'text' | 'image' | 'video' | 'quote' | 'hero' | 'sticky' | 'scrollmedia' | 'timeline' | 'chat';
 
 export type AnimationPreset = 'none' | 'fade' | 'slide-up' | 'slide-left' | 'zoom';
 
@@ -60,27 +60,6 @@ export interface StickyBlock extends BaseBlock {
   overlays: string[];
 }
 
-/** A single annotation pinned to a specific point on the background media. */
-export interface Annotation {
-  id: string;
-  text: string;
-  x: number; // 0–100, percentage from left
-  y: number; // 0–100, percentage from top
-}
-
-/**
- * Annotated media block.
- * The background image/video stays sticky while the reader scrolls.
- * Each annotation appears at its (x, y) position on the media in sequence.
- */
-export interface AnnotatedBlock extends BaseBlock {
-  type: 'annotated';
-  backgroundType: 'image' | 'video';
-  backgroundSrc: string;
-  backgroundAlt?: string;
-  annotations: Annotation[];
-}
-
 /** A single item (image or video URL) in the scrolling media column. */
 export interface ScrollImage {
   id: string;
@@ -123,6 +102,28 @@ export interface TimelineBlock extends BaseBlock {
   entries: TimelineEntry[];
 }
 
+/** A single message in a chat block. */
+export interface ChatMessage {
+  id: string;
+  role: 'sender' | 'receiver';
+  text: string;
+  animate?: boolean;
+  animationDelay?: number;
+}
+
+/** iPhone-style chat conversation block. */
+export interface ChatBlock extends BaseBlock {
+  type: 'chat';
+  senderName?: string;
+  receiverName?: string;
+  showPhoneFrame?: boolean;
+  showStatusBar?: boolean;
+  showContactHeader?: boolean;
+  showInputBar?: boolean;
+  showNames?: boolean;
+  messages: ChatMessage[];
+}
+
 export type Block =
   | TextBlock
   | ImageBlock
@@ -130,9 +131,9 @@ export type Block =
   | QuoteBlock
   | HeroBlock
   | StickyBlock
-  | AnnotatedBlock
   | ScrollMediaBlock
-  | TimelineBlock;
+  | TimelineBlock
+  | ChatBlock;
 
 // Distributive Omit — correctly strips 'id' from each union member
 export type BlockWithoutId =
@@ -142,9 +143,9 @@ export type BlockWithoutId =
   | Omit<QuoteBlock, 'id'>
   | Omit<HeroBlock, 'id'>
   | Omit<StickyBlock, 'id'>
-  | Omit<AnnotatedBlock, 'id'>
   | Omit<ScrollMediaBlock, 'id'>
-  | Omit<TimelineBlock, 'id'>;
+  | Omit<TimelineBlock, 'id'>
+  | Omit<ChatBlock, 'id'>;
 
 export interface Article {
   id: string;

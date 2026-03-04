@@ -40,11 +40,11 @@ export function RenderView() {
         aria-hidden="true"
       />
 
-      {/* Article title — suppressed when the first block is a hero */}
-      {!startsWithHero && article.blocks.length > 0 && (
+      {/* Article title — only shown when a title is set and the first block isn't a hero */}
+      {!startsWithHero && article.title.trim() && (
         <header className="mx-auto max-w-2xl px-6 py-16 text-center">
           <h1 className="text-4xl font-bold leading-tight tracking-tight md:text-5xl">
-            {article.title || 'Namnlös artikel'}
+            {article.title}
           </h1>
         </header>
       )}
@@ -81,7 +81,6 @@ function BlockWrapper({ block }: { block: Block }) {
   if (
     block.type === 'hero' ||
     block.type === 'sticky' ||
-    block.type === 'annotated' ||
     block.type === 'scrollmedia'
   ) {
     if (block.maxWidth) {

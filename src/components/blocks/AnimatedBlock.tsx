@@ -6,9 +6,9 @@ import { VideoBlock } from './VideoBlock';
 import { QuoteBlock } from './QuoteBlock';
 import { HeroBlock } from './HeroBlock';
 import { StickyBlock } from './StickyBlock';
-import { AnnotatedBlock } from './AnnotatedBlock';
 import { ScrollMediaBlock } from './ScrollMediaBlock';
 import { TimelineBlock } from './TimelineBlock';
+import { ChatBlock } from './ChatBlock';
 
 type Variants = {
   hidden: Record<string, number | string>;
@@ -49,7 +49,6 @@ export function AnimatedBlock({ block }: Props) {
   // These blocks manage their own scroll-driven animations internally
   if (block.type === 'hero') return <HeroBlock block={block} />;
   if (block.type === 'sticky') return <StickyBlock block={block} />;
-  if (block.type === 'annotated') return <AnnotatedBlock block={block} />;
   if (block.type === 'scrollmedia') return <ScrollMediaBlock block={block} />;
 
   // When the user prefers reduced motion, skip all entrance animations
@@ -70,6 +69,7 @@ export function AnimatedBlock({ block }: Props) {
       {block.type === 'video' && <VideoBlock block={block} />}
       {block.type === 'quote' && <QuoteBlock block={block} />}
       {block.type === 'timeline' && <TimelineBlock block={block} />}
+      {block.type === 'chat' && <ChatBlock block={block} />}
     </motion.div>
   );
 }
