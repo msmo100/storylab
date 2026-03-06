@@ -6,7 +6,7 @@ const blockStyleSchema = z.object({
   textColor: z.string().optional(),
   accentColor: z.string().optional(),
   fontFamily: z.string().optional(),
-  fontSize: z.enum(['sm', 'base', 'lg', 'xl', '2xl']).optional(),
+  fontSize: z.string().optional(),
 }).optional();
 
 const baseBlockSchema = z.object({

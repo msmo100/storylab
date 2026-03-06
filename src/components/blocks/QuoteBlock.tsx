@@ -1,29 +1,30 @@
 import type { QuoteBlock as QuoteBlockType } from '../../types';
 
-const FONT_SIZE_CLASS: Record<string, string> = {
-  sm: 'text-sm',
-  base: 'text-base',
-  lg: 'text-lg',
-  xl: 'text-xl',
-  '2xl': 'text-2xl',
+const LEGACY_PX: Record<string, string> = {
+  sm: '14px', base: '16px', lg: '18px', xl: '20px', '2xl': '24px',
 };
+
+function resolveFontSize(s?: string): string | undefined {
+  if (!s) return undefined;
+  return LEGACY_PX[s] ?? `${s}px`;
+}
 
 interface Props {
   block: QuoteBlockType;
 }
 
 export function QuoteBlock({ block }: Props) {
-  const sizeClass = FONT_SIZE_CLASS[block.styles?.fontSize ?? '2xl'];
   return (
     <blockquote
       className="border-l-4 pl-6 my-6"
       style={{ borderColor: block.styles?.accentColor ?? '#9ca3af' }}
     >
       <p
-        className={`${sizeClass} font-serif italic`}
+        className="font-serif italic"
         style={{
           color: block.styles?.textColor,
           fontFamily: block.styles?.fontFamily,
+          fontSize: resolveFontSize(block.styles?.fontSize) ?? '1.5rem',
         }}
       >
         {block.text}

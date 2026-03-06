@@ -1,26 +1,27 @@
 import type { TextBlock as TextBlockType } from '../../types';
 
-const FONT_SIZE_CLASS: Record<string, string> = {
-  sm: 'text-sm',
-  base: 'text-base',
-  lg: 'text-lg',
-  xl: 'text-xl',
-  '2xl': 'text-2xl',
+// Backwards-compat: old enum values stored before the px migration
+const LEGACY_PX: Record<string, string> = {
+  sm: '14px', base: '16px', lg: '18px', xl: '20px', '2xl': '24px',
 };
+
+function resolveFontSize(s?: string): string | undefined {
+  if (!s) return undefined;
+  return LEGACY_PX[s] ?? `${s}px`;
+}
 
 interface Props {
   block: TextBlockType;
 }
 
 export function TextBlock({ block }: Props) {
-  const sizeClass = FONT_SIZE_CLASS[block.styles?.fontSize ?? 'base'];
   return (
     <div className="prose prose-lg max-w-none">
       <p
-        className={sizeClass}
         style={{
           color: block.styles?.textColor,
           fontFamily: block.styles?.fontFamily,
+          fontSize: resolveFontSize(block.styles?.fontSize),
         }}
       >
         {block.content}

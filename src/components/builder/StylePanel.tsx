@@ -6,9 +6,7 @@ interface Props {
   onClose: () => void;
 }
 
-// Accent color is relevant for these block types
 const ACCENT_TYPES: Block['type'][] = ['quote', 'timeline', 'hero', 'sticky', 'scrollmedia'];
-// Font size is relevant for these block types
 const FONTSIZE_TYPES: Block['type'][] = ['text', 'quote'];
 
 const FONTS: { value: string; label: string }[] = [
@@ -25,20 +23,15 @@ const FONTS: { value: string; label: string }[] = [
   { value: "'Courier New', monospace", label: 'Courier New' },
 ];
 
-const FONT_SIZES: { value: BlockStyle['fontSize']; label: string }[] = [
-  { value: 'sm', label: 'S' },
-  { value: 'base', label: 'M' },
-  { value: 'lg', label: 'L' },
-  { value: 'xl', label: 'XL' },
-  { value: '2xl', label: 'XXL' },
-];
+const PRESET_SIZES = [10, 11, 12, 13, 14, 15, 16, 18, 20, 22, 24, 28, 32, 36, 42, 48, 56, 64, 72, 96];
+
+const INPUT_CLASS = 'text-sm rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-gray-400';
 
 export function StylePanel({ block, onClose }: Props) {
   const { updateBlock } = useBuilderStore();
 
   function update(patch: Partial<BlockStyle>) {
     const merged = { ...block.styles, ...patch };
-    // Remove undefined keys so the object stays clean
     const cleaned = Object.fromEntries(
       Object.entries(merged).filter(([, v]) => v !== undefined)
     ) as BlockStyle;
@@ -47,6 +40,11 @@ export function StylePanel({ block, onClose }: Props) {
 
   const showAccent = ACCENT_TYPES.includes(block.type);
   const showFontSize = FONTSIZE_TYPES.includes(block.type);
+
+  // fontSize stored as plain number string e.g. "16"
+  const rawSize = block.styles?.fontSize ?? '';
+  const numericSize = rawSize ? parseInt(rawSize, 10) : NaN;
+  const isPreset = PRESET_SIZES.includes(numericSize);
 
   return (
     <div className="flex flex-col w-[272px] flex-shrink-0 border-l border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 overflow-y-auto">
@@ -93,13 +91,14 @@ export function StylePanel({ block, onClose }: Props) {
             Typografi
           </p>
           <div className="flex flex-col gap-3">
+
             {/* Font family */}
             <div>
               <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">Teckensnitt</label>
               <select
                 value={block.styles?.fontFamily ?? ''}
                 onChange={(e) => update({ fontFamily: e.target.value || undefined })}
-                className="w-full text-sm rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-gray-400"
+                className={`w-full ${INPUT_CLASS}`}
               >
                 {FONTS.map((f) => (
                   <option key={f.value} value={f.value} style={{ fontFamily: f.value || undefined }}>
@@ -113,24 +112,32 @@ export function StylePanel({ block, onClose }: Props) {
             {showFontSize && (
               <div>
                 <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">Storlek</label>
-                <div className="flex gap-1">
-                  {FONT_SIZES.map((s) => (
-                    <button
-                      key={s.value}
-                      onClick={() => update({ fontSize: block.styles?.fontSize === s.value ? undefined : s.value })}
-                      className={[
-                        'flex-1 py-1 rounded text-xs font-medium border transition-colors',
-                        block.styles?.fontSize === s.value
-                          ? 'bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 border-gray-900 dark:border-gray-100'
-                          : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-gray-700 hover:border-gray-400 dark:hover:border-gray-500',
-                      ].join(' ')}
-                    >
-                      {s.label}
-                    </button>
-                  ))}
+                <div className="flex gap-2">
+                  {/* Preset dropdown */}
+                  <select
+                    value={isPreset ? String(numericSize) : ''}
+                    onChange={(e) => update({ fontSize: e.target.value || undefined })}
+                    className={`flex-1 ${INPUT_CLASS}`}
+                  >
+                    <option value="">— px</option>
+                    {PRESET_SIZES.map((s) => (
+                      <option key={s} value={String(s)}>{s} px</option>
+                    ))}
+                  </select>
+                  {/* Custom number input */}
+                  <input
+                    type="number"
+                    min={6}
+                    max={200}
+                    value={isNaN(numericSize) ? '' : numericSize}
+                    onChange={(e) => update({ fontSize: e.target.value ? String(parseInt(e.target.value, 10)) : undefined })}
+                    placeholder="px"
+                    className={`w-16 text-center ${INPUT_CLASS}`}
+                  />
                 </div>
               </div>
             )}
+
           </div>
         </section>
       </div>

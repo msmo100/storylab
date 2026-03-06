@@ -4,7 +4,8 @@ export interface BlockStyle {
   textColor?: string;
   accentColor?: string;
   fontFamily?: string;
-  fontSize?: 'sm' | 'base' | 'lg' | 'xl' | '2xl';
+  /** Font size as a numeric string in px, e.g. "16". */
+  fontSize?: string;
 }
 
 export type AnimationPreset = 'none' | 'fade' | 'slide-up' | 'slide-left' | 'zoom';
