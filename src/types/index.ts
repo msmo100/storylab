@@ -154,3 +154,11 @@ export interface Article {
   createdAt: string;
   updatedAt: string;
 }
+
+/** Lightweight row used in the Dashboard listing (no blocks). */
+export interface ProjectSummary {
+  id: string;
+  title: string;
+  createdAt: string;
+  updatedAt: string;
+}

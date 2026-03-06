@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useBuilderStore } from '../../store/builderStore';
+import type { SaveStatus } from '../../store/builderStore';
 import { BlockList } from '../../components/builder/BlockList';
 import { AddBlockMenu } from '../../components/builder/AddBlockMenu';
 import { cn } from '../../utils/cn';
@@ -13,11 +14,25 @@ const DEVICES: { id: Device; label: string; width: number | null; icon: string }
 ];
 
 export function BuilderView() {
-  const { article, setTitle, darkMode, toggleDarkMode } = useBuilderStore();
+  const { article, setTitle, darkMode, toggleDarkMode, loadProject, saveProject, saveStatus } =
+    useBuilderStore();
   const [copied, setCopied] = useState(false);
   const [device, setDevice] = useState<Device>('mobile');
 
-  // BroadcastChannel pushes live article updates into the preview iframe
+  // Read projectId from hash: #/edit?id=<id>
+  const projectId = new URLSearchParams(
+    window.location.hash.replace(/^#\/edit\??/, '')
+  ).get('id');
+
+  // Load the project on mount
+  useEffect(() => {
+    if (projectId) {
+      loadProject(projectId);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [projectId]);
+
+  // BroadcastChannel pushes live article updates into the preview iframe (unchanged)
   const channelRef = useRef<BroadcastChannel | null>(null);
   useEffect(() => {
     channelRef.current = new BroadcastChannel('gp-storylab-preview');
@@ -29,6 +44,20 @@ export function BuilderView() {
       channelRef.current?.postMessage({ type: 'update', article });
     }, 150);
     return () => clearTimeout(id);
+  }, [article]);
+
+  // Debounced auto-save to Supabase
+  const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => {
+    if (!projectId) return;
+    if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
+    saveTimerRef.current = setTimeout(() => {
+      saveProject();
+    }, 1000);
+    return () => {
+      if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [article]);
 
   const previewSrc = window.location.origin + window.location.pathname + '#/render';
@@ -53,7 +82,15 @@ export function BuilderView() {
         {/* Header */}
         <header className="flex-shrink-0 border-b border-gray-200 dark:border-gray-700 px-4 py-3 relative z-20">
           <div className="flex items-center justify-between mb-2.5">
-            <span className="text-sm font-bold tracking-tight text-gray-900 dark:text-gray-100">GP StoryLab</span>
+            <div className="flex items-center gap-2">
+              <a
+                href="#/"
+                className="text-xs text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
+              >
+                ← Tillbaka
+              </a>
+              <span className="text-sm font-bold tracking-tight text-gray-900 dark:text-gray-100">GP StoryLab</span>
+            </div>
             <div className="flex items-center gap-2">
               <button
                 onClick={toggleDarkMode}
@@ -84,7 +121,7 @@ export function BuilderView() {
         {/* Footer */}
         <footer className="flex-shrink-0 border-t border-gray-100 dark:border-gray-700 px-4 py-2.5 flex items-center justify-between text-xs text-gray-400 dark:text-gray-500">
           <span>{blockCount} block</span>
-          <span>Sparad {new Date(article.updatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+          <SaveIndicator status={saveStatus} updatedAt={article.updatedAt} />
         </footer>
       </div>
 
@@ -134,7 +171,6 @@ export function BuilderView() {
 
         {/* Preview canvas */}
         {device === 'desktop' ? (
-          // Desktop: iframe fills the full panel
           <iframe
             src={previewSrc}
             className="flex-1 w-full border-none"
@@ -142,7 +178,6 @@ export function BuilderView() {
             allow="autoplay"
           />
         ) : (
-          // Mobile / Tablet: centered frame with shadow, scrollable canvas
           <div className="flex-1 overflow-auto bg-gray-100 dark:bg-gray-950 flex justify-center py-6">
             <iframe
               src={previewSrc}
@@ -162,5 +197,18 @@ export function BuilderView() {
         )}
       </div>
     </div>
+  );
+}
+
+// ─── Save indicator ───────────────────────────────────────────────────────────
+
+function SaveIndicator({ status, updatedAt }: { status: SaveStatus; updatedAt: string }) {
+  if (status === 'saving') return <span>Sparar…</span>;
+  if (status === 'error') return <span className="text-red-500 dark:text-red-400">Kunde inte spara</span>;
+  if (status === 'saved') return <span className="text-green-600 dark:text-green-400">Sparad</span>;
+  return (
+    <span>
+      Sparad {new Date(updatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+    </span>
   );
 }
