@@ -123,7 +123,7 @@ export const useBuilderStore = create<BuilderStore>((set, get) => ({
     if (result.error) {
       set({ projectsLoading: false, projectsError: result.error });
     } else {
-      set({ projects: result.data, projectsLoading: false });
+      set({ projects: result.data!, projectsLoading: false });
     }
   },
 
@@ -133,7 +133,7 @@ export const useBuilderStore = create<BuilderStore>((set, get) => ({
     if (result.error) {
       console.error('[loadProject]', result.error);
     } else {
-      set({ article: result.data });
+      set({ article: result.data! });
     }
   },
 
@@ -147,7 +147,7 @@ export const useBuilderStore = create<BuilderStore>((set, get) => ({
     if (result.error) {
       set({ saveStatus: 'error' });
     } else {
-      set({ article: result.data, saveStatus: 'saved' });
+      set({ article: result.data!, saveStatus: 'saved' });
     }
   },
 
@@ -158,13 +158,13 @@ export const useBuilderStore = create<BuilderStore>((set, get) => ({
       return null;
     }
     const summary: ProjectSummary = {
-      id: result.data.id,
-      title: result.data.title,
-      createdAt: result.data.createdAt,
-      updatedAt: result.data.updatedAt,
+      id: result.data!.id,
+      title: result.data!.title,
+      createdAt: result.data!.createdAt,
+      updatedAt: result.data!.updatedAt,
     };
     set((state) => ({ projects: [summary, ...state.projects] }));
-    return result.data;
+    return result.data!;
   },
 
   removeProject: async (id) => {
