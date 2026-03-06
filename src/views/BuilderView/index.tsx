@@ -15,7 +15,7 @@ const DEVICES: { id: Device; label: string; width: number | null; icon: string }
 ];
 
 export function BuilderView() {
-  const { article, setTitle, darkMode, toggleDarkMode, loadProject, saveProject, saveStatus } =
+  const { article, setTitle, darkMode, toggleDarkMode, loadProject, saveProject, saveStatus, undo, redo } =
     useBuilderStore();
   const [copied, setCopied] = useState(false);
   const [device, setDevice] = useState<Device>('mobile');
@@ -36,6 +36,35 @@ export function BuilderView() {
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [projectId]);
+
+  // Keyboard shortcuts
+  useEffect(() => {
+    function onKeyDown(e: KeyboardEvent) {
+      const mod = e.metaKey || e.ctrlKey;
+      // Cmd/Ctrl+S — save immediately
+      if (mod && e.key === 's') {
+        e.preventDefault();
+        if (projectId) saveProject();
+      }
+      // Cmd/Ctrl+Z — undo
+      if (mod && !e.shiftKey && e.key === 'z') {
+        e.preventDefault();
+        undo();
+      }
+      // Cmd/Ctrl+Shift+Z or Ctrl+Y — redo
+      if ((mod && e.shiftKey && e.key === 'z') || (e.ctrlKey && e.key === 'y')) {
+        e.preventDefault();
+        redo();
+      }
+      // Escape — close style panel
+      if (e.key === 'Escape') {
+        setSelectedBlockId(null);
+      }
+    }
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [projectId, undo, redo]);
 
   // BroadcastChannel pushes live article updates into the preview iframe (unchanged)
   const channelRef = useRef<BroadcastChannel | null>(null);

@@ -13,10 +13,14 @@ import {
 
 export type SaveStatus = 'idle' | 'saving' | 'saved' | 'error';
 
+const HISTORY_LIMIT = 50;
+
 // ─── Store shape ──────────────────────────────────────────────────────────────
 
 interface BuilderStore {
   article: Article;
+  history: Article[];
+  future: Article[];
   darkMode: boolean;
   saveStatus: SaveStatus;
 
@@ -33,6 +37,10 @@ interface BuilderStore {
   setAnimation: (id: string, animation: AnimationPreset) => void;
   toggleDarkMode: () => void;
 
+  // Undo / redo
+  undo: () => void;
+  redo: () => void;
+
   // Cloud actions
   loadProjects: () => Promise<void>;
   loadProject: (id: string) => Promise<void>;
@@ -48,10 +56,17 @@ function makeBlankArticle(): Article {
   return { id: generateId(), title: '', blocks: [], createdAt: now, updatedAt: now };
 }
 
+/** Push current article onto history, clear future, return new history array. */
+function pushHistory(current: Article, history: Article[]): Article[] {
+  return [...history.slice(-(HISTORY_LIMIT - 1)), current];
+}
+
 // ─── Store ────────────────────────────────────────────────────────────────────
 
 export const useBuilderStore = create<BuilderStore>((set, get) => ({
   article: makeBlankArticle(),
+  history: [],
+  future: [],
   // Persist dark mode preference without the full persist middleware
   darkMode: localStorage.getItem('sl-dark') === 'true',
   saveStatus: 'idle',
@@ -63,11 +78,15 @@ export const useBuilderStore = create<BuilderStore>((set, get) => ({
 
   setTitle: (title) =>
     set((state) => ({
+      history: pushHistory(state.article, state.history),
+      future: [],
       article: { ...state.article, title, updatedAt: new Date().toISOString() },
     })),
 
   addBlock: (block) =>
     set((state) => ({
+      history: pushHistory(state.article, state.history),
+      future: [],
       article: {
         ...state.article,
         blocks: [...state.article.blocks, { ...block, id: generateId() } as Block],
@@ -77,6 +96,8 @@ export const useBuilderStore = create<BuilderStore>((set, get) => ({
 
   updateBlock: (id, updates) =>
     set((state) => ({
+      history: pushHistory(state.article, state.history),
+      future: [],
       article: {
         ...state.article,
         blocks: state.article.blocks.map((b) =>
@@ -88,6 +109,8 @@ export const useBuilderStore = create<BuilderStore>((set, get) => ({
 
   removeBlock: (id) =>
     set((state) => ({
+      history: pushHistory(state.article, state.history),
+      future: [],
       article: {
         ...state.article,
         blocks: state.article.blocks.filter((b) => b.id !== id),
@@ -97,11 +120,15 @@ export const useBuilderStore = create<BuilderStore>((set, get) => ({
 
   reorderBlocks: (blocks) =>
     set((state) => ({
+      history: pushHistory(state.article, state.history),
+      future: [],
       article: { ...state.article, blocks, updatedAt: new Date().toISOString() },
     })),
 
   setAnimation: (id, animation) =>
     set((state) => ({
+      history: pushHistory(state.article, state.history),
+      future: [],
       article: {
         ...state.article,
         blocks: state.article.blocks.map((b) => (b.id === id ? { ...b, animation } : b)),
@@ -114,6 +141,30 @@ export const useBuilderStore = create<BuilderStore>((set, get) => ({
     localStorage.setItem('sl-dark', String(next));
     set({ darkMode: next });
   },
+
+  // ── Undo / redo ───────────────────────────────────────────────────────────
+
+  undo: () =>
+    set((state) => {
+      if (!state.history.length) return state;
+      const prev = state.history[state.history.length - 1];
+      return {
+        history: state.history.slice(0, -1),
+        future: [state.article, ...state.future.slice(0, HISTORY_LIMIT - 1)],
+        article: prev,
+      };
+    }),
+
+  redo: () =>
+    set((state) => {
+      if (!state.future.length) return state;
+      const next = state.future[0];
+      return {
+        history: [...state.history.slice(-(HISTORY_LIMIT - 1)), state.article],
+        future: state.future.slice(1),
+        article: next,
+      };
+    }),
 
   // ── Cloud actions ─────────────────────────────────────────────────────────
 
@@ -128,7 +179,7 @@ export const useBuilderStore = create<BuilderStore>((set, get) => ({
   },
 
   loadProject: async (id) => {
-    set({ saveStatus: 'idle' });
+    set({ saveStatus: 'idle', history: [], future: [] });
     const result = await getProject(id);
     if (result.error) {
       console.error('[loadProject]', result.error);
