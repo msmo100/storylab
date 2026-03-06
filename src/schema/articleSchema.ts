@@ -2,10 +2,18 @@ import { z } from 'zod';
 
 const animationPresetSchema = z.enum(['none', 'fade', 'slide-up', 'slide-left', 'zoom']);
 
+const blockStyleSchema = z.object({
+  textColor: z.string().optional(),
+  accentColor: z.string().optional(),
+  fontFamily: z.string().optional(),
+  fontSize: z.enum(['sm', 'base', 'lg', 'xl', '2xl']).optional(),
+}).optional();
+
 const baseBlockSchema = z.object({
   id: z.string(),
   animation: animationPresetSchema,
   animationDelay: z.number().min(0).optional(),
+  styles: blockStyleSchema,
 });
 
 const textBlockSchema = baseBlockSchema.extend({

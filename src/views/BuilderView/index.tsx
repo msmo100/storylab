@@ -3,6 +3,7 @@ import { useBuilderStore } from '../../store/builderStore';
 import type { SaveStatus } from '../../store/builderStore';
 import { BlockList } from '../../components/builder/BlockList';
 import { AddBlockMenu } from '../../components/builder/AddBlockMenu';
+import { StylePanel } from '../../components/builder/StylePanel';
 import { cn } from '../../utils/cn';
 
 type Device = 'mobile' | 'tablet' | 'desktop';
@@ -18,6 +19,10 @@ export function BuilderView() {
     useBuilderStore();
   const [copied, setCopied] = useState(false);
   const [device, setDevice] = useState<Device>('mobile');
+  const [selectedBlockId, setSelectedBlockId] = useState<string | null>(null);
+
+  // Deselect if the block is removed
+  const selectedBlock = article.blocks.find((b) => b.id === selectedBlockId) ?? null;
 
   // Read projectId from hash: #/edit?id=<id>
   const projectId = new URLSearchParams(
@@ -115,7 +120,7 @@ export function BuilderView() {
 
         {/* Block list */}
         <main className="flex-1 overflow-y-auto px-4 py-4">
-          <BlockList />
+          <BlockList selectedBlockId={selectedBlockId} onSelect={setSelectedBlockId} />
         </main>
 
         {/* Footer */}
@@ -125,7 +130,7 @@ export function BuilderView() {
         </footer>
       </div>
 
-      {/* ── Right: Preview panel ─────────────────────────────────── */}
+      {/* ── Middle: Preview panel ────────────────────────────────── */}
       <div className="flex flex-col flex-1 min-w-0">
 
         {/* Preview toolbar */}
@@ -196,6 +201,14 @@ export function BuilderView() {
           </div>
         )}
       </div>
+
+      {/* ── Right: Style panel (when a block is selected) ─────────── */}
+      {selectedBlock && (
+        <StylePanel
+          block={selectedBlock}
+          onClose={() => setSelectedBlockId(null)}
+        />
+      )}
     </div>
   );
 }

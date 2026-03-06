@@ -59,7 +59,10 @@ export function HeroBlock({ block }: Props) {
         transition={{ duration: 0.9, ease: 'easeOut', delay: 0.15 }}
         className="relative z-10 text-center text-white max-w-3xl px-6"
       >
-        <h1 className="text-5xl md:text-7xl font-bold leading-tight tracking-tight drop-shadow-md">
+        <h1
+          className="text-5xl md:text-7xl font-bold leading-tight tracking-tight drop-shadow-md"
+          style={{ color: block.styles?.accentColor }}
+        >
           {block.heading || 'Hero heading'}
         </h1>
         {block.subheading && (

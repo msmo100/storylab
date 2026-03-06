@@ -9,6 +9,8 @@ import { cn } from '../../utils/cn';
 
 interface Props {
   block: Block;
+  isSelected: boolean;
+  onSelect: () => void;
 }
 
 const BLOCK_LABELS: Record<Block['type'], string> = {
@@ -52,14 +54,14 @@ function blockPreview(block: Block): string {
   return '';
 }
 
-export function BlockCard({ block }: Props) {
+export function BlockCard({ block, isSelected, onSelect }: Props) {
   const { removeBlock } = useBuilderStore();
   const [expanded, setExpanded] = useState(false);
 
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: block.id,
   });
- 
+
   const style: React.CSSProperties = {
     transform: CSS.Transform.toString(transform),
     transition,
@@ -70,8 +72,11 @@ export function BlockCard({ block }: Props) {
       ref={setNodeRef}
       style={style}
       className={cn(
-        'rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-3 shadow-sm select-none',
-        isDragging && 'opacity-40 ring-2 ring-gray-400'
+        'rounded-lg border bg-white dark:bg-gray-800 p-3 shadow-sm select-none',
+        isSelected
+          ? 'border-gray-400 dark:border-gray-500 ring-2 ring-gray-400 dark:ring-gray-500'
+          : 'border-gray-200 dark:border-gray-700',
+        isDragging && 'opacity-40'
       )}
     >
       <div className="flex items-center gap-2">
@@ -94,6 +99,14 @@ export function BlockCard({ block }: Props) {
         <p className="flex-1 truncate text-sm text-gray-500 dark:text-gray-400">{blockPreview(block)}</p>
 
         {/* Actions */}
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={onSelect}
+          aria-pressed={isSelected}
+        >
+          Stil
+        </Button>
         <Button
           variant="ghost"
           size="sm"

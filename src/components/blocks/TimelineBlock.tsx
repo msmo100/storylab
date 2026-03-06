@@ -32,9 +32,7 @@ function Dot({ style }: { style: TimelineDotStyle }) {
         className="absolute left-0 top-1.5 w-6 h-6 flex items-center justify-center"
         aria-hidden="true"
       >
-        <div
-          className="w-3.5 h-3.5 bg-current rotate-45"
-        />
+        <div className="w-3.5 h-3.5 bg-current rotate-45" />
       </div>
     );
   }
@@ -60,13 +58,20 @@ export function TimelineBlock({ block }: Props) {
   }
 
   const lineWidth = block.lineWidth ?? 1;
+  const accentColor = block.styles?.accentColor;
+  const textColor = block.styles?.textColor;
 
   return (
     <div className="relative">
-      {/* Vertical line — translateX(-50%) keeps it centered on the dot column */}
+      {/* Vertical line */}
       <div
-        className="absolute top-2 bottom-2 bg-current opacity-20"
-        style={{ left: '0.75rem', width: `${lineWidth}px`, transform: 'translateX(-50%)' }}
+        className="absolute top-2 bottom-2 opacity-20"
+        style={{
+          left: '0.75rem',
+          width: `${lineWidth}px`,
+          transform: 'translateX(-50%)',
+          backgroundColor: accentColor ?? 'currentColor',
+        }}
         aria-hidden="true"
       />
 
@@ -87,8 +92,16 @@ export function TimelineBlock({ block }: Props) {
             : {};
 
           return (
-            <Tag key={entry.id} className="relative pl-10" {...animProps}>
-              <Dot style={dotStyle} />
+            <Tag
+              key={entry.id}
+              className="relative pl-10"
+              style={{ color: textColor }}
+              {...animProps}
+            >
+              {/* Dot inherits accentColor via `color` on this wrapper */}
+              <div style={{ color: accentColor }}>
+                <Dot style={dotStyle} />
+              </div>
 
               {/* Header: title + time */}
               <div className="flex flex-wrap items-baseline gap-x-3 gap-y-0.5 mb-1">

@@ -121,7 +121,13 @@ export function ScrollMediaBlock({ block }: Props) {
           transition={{ duration: 0.55, ease: [0.25, 0, 0.25, 1] }}
         >
           {text ? (
-            <p className="text-white text-2xl md:text-4xl font-semibold leading-snug drop-shadow-lg">
+            <p
+              className="text-white text-2xl md:text-4xl font-semibold leading-snug drop-shadow-lg"
+              style={{
+                color: block.styles?.textColor,
+                fontFamily: block.styles?.fontFamily,
+              }}
+            >
               {text}
             </p>
           ) : (

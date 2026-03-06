@@ -10,7 +10,12 @@ import { SortableContext, verticalListSortingStrategy, arrayMove } from '@dnd-ki
 import { useBuilderStore } from '../../store/builderStore';
 import { BlockCard } from './BlockCard';
 
-export function BlockList() {
+interface Props {
+  selectedBlockId: string | null;
+  onSelect: (id: string) => void;
+}
+
+export function BlockList({ selectedBlockId, onSelect }: Props) {
   const { article, reorderBlocks } = useBuilderStore();
   const { blocks } = article;
 
@@ -38,7 +43,12 @@ export function BlockList() {
       <SortableContext items={blocks.map((b) => b.id)} strategy={verticalListSortingStrategy}>
         <div className="flex flex-col gap-2">
           {blocks.map((block) => (
-            <BlockCard key={block.id} block={block} />
+            <BlockCard
+              key={block.id}
+              block={block}
+              isSelected={block.id === selectedBlockId}
+              onSelect={() => onSelect(block.id)}
+            />
           ))}
         </div>
       </SortableContext>

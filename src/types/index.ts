@@ -1,5 +1,12 @@
 export type BlockType = 'text' | 'image' | 'video' | 'quote' | 'hero' | 'sticky' | 'scrollmedia' | 'timeline' | 'chat';
 
+export interface BlockStyle {
+  textColor?: string;
+  accentColor?: string;
+  fontFamily?: string;
+  fontSize?: 'sm' | 'base' | 'lg' | 'xl' | '2xl';
+}
+
 export type AnimationPreset = 'none' | 'fade' | 'slide-up' | 'slide-left' | 'zoom';
 
 /** Entrance animation for the sticky text in a ScrollMedia block. */
@@ -13,6 +20,8 @@ export interface BaseBlock {
   animationDelay?: number;
   /** CSS max-width value (e.g. '800px', '60vw'). Undefined = automatic. */
   maxWidth?: string;
+  /** Per-block style overrides. */
+  styles?: BlockStyle;
 }
 
 export interface TextBlock extends BaseBlock {
