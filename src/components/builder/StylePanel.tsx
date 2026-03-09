@@ -1,5 +1,8 @@
+import { useState } from 'react';
 import { useBuilderStore } from '../../store/builderStore';
-import type { Block, BlockStyle } from '../../types';
+import type { Block, BlockStyle, ImageBlock, ScrollMediaBlock } from '../../types';
+import { cn } from '../../utils/cn';
+import { FocalPointModal } from './FocalPointModal';
 
 interface Props {
   block: Block;
@@ -64,9 +67,17 @@ export function StylePanel({ block, onClose }: Props) {
     updateBlock(block.id, { styles: undefined } as Partial<Block>);
   }
 
+  const [focalModalOpen, setFocalModalOpen] = useState(false);
+
   const hasAnyStyle = block.styles && Object.keys(block.styles).length > 0;
   const showAccent = ACCENT_TYPES.includes(block.type);
   const showFontSize = FONTSIZE_TYPES.includes(block.type);
+  const showFocalPoint = block.type === 'image' || block.type === 'video' || block.type === 'scrollmedia';
+
+  const focalSrc =
+    block.type === 'image'       ? (block as ImageBlock).src || undefined :
+    block.type === 'scrollmedia' ? (block as ScrollMediaBlock).images[0]?.src || undefined :
+    undefined;
 
   // fontSize stored as plain number string e.g. "16"
   const rawSize = block.styles?.fontSize ?? '';
@@ -294,6 +305,45 @@ export function StylePanel({ block, onClose }: Props) {
                 ))}
               </select>
             </div>
+
+            {/* Focal point */}
+            {showFocalPoint && (
+              <div>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="text-xs text-gray-500 dark:text-gray-400">Bildutsnitt</label>
+                  {block.styles?.objectPosition && (
+                    <button
+                      onClick={() => update({ objectPosition: undefined })}
+                      className="text-xs text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
+                    >
+                      Återst.
+                    </button>
+                  )}
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setFocalModalOpen(true)}
+                  className={cn(
+                    'w-full py-2 px-3 rounded-lg text-xs font-medium border transition-colors text-left',
+                    block.styles?.objectPosition
+                      ? 'border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-300'
+                      : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-400 dark:text-gray-500 hover:border-gray-300 dark:hover:border-gray-600'
+                  )}
+                >
+                  {block.styles?.objectPosition
+                    ? `Fokus: ${block.styles.objectPosition}`
+                    : '+ Välj fokuspunkt…'}
+                </button>
+                {focalModalOpen && (
+                  <FocalPointModal
+                    src={focalSrc}
+                    value={block.styles?.objectPosition}
+                    onSave={(v) => update({ objectPosition: v })}
+                    onClose={() => setFocalModalOpen(false)}
+                  />
+                )}
+              </div>
+            )}
 
           </div>
         </section>

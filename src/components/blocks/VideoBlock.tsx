@@ -38,6 +38,7 @@ export function VideoBlock({ block }: Props) {
             ? `${block.styles.outlineWidth ?? '2px'} solid ${block.styles.outlineColor}`
             : undefined,
           borderRadius: block.styles?.borderRadius,
+          objectPosition: block.styles?.objectPosition,
         }}
       />
     </div>

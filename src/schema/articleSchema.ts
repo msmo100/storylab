@@ -14,6 +14,7 @@ const blockStyleSchema = z.object({
   outlineColor: z.string().optional(),
   outlineWidth: z.string().optional(),
   borderRadius: z.string().optional(),
+  objectPosition: z.string().optional(),
 }).optional();
 
 const baseBlockSchema = z.object({

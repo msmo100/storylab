@@ -152,12 +152,14 @@ export function ScrollMediaBlock({ block }: Props) {
               loop
               playsInline
               className="absolute inset-0 w-full h-full object-cover"
+              style={{ objectPosition: block.styles?.objectPosition }}
             />
           ) : (
             <img
               src={img.src || PLACEHOLDER}
               alt={img.alt || ''}
               className="absolute inset-0 w-full h-full object-cover"
+              style={{ objectPosition: block.styles?.objectPosition }}
             />
           )
         ) : (
@@ -193,12 +195,14 @@ export function ScrollMediaBlock({ block }: Props) {
                   loop
                   playsInline
                   className="w-full h-full object-cover"
+                  style={{ objectPosition: block.styles?.objectPosition }}
                 />
               ) : (
                 <img
                   src={img.src || PLACEHOLDER}
                   alt={img.alt || ''}
                   className="w-full h-full object-cover"
+                  style={{ objectPosition: block.styles?.objectPosition }}
                 />
               )}
             </motion.div>

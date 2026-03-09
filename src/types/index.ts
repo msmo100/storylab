@@ -19,6 +19,8 @@ export interface BlockStyle {
   outlineWidth?: string;
   /** CSS border-radius value, e.g. "8px". */
   borderRadius?: string;
+  /** CSS object-position value for image/video cropping, e.g. "top center". */
+  objectPosition?: string;
 }
 
 export type AnimationPreset = 'none' | 'fade' | 'slide-up' | 'slide-left' | 'zoom';
