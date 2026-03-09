@@ -310,7 +310,7 @@ export function StylePanel({ block, onClose }: Props) {
             {showFocalPoint && (
               <div>
                 <div className="flex items-center justify-between mb-1">
-                  <label className="text-xs text-gray-500 dark:text-gray-400">Bildutsnitt</label>
+                  <label className="text-xs text-gray-500 dark:text-gray-400">Beskärning</label>
                   {block.styles?.objectPosition && (
                     <button
                       onClick={() => update({ objectPosition: undefined })}

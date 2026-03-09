@@ -55,7 +55,7 @@ export function FocalPointModal({ src, value, onSave, onClose }: Props) {
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 dark:border-gray-800">
           <div>
-            <span className="text-sm font-semibold text-gray-800 dark:text-gray-200">Bildutsnitt</span>
+            <span className="text-sm font-semibold text-gray-800 dark:text-gray-200">Beskärning</span>
             <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">Klicka eller dra för att ange fokuspunkt</p>
           </div>
           <button
