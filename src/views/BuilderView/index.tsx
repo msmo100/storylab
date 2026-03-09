@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useBuilderStore } from '../../store/builderStore';
 import type { SaveStatus } from '../../store/builderStore';
+import { useAuthStore } from '../../store/authStore';
 import { BlockList } from '../../components/builder/BlockList';
 import { AddBlockMenu } from '../../components/builder/AddBlockMenu';
 import { StylePanel } from '../../components/builder/StylePanel';
@@ -8,15 +9,16 @@ import { cn } from '../../utils/cn';
 
 type Device = 'mobile' | 'tablet' | 'desktop';
 
-const DEVICES: { id: Device; label: string; width: number | null; icon: string }[] = [
-  { id: 'mobile',  label: 'Mobil',   width: 390,  icon: '▯' },
-  { id: 'tablet',  label: 'iPad',    width: 768,  icon: '▭' },
-  { id: 'desktop', label: 'Desktop', width: null, icon: '▬' },
+const DEVICES: { id: Device; label: string; width: number | null }[] = [
+  { id: 'mobile',  label: 'Mobil',   width: 390  },
+  { id: 'tablet',  label: 'iPad',    width: 768  },
+  { id: 'desktop', label: 'Desktop', width: null },
 ];
 
 export function BuilderView() {
-  const { article, setTitle, darkMode, toggleDarkMode, loadProject, saveProject, saveStatus, undo, redo } =
+  const { article, setTitle, darkMode, toggleDarkMode, loadProject, saveProject, saveStatus, undo, redo, history, future } =
     useBuilderStore();
+  const { guestMode, exitGuestMode } = useAuthStore();
   const [copied, setCopied] = useState(false);
   const [device, setDevice] = useState<Device>('mobile');
   const [selectedBlockId, setSelectedBlockId] = useState<string | null>(null);
@@ -41,10 +43,10 @@ export function BuilderView() {
   useEffect(() => {
     function onKeyDown(e: KeyboardEvent) {
       const mod = e.metaKey || e.ctrlKey;
-      // Cmd/Ctrl+S — save immediately
+      // Cmd/Ctrl+S — save immediately (skip in guest mode)
       if (mod && e.key === 's') {
         e.preventDefault();
-        if (projectId) saveProject();
+        if (projectId && !guestMode) saveProject();
       }
       // Cmd/Ctrl+Z — undo
       if (mod && !e.shiftKey && e.key === 'z') {
@@ -64,9 +66,9 @@ export function BuilderView() {
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [projectId, undo, redo]);
+  }, [projectId, guestMode, undo, redo]);
 
-  // BroadcastChannel pushes live article updates into the preview iframe (unchanged)
+  // BroadcastChannel pushes live article updates into the preview iframe
   const channelRef = useRef<BroadcastChannel | null>(null);
   useEffect(() => {
     channelRef.current = new BroadcastChannel('gp-storylab-preview');
@@ -80,10 +82,10 @@ export function BuilderView() {
     return () => clearTimeout(id);
   }, [article]);
 
-  // Debounced auto-save to Supabase
+  // Debounced auto-save (skip in guest mode)
   const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   useEffect(() => {
-    if (!projectId) return;
+    if (!projectId || guestMode) return;
     if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
     saveTimerRef.current = setTimeout(() => {
       saveProject();
@@ -92,7 +94,16 @@ export function BuilderView() {
       if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [article]);
+  }, [article, guestMode]);
+
+  function handleBack() {
+    if (guestMode) {
+      exitGuestMode();
+      window.location.hash = '#/auth';
+    } else {
+      window.location.hash = '#/';
+    }
+  }
 
   const previewSrc = window.location.origin + window.location.pathname + '#/render';
   const embedCode = `<iframe src="${previewSrc}" width="100%" height="800" frameborder="0" allow="autoplay" style="border:none;display:block;"></iframe>`;
@@ -106,6 +117,8 @@ export function BuilderView() {
 
   const blockCount = article.blocks.length;
   const activeDevice = DEVICES.find((d) => d.id === device)!;
+  const canUndo = history.length > 0;
+  const canRedo = future.length > 0;
 
   return (
     <div className="flex h-screen overflow-hidden bg-gray-100 dark:bg-gray-950">
@@ -117,19 +130,38 @@ export function BuilderView() {
         <header className="flex-shrink-0 border-b border-gray-200 dark:border-gray-700 px-4 py-3 relative z-20">
           <div className="flex items-center justify-between mb-2.5">
             <div className="flex items-center gap-2">
-              <a
-                href="#/"
+              <button
+                onClick={handleBack}
                 className="text-xs text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
               >
-                ← Tillbaka
-              </a>
+                ← {guestMode ? 'Logga in' : 'Tillbaka'}
+              </button>
               <span className="text-sm font-bold tracking-tight text-gray-900 dark:text-gray-100">GP StoryLab</span>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1">
+              {/* Undo / Redo buttons */}
+              <button
+                onClick={undo}
+                disabled={!canUndo}
+                title="Ångra (⌘Z)"
+                aria-label="Ångra"
+                className="px-1.5 py-1 rounded text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 disabled:opacity-30 disabled:cursor-not-allowed transition-colors text-sm leading-none"
+              >
+                ↩
+              </button>
+              <button
+                onClick={redo}
+                disabled={!canRedo}
+                title="Gör om (⌘⇧Z)"
+                aria-label="Gör om"
+                className="px-1.5 py-1 rounded text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 disabled:opacity-30 disabled:cursor-not-allowed transition-colors text-sm leading-none"
+              >
+                ↪
+              </button>
               <button
                 onClick={toggleDarkMode}
                 title={darkMode ? 'Växla till ljusläge' : 'Växla till mörkt läge'}
-                className="text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors text-base leading-none px-1"
+                className="text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors text-base leading-none px-1 ml-1"
                 aria-label="Växla mörkt läge"
               >
                 {darkMode ? '☀' : '☽'}
@@ -155,7 +187,11 @@ export function BuilderView() {
         {/* Footer */}
         <footer className="flex-shrink-0 border-t border-gray-100 dark:border-gray-700 px-4 py-2.5 flex items-center justify-between text-xs text-gray-400 dark:text-gray-500">
           <span>{blockCount} block</span>
-          <SaveIndicator status={saveStatus} updatedAt={article.updatedAt} />
+          {guestMode ? (
+            <span className="text-amber-500 dark:text-amber-400">Gästläge — sparas ej</span>
+          ) : (
+            <SaveIndicator status={saveStatus} updatedAt={article.updatedAt} />
+          )}
         </footer>
       </div>
 

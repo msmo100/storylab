@@ -5,11 +5,14 @@ import { useBuilderStore } from '../../store/builderStore';
 import type { Block } from '../../types';
 import { Button } from '../ui/Button';
 import { BlockEditor } from './BlockEditor';
+import { ConfirmModal } from '../ui/Modal';
 import { cn } from '../../utils/cn';
 
 interface Props {
   block: Block;
   isSelected: boolean;
+  isFirst: boolean;
+  isLast: boolean;
   onSelect: () => void;
 }
 
@@ -37,26 +40,11 @@ const BLOCK_COLORS: Record<Block['type'], string> = {
   chat: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300',
 };
 
-function blockPreview(block: Block): string {
-  if (block.type === 'text') return block.content || 'Tomt textblock';
-  if (block.type === 'image') return block.src || 'Ingen bild-URL angiven';
-  if (block.type === 'video') return block.src || 'Ingen video-URL angiven';
-  if (block.type === 'quote') return block.text || 'Tomt citat';
-  if (block.type === 'hero') return block.heading || 'Ingen rubrik angiven';
-  if (block.type === 'sticky')
-    return block.overlays.length ? `${block.overlays.length} överlager` : 'Inga överlager';
-  if (block.type === 'scrollmedia')
-    return block.images.length ? `${block.images.length} ${block.images.length === 1 ? 'bild' : 'bilder'} — ${block.textPosition} text` : 'Inga bilder';
-  if (block.type === 'timeline')
-    return block.entries.length ? `${block.entries.length} ${block.entries.length === 1 ? 'händelse' : 'händelser'}` : 'Inga händelser';
-  if (block.type === 'chat')
-    return block.messages.length ? `${block.messages.length} ${block.messages.length === 1 ? 'meddelande' : 'meddelanden'}` : 'Inga meddelanden';
-  return '';
-}
 
-export function BlockCard({ block, isSelected, onSelect }: Props) {
-  const { removeBlock } = useBuilderStore();
+export function BlockCard({ block, isSelected, isFirst, isLast, onSelect }: Props) {
+  const { removeBlock, duplicateBlock, moveBlockUp, moveBlockDown } = useBuilderStore();
   const [expanded, setExpanded] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
 
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: block.id,
@@ -68,65 +56,110 @@ export function BlockCard({ block, isSelected, onSelect }: Props) {
   };
 
   return (
-    <div
-      ref={setNodeRef}
-      style={style}
-      className={cn(
-        'rounded-lg border bg-white dark:bg-gray-800 p-3 shadow-sm select-none',
-        isSelected
-          ? 'border-gray-400 dark:border-gray-500 ring-2 ring-gray-400 dark:ring-gray-500'
-          : 'border-gray-200 dark:border-gray-700',
-        isDragging && 'opacity-40'
-      )}
-    >
-      <div className="flex items-center gap-2">
-        {/* Drag handle */}
-        <button
-          {...attributes}
-          {...listeners}
-          aria-label="Dra för att sortera om"
-          className="cursor-grab active:cursor-grabbing text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 p-1 -ml-1 touch-none"
-        >
-          <DragIcon />
-        </button>
+    <>
+      <div
+        ref={setNodeRef}
+        style={style}
+        className={cn(
+          'rounded-lg border bg-white dark:bg-gray-800 p-3 shadow-sm select-none',
+          isSelected
+            ? 'border-gray-400 dark:border-gray-500 ring-2 ring-gray-400 dark:ring-gray-500'
+            : 'border-gray-200 dark:border-gray-700',
+          isDragging && 'opacity-40'
+        )}
+      >
+        <div className="group/row flex items-center gap-1.5">
+          {/* Drag handle */}
+          <button
+            {...attributes}
+            {...listeners}
+            aria-label="Dra för att sortera om"
+            className="flex-shrink-0 cursor-grab active:cursor-grabbing text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 p-1 -ml-1 touch-none"
+          >
+            <DragIcon />
+          </button>
 
-        {/* Block type badge */}
-        <span className={cn('rounded px-2 py-0.5 text-xs font-semibold', BLOCK_COLORS[block.type])}>
-          {BLOCK_LABELS[block.type]}
-        </span>
+          {/* Block type badge */}
+          <span className={cn('flex-shrink-0 rounded px-2 py-0.5 text-xs font-semibold', BLOCK_COLORS[block.type])}>
+            {BLOCK_LABELS[block.type]}
+          </span>
 
-        {/* Content preview */}
-        <p className="flex-1 truncate text-sm text-gray-500 dark:text-gray-400">{blockPreview(block)}</p>
+          {/* Spacer */}
+          <span className="flex-1" />
 
-        {/* Actions */}
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={onSelect}
-          aria-pressed={isSelected}
-        >
-          Stil
-        </Button>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => setExpanded((v) => !v)}
-          aria-expanded={expanded}
-        >
-          {expanded ? 'Stäng' : 'Redigera'}
-        </Button>
-        <Button
-          variant="danger"
-          size="sm"
-          onClick={() => removeBlock(block.id)}
-          aria-label="Ta bort block"
-        >
-          ✕
-        </Button>
+          {/* Move up / down — hover only */}
+          <button
+            onClick={() => moveBlockUp(block.id)}
+            disabled={isFirst}
+            aria-label="Flytta upp"
+            title="Flytta upp"
+            className="flex-shrink-0 opacity-0 group-hover/row:opacity-100 p-1 rounded text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-0 disabled:cursor-not-allowed transition-opacity text-xs leading-none"
+          >
+            ▲
+          </button>
+          <button
+            onClick={() => moveBlockDown(block.id)}
+            disabled={isLast}
+            aria-label="Flytta ner"
+            title="Flytta ner"
+            className="flex-shrink-0 opacity-0 group-hover/row:opacity-100 p-1 rounded text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-0 disabled:cursor-not-allowed transition-opacity text-xs leading-none"
+          >
+            ▼
+          </button>
+
+          {/* Duplicate — hover only */}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => duplicateBlock(block.id)}
+            aria-label="Duplicera block"
+            title="Duplicera"
+            className="flex-shrink-0 opacity-0 group-hover/row:opacity-100 transition-opacity"
+          >
+            ⎘
+          </Button>
+
+          {/* Style / Edit / Delete — always visible */}
+          <Button className="flex-shrink-0" variant="ghost" size="sm" onClick={onSelect} aria-pressed={isSelected}>
+            Stil
+          </Button>
+          <Button
+            className="flex-shrink-0"
+            variant="ghost"
+            size="sm"
+            onClick={() => setExpanded((v) => !v)}
+            aria-expanded={expanded}
+          >
+            {expanded ? 'Stäng' : 'Redigera'}
+          </Button>
+          <Button
+            className="flex-shrink-0"
+            variant="danger"
+            size="sm"
+            onClick={() => setConfirmDelete(true)}
+            aria-label="Ta bort block"
+          >
+            ✕
+          </Button>
+        </div>
+
+        {expanded && <BlockEditor block={block} />}
       </div>
 
-      {expanded && <BlockEditor block={block} />}
-    </div>
+      <ConfirmModal
+        open={confirmDelete}
+        title="Ta bort block?"
+        message={`${BLOCK_LABELS[block.type]}-blocket tas bort permanent.`}
+        confirmLabel="Ta bort"
+        cancelLabel="Avbryt"
+        danger
+        onConfirm={() => {
+          removeBlock(block.id);
+          setConfirmDelete(false);
+        }}
+        onCancel={() => setConfirmDelete(false)}
+      />
+    </>
   );
 }
 

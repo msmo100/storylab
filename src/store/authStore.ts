@@ -10,9 +10,13 @@ interface AuthStore {
   error: string | null;
   /** True when signup succeeded but email confirmation is required before login. */
   pendingConfirmation: boolean;
+  /** True when the user chose to use the app without logging in. */
+  guestMode: boolean;
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
+  enterGuestMode: () => void;
+  exitGuestMode: () => void;
   /** Call once in main.tsx. Returns an unsubscribe function. */
   _initialize: () => () => void;
 }
@@ -23,6 +27,7 @@ export const useAuthStore = create<AuthStore>((set) => ({
   loading: true,
   error: null,
   pendingConfirmation: false,
+  guestMode: false,
 
   signIn: async (email, password) => {
     set({ error: null, pendingConfirmation: false });
@@ -49,9 +54,14 @@ export const useAuthStore = create<AuthStore>((set) => ({
     // onAuthStateChange fires and sets user/session to null
   },
 
+  enterGuestMode: () => set({ guestMode: true }),
+
+  exitGuestMode: () => set({ guestMode: false }),
+
   _initialize: () => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      set({ session, user: session?.user ?? null, loading: false });
+      // When a real auth event fires, clear guest mode
+      set({ session, user: session?.user ?? null, loading: false, guestMode: false });
     });
     return () => subscription.unsubscribe();
   },

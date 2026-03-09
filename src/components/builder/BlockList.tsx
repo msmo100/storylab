@@ -42,11 +42,13 @@ export function BlockList({ selectedBlockId, onSelect }: Props) {
     <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
       <SortableContext items={blocks.map((b) => b.id)} strategy={verticalListSortingStrategy}>
         <div className="flex flex-col gap-2">
-          {blocks.map((block) => (
+          {blocks.map((block, index) => (
             <BlockCard
               key={block.id}
               block={block}
               isSelected={block.id === selectedBlockId}
+              isFirst={index === 0}
+              isLast={index === blocks.length - 1}
               onSelect={() => onSelect(block.id)}
             />
           ))}

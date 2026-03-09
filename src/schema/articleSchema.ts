@@ -5,14 +5,18 @@ const animationPresetSchema = z.enum(['none', 'fade', 'slide-up', 'slide-left', 
 const blockStyleSchema = z.object({
   textColor: z.string().optional(),
   accentColor: z.string().optional(),
+  backgroundColor: z.string().optional(),
   fontFamily: z.string().optional(),
   fontSize: z.string().optional(),
+  lineHeight: z.string().optional(),
+  letterSpacing: z.string().optional(),
 }).optional();
 
 const baseBlockSchema = z.object({
   id: z.string(),
   animation: animationPresetSchema,
   animationDelay: z.number().min(0).optional(),
+  maxWidth: z.string().optional(),
   styles: blockStyleSchema,
 });
 

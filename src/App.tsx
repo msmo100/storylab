@@ -5,6 +5,7 @@ import { AuthView } from './views/AuthView';
 import { DashboardView } from './views/DashboardView';
 import { BuilderView } from './views/BuilderView';
 import { RenderView } from './views/RenderView';
+import { ToastContainer } from './components/ui/Toast';
 
 type View = 'auth' | 'dashboard' | 'builder' | 'render';
 
@@ -19,7 +20,7 @@ function getView(): View {
 function App() {
   const [view, setView] = useState<View>(getView);
   const darkMode = useBuilderStore((s) => s.darkMode);
-  const { user, loading } = useAuthStore();
+  const { user, loading, guestMode } = useAuthStore();
 
   // Hash change listener
   useEffect(() => {
@@ -33,9 +34,9 @@ function App() {
     document.documentElement.classList.toggle('dark', darkMode);
   }, [darkMode]);
 
-  // Auth guards: run once auth state is known
+  // Auth guards: run once auth state is known (skip for guest mode)
   useEffect(() => {
-    if (loading) return;
+    if (loading || guestMode) return;
 
     if (!user && view !== 'auth' && view !== 'render') {
       window.location.hash = '#/auth';
@@ -44,7 +45,7 @@ function App() {
     if (user && view === 'auth') {
       window.location.hash = '#/';
     }
-  }, [user, loading, view]);
+  }, [user, loading, guestMode, view]);
 
   // Spinner while the initial Supabase session resolves
   if (loading) {
@@ -58,11 +59,25 @@ function App() {
   // Render view is public — used inside CMS iframes with no auth context
   if (view === 'render') return <RenderView />;
 
+  // Guest mode: skip auth and go straight to a blank builder
+  if (guestMode) {
+    return (
+      <>
+        <BuilderView />
+        <ToastContainer />
+      </>
+    );
+  }
+
   // All other views require a logged-in user
   if (!user) return <AuthView />;
 
-  if (view === 'builder') return <BuilderView />;
-  return <DashboardView />;
+  return (
+    <>
+      {view === 'builder' ? <BuilderView /> : <DashboardView />}
+      <ToastContainer />
+    </>
+  );
 }
 
 export default App;

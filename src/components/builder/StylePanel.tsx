@@ -25,6 +25,9 @@ const FONTS: { value: string; label: string }[] = [
 
 const PRESET_SIZES = [10, 11, 12, 13, 14, 15, 16, 18, 20, 22, 24, 28, 32, 36, 42, 48, 56, 64, 72, 96];
 
+const LINE_HEIGHTS = ['1', '1.2', '1.3', '1.4', '1.5', '1.6', '1.75', '2'];
+const LETTER_SPACINGS = ['-0.05', '-0.02', '0', '0.02', '0.05', '0.1', '0.15', '0.2'];
+
 const INPUT_CLASS = 'text-sm rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-gray-400';
 
 export function StylePanel({ block, onClose }: Props) {
@@ -38,6 +41,11 @@ export function StylePanel({ block, onClose }: Props) {
     updateBlock(block.id, { styles: Object.keys(cleaned).length ? cleaned : undefined } as Partial<Block>);
   }
 
+  function resetAll() {
+    updateBlock(block.id, { styles: undefined } as Partial<Block>);
+  }
+
+  const hasAnyStyle = block.styles && Object.keys(block.styles).length > 0;
   const showAccent = ACCENT_TYPES.includes(block.type);
   const showFontSize = FONTSIZE_TYPES.includes(block.type);
 
@@ -51,13 +59,24 @@ export function StylePanel({ block, onClose }: Props) {
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-gray-700 flex-shrink-0">
         <span className="text-sm font-semibold text-gray-800 dark:text-gray-200">Stil</span>
-        <button
-          onClick={onClose}
-          className="text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors text-base leading-none px-1"
-          aria-label="Stäng stilpanel"
-        >
-          ✕
-        </button>
+        <div className="flex items-center gap-2">
+          {hasAnyStyle && (
+            <button
+              onClick={resetAll}
+              className="text-xs text-gray-400 dark:text-gray-500 hover:text-red-500 dark:hover:text-red-400 transition-colors"
+              title="Återställ alla stilar"
+            >
+              Återställ alla
+            </button>
+          )}
+          <button
+            onClick={onClose}
+            className="text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors text-base leading-none px-1"
+            aria-label="Stäng stilpanel"
+          >
+            ✕
+          </button>
+        </div>
       </div>
 
       <div className="flex flex-col gap-6 px-4 py-4">
@@ -73,6 +92,12 @@ export function StylePanel({ block, onClose }: Props) {
               value={block.styles?.textColor}
               onChange={(v) => update({ textColor: v || undefined })}
               onReset={() => update({ textColor: undefined })}
+            />
+            <ColorRow
+              label="Bakgrundsfärg"
+              value={block.styles?.backgroundColor}
+              onChange={(v) => update({ backgroundColor: v || undefined })}
+              onReset={() => update({ backgroundColor: undefined })}
             />
             {showAccent && (
               <ColorRow
@@ -113,7 +138,6 @@ export function StylePanel({ block, onClose }: Props) {
               <div>
                 <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">Storlek</label>
                 <div className="flex gap-2">
-                  {/* Preset dropdown */}
                   <select
                     value={isPreset ? String(numericSize) : ''}
                     onChange={(e) => update({ fontSize: e.target.value || undefined })}
@@ -124,7 +148,6 @@ export function StylePanel({ block, onClose }: Props) {
                       <option key={s} value={String(s)}>{s} px</option>
                     ))}
                   </select>
-                  {/* Custom number input */}
                   <input
                     type="number"
                     min={6}
@@ -137,6 +160,36 @@ export function StylePanel({ block, onClose }: Props) {
                 </div>
               </div>
             )}
+
+            {/* Line height */}
+            <div>
+              <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">Radavstånd</label>
+              <select
+                value={block.styles?.lineHeight ?? ''}
+                onChange={(e) => update({ lineHeight: e.target.value || undefined })}
+                className={`w-full ${INPUT_CLASS}`}
+              >
+                <option value="">Standard</option>
+                {LINE_HEIGHTS.map((v) => (
+                  <option key={v} value={v}>{v}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Letter spacing */}
+            <div>
+              <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">Teckenavstånd</label>
+              <select
+                value={block.styles?.letterSpacing ?? ''}
+                onChange={(e) => update({ letterSpacing: e.target.value || undefined })}
+                className={`w-full ${INPUT_CLASS}`}
+              >
+                <option value="">Standard</option>
+                {LETTER_SPACINGS.map((v) => (
+                  <option key={v} value={v}>{v === '0' ? '0 (normal)' : `${v} em`}</option>
+                ))}
+              </select>
+            </div>
 
           </div>
         </section>
@@ -156,13 +209,28 @@ function ColorRow({ label, value, onChange, onReset }: ColorRowProps) {
   return (
     <div className="flex items-center gap-2">
       <label className="flex-1 text-xs text-gray-500 dark:text-gray-400">{label}</label>
-      <input
-        type="color"
-        value={value ?? '#000000'}
-        onChange={(e) => onChange(e.target.value)}
-        className="w-8 h-8 rounded cursor-pointer border border-gray-200 dark:border-gray-700 bg-transparent p-0.5"
-        title={label}
-      />
+      <div className="relative">
+        <input
+          type="color"
+          value={value ?? '#ffffff'}
+          onChange={(e) => onChange(e.target.value)}
+          className="w-8 h-8 rounded cursor-pointer border border-gray-200 dark:border-gray-700 bg-transparent p-0.5"
+          title={label}
+        />
+        {/* Checkerboard overlay when no value is set */}
+        {!value && (
+          <div
+            className="absolute inset-0.5 rounded pointer-events-none"
+            style={{
+              backgroundImage:
+                'linear-gradient(45deg, #ccc 25%, transparent 25%), linear-gradient(-45deg, #ccc 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #ccc 75%), linear-gradient(-45deg, transparent 75%, #ccc 75%)',
+              backgroundSize: '6px 6px',
+              backgroundPosition: '0 0, 0 3px, 3px -3px, -3px 0px',
+              opacity: 0.6,
+            }}
+          />
+        )}
+      </div>
       {value && (
         <button
           onClick={onReset}

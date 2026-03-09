@@ -113,7 +113,7 @@ export function StickyBlock({ block }: Props) {
         <div className="absolute inset-0">
           {overlays.length === 0 ? (
             <div className="absolute inset-0 flex items-center justify-center">
-              <p className="text-white/40 text-base">No overlays added yet</p>
+              <p className="text-white/40 text-base">Inga överlager tillagda</p>
             </div>
           ) : (
             overlays.map((text, i) => (

@@ -1,13 +1,5 @@
 import type { QuoteBlock as QuoteBlockType } from '../../types';
-
-const LEGACY_PX: Record<string, string> = {
-  sm: '14px', base: '16px', lg: '18px', xl: '20px', '2xl': '24px',
-};
-
-function resolveFontSize(s?: string): string | undefined {
-  if (!s) return undefined;
-  return LEGACY_PX[s] ?? `${s}px`;
-}
+import { resolveFontSize } from '../../utils/resolveFontSize';
 
 interface Props {
   block: QuoteBlockType;
@@ -23,8 +15,11 @@ export function QuoteBlock({ block }: Props) {
         className="font-serif italic"
         style={{
           color: block.styles?.textColor,
+          backgroundColor: block.styles?.backgroundColor,
           fontFamily: block.styles?.fontFamily,
           fontSize: resolveFontSize(block.styles?.fontSize) ?? '1.5rem',
+          lineHeight: block.styles?.lineHeight,
+          letterSpacing: block.styles?.letterSpacing ? `${block.styles.letterSpacing}em` : undefined,
         }}
       >
         {block.text}

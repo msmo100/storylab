@@ -32,6 +32,7 @@ function rowToSummary(row: any): ProjectSummary {
     title: row.title,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
+    blockCount: Array.isArray(row.blocks) ? row.blocks.length : undefined,
   };
 }
 
@@ -41,7 +42,7 @@ function rowToSummary(row: any): ProjectSummary {
 export async function listProjects(): Promise<ServiceResult<ProjectSummary[]>> {
   const { data, error } = await supabase
     .from('articles')
-    .select('id, title, created_at, updated_at')
+    .select('id, title, created_at, updated_at, blocks')
     .order('updated_at', { ascending: false });
 
   if (error) return { data: null, error: error.message };

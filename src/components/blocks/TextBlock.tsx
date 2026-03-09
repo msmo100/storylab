@@ -1,14 +1,5 @@
 import type { TextBlock as TextBlockType } from '../../types';
-
-// Backwards-compat: old enum values stored before the px migration
-const LEGACY_PX: Record<string, string> = {
-  sm: '14px', base: '16px', lg: '18px', xl: '20px', '2xl': '24px',
-};
-
-function resolveFontSize(s?: string): string | undefined {
-  if (!s) return undefined;
-  return LEGACY_PX[s] ?? `${s}px`;
-}
+import { resolveFontSize } from '../../utils/resolveFontSize';
 
 interface Props {
   block: TextBlockType;
@@ -20,8 +11,11 @@ export function TextBlock({ block }: Props) {
       <p
         style={{
           color: block.styles?.textColor,
+          backgroundColor: block.styles?.backgroundColor,
           fontFamily: block.styles?.fontFamily,
           fontSize: resolveFontSize(block.styles?.fontSize),
+          lineHeight: block.styles?.lineHeight,
+          letterSpacing: block.styles?.letterSpacing ? `${block.styles.letterSpacing}em` : undefined,
         }}
       >
         {block.content}

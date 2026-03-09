@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import type { Article, Block, BlockWithoutId, AnimationPreset, ProjectSummary } from '../types';
 import { generateId } from '../utils/generateId';
+import { toast } from './toastStore';
 import {
   listProjects,
   getProject,
@@ -28,11 +29,14 @@ interface BuilderStore {
   projectsLoading: boolean;
   projectsError: string | null;
 
-  // Editor actions — identical signatures to before
+  // Editor actions
   setTitle: (title: string) => void;
   addBlock: (block: BlockWithoutId) => void;
   updateBlock: (id: string, updates: Partial<Block>) => void;
   removeBlock: (id: string) => void;
+  duplicateBlock: (id: string) => void;
+  moveBlockUp: (id: string) => void;
+  moveBlockDown: (id: string) => void;
   reorderBlocks: (blocks: Block[]) => void;
   setAnimation: (id: string, animation: AnimationPreset) => void;
   toggleDarkMode: () => void;
@@ -47,6 +51,10 @@ interface BuilderStore {
   saveProject: () => Promise<void>;
   createNewProject: (title: string) => Promise<Article | null>;
   removeProject: (id: string) => Promise<void>;
+  renameProject: (id: string, newTitle: string) => Promise<void>;
+
+  // Guest mode
+  startGuestSession: () => void;
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -117,6 +125,48 @@ export const useBuilderStore = create<BuilderStore>((set, get) => ({
         updatedAt: new Date().toISOString(),
       },
     })),
+
+  duplicateBlock: (id) =>
+    set((state) => {
+      const idx = state.article.blocks.findIndex((b) => b.id === id);
+      if (idx === -1) return state;
+      const copy: Block = { ...state.article.blocks[idx], id: generateId() };
+      const next = [...state.article.blocks];
+      next.splice(idx + 1, 0, copy);
+      return {
+        history: pushHistory(state.article, state.history),
+        future: [],
+        article: { ...state.article, blocks: next, updatedAt: new Date().toISOString() },
+      };
+    }),
+
+  moveBlockUp: (id) =>
+    set((state) => {
+      const blocks = state.article.blocks;
+      const idx = blocks.findIndex((b) => b.id === id);
+      if (idx <= 0) return state;
+      const next = [...blocks];
+      [next[idx - 1], next[idx]] = [next[idx], next[idx - 1]];
+      return {
+        history: pushHistory(state.article, state.history),
+        future: [],
+        article: { ...state.article, blocks: next, updatedAt: new Date().toISOString() },
+      };
+    }),
+
+  moveBlockDown: (id) =>
+    set((state) => {
+      const blocks = state.article.blocks;
+      const idx = blocks.findIndex((b) => b.id === id);
+      if (idx === -1 || idx >= blocks.length - 1) return state;
+      const next = [...blocks];
+      [next[idx], next[idx + 1]] = [next[idx + 1], next[idx]];
+      return {
+        history: pushHistory(state.article, state.history),
+        future: [],
+        article: { ...state.article, blocks: next, updatedAt: new Date().toISOString() },
+      };
+    }),
 
   reorderBlocks: (blocks) =>
     set((state) => ({
@@ -197,6 +247,7 @@ export const useBuilderStore = create<BuilderStore>((set, get) => ({
     });
     if (result.error) {
       set({ saveStatus: 'error' });
+      toast.error('Kunde inte spara projektet');
     } else {
       set({ article: result.data!, saveStatus: 'saved' });
     }
@@ -206,6 +257,7 @@ export const useBuilderStore = create<BuilderStore>((set, get) => ({
     const result = await createProject(title);
     if (result.error) {
       console.error('[createNewProject]', result.error);
+      toast.error('Kunde inte skapa projektet');
       return null;
     }
     const summary: ProjectSummary = {
@@ -213,6 +265,7 @@ export const useBuilderStore = create<BuilderStore>((set, get) => ({
       title: result.data!.title,
       createdAt: result.data!.createdAt,
       updatedAt: result.data!.updatedAt,
+      blockCount: 0,
     };
     set((state) => ({ projects: [summary, ...state.projects] }));
     return result.data!;
@@ -223,8 +276,29 @@ export const useBuilderStore = create<BuilderStore>((set, get) => ({
     set((state) => ({ projects: state.projects.filter((p) => p.id !== id) }));
     const result = await deleteProject(id);
     if (result.error) {
-      // Roll back
-      get().loadProjects();
+      toast.error('Kunde inte ta bort projektet');
+      get().loadProjects(); // roll back
+    } else {
+      toast.success('Projekt borttaget');
     }
   },
+
+  renameProject: async (id, newTitle) => {
+    // Optimistic update
+    set((state) => ({
+      projects: state.projects.map((p) =>
+        p.id === id ? { ...p, title: newTitle } : p
+      ),
+    }));
+    const result = await updateProject(id, { title: newTitle });
+    if (result.error) {
+      toast.error('Kunde inte byta namn');
+      get().loadProjects(); // roll back
+    }
+  },
+
+  // ── Guest mode ────────────────────────────────────────────────────────────
+
+  startGuestSession: () =>
+    set({ article: makeBlankArticle(), history: [], future: [], saveStatus: 'idle' }),
 }));

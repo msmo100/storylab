@@ -3,9 +3,14 @@ export type BlockType = 'text' | 'image' | 'video' | 'quote' | 'hero' | 'sticky'
 export interface BlockStyle {
   textColor?: string;
   accentColor?: string;
+  backgroundColor?: string;
   fontFamily?: string;
   /** Font size as a numeric string in px, e.g. "16". */
   fontSize?: string;
+  /** Line height as a unitless string, e.g. "1.5". */
+  lineHeight?: string;
+  /** Letter spacing in em, e.g. "0.05". */
+  letterSpacing?: string;
 }
 
 export type AnimationPreset = 'none' | 'fade' | 'slide-up' | 'slide-left' | 'zoom';
@@ -171,4 +176,5 @@ export interface ProjectSummary {
   title: string;
   createdAt: string;
   updatedAt: string;
+  blockCount?: number;
 }

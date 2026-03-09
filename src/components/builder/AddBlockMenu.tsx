@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { useBuilderStore } from '../../store/builderStore';
 import type { BlockWithoutId } from '../../types';
 import { Button } from '../ui/Button';
@@ -102,38 +102,96 @@ const BLOCK_OPTIONS: BlockOption[] = [
 export function AddBlockMenu() {
   const { addBlock } = useBuilderStore();
   const [open, setOpen] = useState(false);
+  const [focusedIndex, setFocusedIndex] = useState(-1);
   const menuRef = useRef<HTMLDivElement>(null);
+  const itemRefs = useRef<(HTMLButtonElement | null)[]>([]);
+
+  const close = useCallback(() => {
+    setOpen(false);
+    setFocusedIndex(-1);
+  }, []);
 
   // Close on outside click
   useEffect(() => {
     if (!open) return;
     const handler = (e: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
-        setOpen(false);
+        close();
       }
     };
     document.addEventListener('mousedown', handler);
     return () => document.removeEventListener('mousedown', handler);
+  }, [open, close]);
+
+  // Keyboard navigation
+  useEffect(() => {
+    if (!open) return;
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        close();
+        return;
+      }
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        setFocusedIndex((i) => {
+          const next = Math.min(i + 1, BLOCK_OPTIONS.length - 1);
+          itemRefs.current[next]?.focus();
+          return next;
+        });
+      }
+      if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        setFocusedIndex((i) => {
+          const next = Math.max(i - 1, 0);
+          itemRefs.current[next]?.focus();
+          return next;
+        });
+      }
+    };
+    document.addEventListener('keydown', handler);
+    return () => document.removeEventListener('keydown', handler);
+  }, [open, close]);
+
+  // Focus first item when opened
+  useEffect(() => {
+    if (open) {
+      setTimeout(() => {
+        itemRefs.current[0]?.focus();
+        setFocusedIndex(0);
+      }, 0);
+    }
   }, [open]);
 
   function handleAdd(option: BlockOption) {
     addBlock(option.defaultBlock);
-    setOpen(false);
+    close();
   }
 
   return (
     <div ref={menuRef} className="relative">
-      <Button variant="primary" onClick={() => setOpen((v) => !v)}>
-        <span aria-hidden="true">+</span> Lägg till block
+      <Button
+        variant="primary"
+        onClick={() => setOpen((v) => !v)}
+        aria-haspopup="listbox"
+        aria-expanded={open}
+      >
+        + Block
       </Button>
 
       {open && (
-        <div className="absolute left-0 top-full mt-2 z-20 w-64 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-2 shadow-lg">
-          {BLOCK_OPTIONS.map((opt) => (
+        <div
+          role="listbox"
+          aria-label="Välj blocktyp"
+          className="absolute left-0 top-full mt-2 z-20 w-64 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-2 shadow-lg"
+        >
+          {BLOCK_OPTIONS.map((opt, i) => (
             <button
               key={opt.label}
+              ref={(el) => { itemRefs.current[i] = el; }}
+              role="option"
+              aria-selected={focusedIndex === i}
               onClick={() => handleAdd(opt)}
-              className="flex w-full items-start gap-3 rounded-lg p-2.5 text-left hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+              className="flex w-full items-start gap-3 rounded-lg p-2.5 text-left hover:bg-gray-50 dark:hover:bg-gray-700 focus:bg-gray-50 dark:focus:bg-gray-700 focus:outline-none transition-colors"
             >
               <span className="mt-0.5 text-lg leading-none w-5 text-center">{opt.emoji}</span>
               <span>

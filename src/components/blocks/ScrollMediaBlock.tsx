@@ -131,7 +131,7 @@ export function ScrollMediaBlock({ block }: Props) {
               {text}
             </p>
           ) : (
-            <p className="text-white/40 text-base italic">No text added yet</p>
+            <p className="text-white/40 text-base italic">Ingen text tillagd</p>
           )}
         </motion.div>
       </motion.div>
@@ -162,7 +162,7 @@ export function ScrollMediaBlock({ block }: Props) {
           )
         ) : (
           <div className="absolute inset-0 bg-gray-900 flex items-center justify-center">
-            <p className="text-white/40 text-base">No images added yet</p>
+            <p className="text-white/40 text-base">Inga bilder tillagda</p>
           </div>
         )}
         <div className="absolute inset-0 bg-black/45 z-[1] pointer-events-none" />
