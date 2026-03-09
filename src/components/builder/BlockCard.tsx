@@ -5,7 +5,6 @@ import { useBuilderStore } from '../../store/builderStore';
 import type { Block } from '../../types';
 import { Button } from '../ui/Button';
 import { BlockEditor } from './BlockEditor';
-import { ConfirmModal } from '../ui/Modal';
 import { cn } from '../../utils/cn';
 
 interface Props {
@@ -44,7 +43,6 @@ const BLOCK_COLORS: Record<Block['type'], string> = {
 export function BlockCard({ block, isSelected, isFirst, isLast, onSelect }: Props) {
   const { removeBlock, duplicateBlock, moveBlockUp, moveBlockDown } = useBuilderStore();
   const [expanded, setExpanded] = useState(false);
-  const [confirmDelete, setConfirmDelete] = useState(false);
 
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: block.id,
@@ -136,7 +134,7 @@ export function BlockCard({ block, isSelected, isFirst, isLast, onSelect }: Prop
             className="flex-shrink-0"
             variant="danger"
             size="sm"
-            onClick={() => setConfirmDelete(true)}
+            onClick={() => removeBlock(block.id)}
             aria-label="Ta bort block"
           >
             ✕
@@ -146,19 +144,6 @@ export function BlockCard({ block, isSelected, isFirst, isLast, onSelect }: Prop
         {expanded && <BlockEditor block={block} />}
       </div>
 
-      <ConfirmModal
-        open={confirmDelete}
-        title="Ta bort block?"
-        message={`${BLOCK_LABELS[block.type]}-blocket tas bort permanent.`}
-        confirmLabel="Ta bort"
-        cancelLabel="Avbryt"
-        danger
-        onConfirm={() => {
-          removeBlock(block.id);
-          setConfirmDelete(false);
-        }}
-        onCancel={() => setConfirmDelete(false)}
-      />
     </>
   );
 }
