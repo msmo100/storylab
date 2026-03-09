@@ -23,7 +23,7 @@ const BLOCK_LABELS: Record<Block['type'], string> = {
   quote: 'Citat',
   hero: 'Hero',
   sticky: 'Klistrad',
-  scrollmedia: 'Scrollmedia',
+  scrollmedia: 'Scroll',
   timeline: 'Tidslinje',
   chat: 'Chatt',
 };
