@@ -25,6 +25,7 @@ const BLOCK_LABELS: Record<Block['type'], string> = {
   scrollmedia: 'Scroll',
   timeline: 'Tidslinje',
   chat: 'Chatt',
+  carousel: 'Karusell',
 };
 
 const BLOCK_COLORS: Record<Block['type'], string> = {
@@ -37,6 +38,7 @@ const BLOCK_COLORS: Record<Block['type'], string> = {
   scrollmedia: 'bg-orange-100 text-orange-800 dark:bg-orange-900/40 dark:text-orange-300',
   timeline: 'bg-cyan-100 text-cyan-800 dark:bg-cyan-900/40 dark:text-cyan-300',
   chat: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300',
+  carousel: 'bg-pink-100 text-pink-800 dark:bg-pink-900/40 dark:text-pink-300',
 };
 
 

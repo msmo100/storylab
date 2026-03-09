@@ -23,6 +23,14 @@ export function VideoBlock({ block }: Props) {
     }
   }, [isIntersecting]);
 
+  const decorStyle = {
+    boxShadow: block.styles?.boxShadow,
+    outline: block.styles?.outlineColor
+      ? `${block.styles.outlineWidth ?? '2px'} solid ${block.styles.outlineColor}`
+      : undefined,
+    borderRadius: block.styles?.borderRadius,
+  };
+
   return (
     <div ref={wrapperRef}>
       <video
@@ -33,11 +41,7 @@ export function VideoBlock({ block }: Props) {
         playsInline
         className="w-full object-cover"
         style={{
-          boxShadow: block.styles?.boxShadow,
-          outline: block.styles?.outlineColor
-            ? `${block.styles.outlineWidth ?? '2px'} solid ${block.styles.outlineColor}`
-            : undefined,
-          borderRadius: block.styles?.borderRadius,
+          ...decorStyle,
           objectPosition: block.styles?.objectPosition,
         }}
       />

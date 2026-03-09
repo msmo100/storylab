@@ -119,6 +119,18 @@ const chatBlockSchema = baseBlockSchema.extend({
   messages: z.array(chatMessageSchema),
 });
 
+const carouselItemSchema = z.object({
+  id: z.string(),
+  src: z.string(),
+  poster: z.string().optional(),
+  caption: z.string().optional(),
+});
+
+const carouselBlockSchema = baseBlockSchema.extend({
+  type: z.literal('carousel'),
+  items: z.array(carouselItemSchema),
+});
+
 export const blockSchema = z.discriminatedUnion('type', [
   textBlockSchema,
   imageBlockSchema,
@@ -129,6 +141,7 @@ export const blockSchema = z.discriminatedUnion('type', [
   scrollMediaBlockSchema,
   timelineBlockSchema,
   chatBlockSchema,
+  carouselBlockSchema,
 ]);
 
 export const articleSchema = z.object({

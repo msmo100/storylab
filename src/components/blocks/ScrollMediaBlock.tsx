@@ -36,6 +36,14 @@ export function ScrollMediaBlock({ block }: Props) {
   });
 
   const { text, textPosition, textEntrance, mediaType, images } = block;
+
+  const decorationStyle = {
+    boxShadow: block.styles?.boxShadow,
+    outline: block.styles?.outlineColor
+      ? `${block.styles.outlineWidth ?? '2px'} solid ${block.styles.outlineColor}`
+      : undefined,
+    borderRadius: block.styles?.borderRadius,
+  };
   const n = images.length;
 
   // Per-image scroll durations (in viewport-height units, default 1 each).
@@ -120,12 +128,23 @@ export function ScrollMediaBlock({ block }: Props) {
           animate={hasEntered ? entranceVisible : entranceHidden}
           transition={{ duration: 0.55, ease: [0.25, 0, 0.25, 1] }}
         >
+          {block.styles?.accentColor && (
+            <div
+              className="mb-3 h-1 w-10 rounded-full"
+              style={{ background: block.styles.accentColor }}
+            />
+          )}
           {text ? (
             <p
               className="text-white text-2xl md:text-4xl font-semibold leading-snug drop-shadow-lg"
               style={{
                 color: block.styles?.textColor,
                 fontFamily: block.styles?.fontFamily,
+                lineHeight: block.styles?.lineHeight,
+                letterSpacing: block.styles?.letterSpacing ? `${block.styles.letterSpacing}em` : undefined,
+                backgroundColor: block.styles?.backgroundColor,
+                padding: block.styles?.backgroundColor ? '0.5em 0.75em' : undefined,
+                borderRadius: block.styles?.backgroundColor ? '4px' : undefined,
               }}
             >
               {text}
@@ -142,32 +161,35 @@ export function ScrollMediaBlock({ block }: Props) {
   if (n <= 1) {
     const img = images[0];
     return (
-      <div ref={stickyRef} className="relative h-screen overflow-hidden">
-        {img ? (
-          mediaType === 'video' ? (
-            <video
-              ref={(el) => { videoRefs.current[0] = el; }}
-              src={img.src}
-              muted
-              loop
-              playsInline
-              className="absolute inset-0 w-full h-full object-cover"
-              style={{ objectPosition: block.styles?.objectPosition }}
-            />
+      <div ref={stickyRef} className="relative h-screen" style={decorationStyle}>
+        {/* Inner wrapper clips images to border-radius without clipping shadow/outline */}
+        <div className="absolute inset-0 overflow-hidden" style={{ borderRadius: block.styles?.borderRadius }}>
+          {img ? (
+            mediaType === 'video' ? (
+              <video
+                ref={(el) => { videoRefs.current[0] = el; }}
+                src={img.src}
+                muted
+                loop
+                playsInline
+                className="absolute inset-0 w-full h-full object-cover"
+                style={{ objectPosition: block.styles?.objectPosition }}
+              />
+            ) : (
+              <img
+                src={img.src || PLACEHOLDER}
+                alt={img.alt || ''}
+                className="absolute inset-0 w-full h-full object-cover"
+                style={{ objectPosition: block.styles?.objectPosition }}
+              />
+            )
           ) : (
-            <img
-              src={img.src || PLACEHOLDER}
-              alt={img.alt || ''}
-              className="absolute inset-0 w-full h-full object-cover"
-              style={{ objectPosition: block.styles?.objectPosition }}
-            />
-          )
-        ) : (
-          <div className="absolute inset-0 bg-gray-900 flex items-center justify-center">
-            <p className="text-white/40 text-base">Inga bilder tillagda</p>
-          </div>
-        )}
-        <div className="absolute inset-0 bg-black/45 z-[1] pointer-events-none" />
+            <div className="absolute inset-0 bg-gray-900 flex items-center justify-center">
+              <p className="text-white/40 text-base">Inga bilder tillagda</p>
+            </div>
+          )}
+          <div className="absolute inset-0 bg-black/45 z-[1] pointer-events-none" />
+        </div>
         {textOverlay}
       </div>
     );
@@ -176,41 +198,44 @@ export function ScrollMediaBlock({ block }: Props) {
   // ── 2+ images: sticky scroll with crossfade ─────────────────────────────────
   return (
     <div ref={containerRef} style={{ height: `${totalVh * 100}vh` }}>
-      <div ref={stickyRef} className="sticky top-0 h-screen overflow-hidden">
-        {/* Images stacked — crossfade as activeIndex changes */}
-        <div className="absolute inset-0">
-          {images.map((img, i) => (
-            <motion.div
-              key={img.id}
-              className="absolute inset-0"
-              initial={{ opacity: i === 0 ? 1 : 0 }}
-              animate={{ opacity: i === activeIndex ? 1 : 0 }}
-              transition={{ duration: 0.5, ease: 'easeInOut' }}
-            >
-              {mediaType === 'video' ? (
-                <video
-                  ref={(el) => { videoRefs.current[i] = el; }}
-                  src={img.src}
-                  muted
-                  loop
-                  playsInline
-                  className="w-full h-full object-cover"
-                  style={{ objectPosition: block.styles?.objectPosition }}
-                />
-              ) : (
-                <img
-                  src={img.src || PLACEHOLDER}
-                  alt={img.alt || ''}
-                  className="w-full h-full object-cover"
-                  style={{ objectPosition: block.styles?.objectPosition }}
-                />
-              )}
-            </motion.div>
-          ))}
-        </div>
+      <div ref={stickyRef} className="sticky top-0 h-screen" style={decorationStyle}>
+        {/* Inner wrapper clips images to border-radius without clipping shadow/outline */}
+        <div className="absolute inset-0 overflow-hidden" style={{ borderRadius: block.styles?.borderRadius }}>
+          {/* Images stacked — crossfade as activeIndex changes */}
+          <div className="absolute inset-0">
+            {images.map((img, i) => (
+              <motion.div
+                key={img.id}
+                className="absolute inset-0"
+                initial={{ opacity: i === 0 ? 1 : 0 }}
+                animate={{ opacity: i === activeIndex ? 1 : 0 }}
+                transition={{ duration: 0.5, ease: 'easeInOut' }}
+              >
+                {mediaType === 'video' ? (
+                  <video
+                    ref={(el) => { videoRefs.current[i] = el; }}
+                    src={img.src}
+                    muted
+                    loop
+                    playsInline
+                    className="w-full h-full object-cover"
+                    style={{ objectPosition: block.styles?.objectPosition }}
+                  />
+                ) : (
+                  <img
+                    src={img.src || PLACEHOLDER}
+                    alt={img.alt || ''}
+                    className="w-full h-full object-cover"
+                    style={{ objectPosition: block.styles?.objectPosition }}
+                  />
+                )}
+              </motion.div>
+            ))}
+          </div>
 
-        {/* Scrim keeps text legible over any image */}
-        <div className="absolute inset-0 bg-black/45 z-[1] pointer-events-none" />
+          {/* Scrim keeps text legible over any image */}
+          <div className="absolute inset-0 bg-black/45 z-[1] pointer-events-none" />
+        </div>
         {textOverlay}
       </div>
     </div>

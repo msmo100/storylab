@@ -1,5 +1,5 @@
 import { useBuilderStore } from '../../store/builderStore';
-import type { Block, ScrollImage, TextEntrance, TimelineEntry, TimelineDotStyle, ChatMessage } from '../../types';
+import type { Block, ScrollImage, TextEntrance, TimelineEntry, TimelineDotStyle, ChatMessage, CarouselItem } from '../../types';
 import { generateId } from '../../utils/generateId';
 import { Input } from '../ui/Input';
 import { Textarea } from '../ui/Textarea';
@@ -23,7 +23,7 @@ export function BlockEditor({ block }: Props) {
 
   // Hero, sticky, and scrollmedia blocks have built-in scroll behavior — animation preset unused
   const showAnimationSelect =
-    block.type !== 'hero' && block.type !== 'sticky' && block.type !== 'scrollmedia' && block.type !== 'timeline' && block.type !== 'chat';
+    block.type !== 'hero' && block.type !== 'sticky' && block.type !== 'scrollmedia' && block.type !== 'timeline' && block.type !== 'chat' && block.type !== 'carousel';
 
   return (
     <div className="mt-3 flex flex-col gap-3 border-t border-gray-200 dark:border-gray-700 pt-3">
@@ -87,7 +87,7 @@ export function BlockEditor({ block }: Props) {
           <Input
             label="Video-URL"
             value={block.src}
-            placeholder="https://… (.mp4)"
+            placeholder="https://…"
             onChange={(e) => update({ src: e.target.value } as Partial<Block>)}
           />
           <label className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
@@ -616,6 +616,82 @@ export function BlockEditor({ block }: Props) {
             }}
           >
             + Lägg till meddelande
+          </Button>
+        </div>
+      )}
+
+      {block.type === 'carousel' && (
+        <div className="flex flex-col gap-2">
+          <span className="text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wide">
+            Videor
+          </span>
+          <p className="text-xs text-gray-400 dark:text-gray-500">
+            Lägg till videor att svepa igenom.
+          </p>
+
+          {block.items.map((item, i) => (
+            <div key={item.id} className="rounded-lg border border-gray-200 dark:border-gray-700 p-3 flex flex-col gap-2">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-medium text-gray-600 dark:text-gray-400">Video {i + 1}</span>
+                <Button
+                  variant="danger"
+                  size="sm"
+                  onClick={() =>
+                    update({ items: block.items.filter((it) => it.id !== item.id) } as Partial<Block>)
+                  }
+                >
+                  ✕
+                </Button>
+              </div>
+              <Input
+                label="Video-URL"
+                value={item.src}
+                placeholder="https://… (.mp4)"
+                onChange={(e) =>
+                  update({
+                    items: block.items.map((it) =>
+                      it.id === item.id ? { ...it, src: e.target.value } : it
+                    ),
+                  } as Partial<Block>)
+                }
+              />
+              <Input
+                label="Poster-URL (valfri)"
+                value={item.poster ?? ''}
+                placeholder="https://… (förhandsvisningsbild)"
+                onChange={(e) =>
+                  update({
+                    items: block.items.map((it) =>
+                      it.id === item.id ? { ...it, poster: e.target.value || undefined } : it
+                    ),
+                  } as Partial<Block>)
+                }
+              />
+              <Input
+                label="Bildtext (valfri)"
+                value={item.caption ?? ''}
+                placeholder="Beskrivning av videon…"
+                onChange={(e) =>
+                  update({
+                    items: block.items.map((it) =>
+                      it.id === item.id ? { ...it, caption: e.target.value || undefined } : it
+                    ),
+                  } as Partial<Block>)
+                }
+              />
+            </div>
+          ))}
+
+          <Button
+            variant="secondary"
+            size="sm"
+            className="self-start"
+            onClick={() => {
+              const newItem: CarouselItem = { id: generateId(), src: '' };
+              update({ items: [...block.items, newItem] } as Partial<Block>);
+            }}
+          >
+            + Lägg till video
           </Button>
         </div>
       )}

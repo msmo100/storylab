@@ -87,7 +87,7 @@ function BlockWrapper({ block }: { block: Block }) {
     return <AnimatedBlock block={block} />;
   }
 
-  if (block.type === 'image' || block.type === 'video') {
+  if (block.type === 'image' || block.type === 'video' || block.type === 'carousel') {
     return (
       <div className="my-12" style={sizeStyle}>
         <AnimatedBlock block={block} />

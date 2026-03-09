@@ -1,4 +1,4 @@
-export type BlockType = 'text' | 'image' | 'video' | 'quote' | 'hero' | 'sticky' | 'scrollmedia' | 'timeline' | 'chat';
+export type BlockType = 'text' | 'image' | 'video' | 'quote' | 'hero' | 'sticky' | 'scrollmedia' | 'timeline' | 'chat' | 'carousel';
 
 export interface BlockStyle {
   textColor?: string;
@@ -149,6 +149,20 @@ export interface ChatBlock extends BaseBlock {
   messages: ChatMessage[];
 }
 
+/** A single item (video or image) in a carousel block. */
+export interface CarouselItem {
+  id: string;
+  src: string;
+  poster?: string;
+  caption?: string;
+}
+
+/** Horizontally swipeable carousel of videos (or images). */
+export interface CarouselBlock extends BaseBlock {
+  type: 'carousel';
+  items: CarouselItem[];
+}
+
 export type Block =
   | TextBlock
   | ImageBlock
@@ -158,7 +172,8 @@ export type Block =
   | StickyBlock
   | ScrollMediaBlock
   | TimelineBlock
-  | ChatBlock;
+  | ChatBlock
+  | CarouselBlock;
 
 // Distributive Omit — correctly strips 'id' from each union member
 export type BlockWithoutId =
@@ -170,7 +185,8 @@ export type BlockWithoutId =
   | Omit<StickyBlock, 'id'>
   | Omit<ScrollMediaBlock, 'id'>
   | Omit<TimelineBlock, 'id'>
-  | Omit<ChatBlock, 'id'>;
+  | Omit<ChatBlock, 'id'>
+  | Omit<CarouselBlock, 'id'>;
 
 export interface Article {
   id: string;

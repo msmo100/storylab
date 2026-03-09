@@ -97,6 +97,17 @@ const BLOCK_OPTIONS: BlockOption[] = [
       messages: [],
     },
   },
+  {
+    label: 'Karusell',
+    description: 'Svepbara videor eller bilder i rad',
+    emoji: '🎠',
+    defaultBlock: {
+      type: 'carousel',
+      animation: 'fade',
+      animationDelay: 0,
+      items: [],
+    },
+  },
 ];
 
 export function AddBlockMenu() {
