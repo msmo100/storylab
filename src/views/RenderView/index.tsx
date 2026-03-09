@@ -1,5 +1,4 @@
 import { useEffect, useState, type CSSProperties } from 'react';
-import { useScroll, useSpring, motion } from 'framer-motion';
 import { useBuilderStore } from '../../store/builderStore';
 import { AnimatedBlock } from '../../components/blocks/AnimatedBlock';
 import type { Article, Block } from '../../types';
@@ -22,24 +21,23 @@ export function RenderView() {
   // Prefer live article (from builder) over the last-persisted store value
   const article = liveArticle ?? storeArticle;
 
-  const { scrollYProgress } = useScroll();
-  const progressBar = useSpring(scrollYProgress, { stiffness: 400, damping: 40 });
-
   // Detect whether we're running inside a CMS iframe
   const isEmbedded = window !== window.parent;
+
+  // Hide the native scrollbar when rendered inside the builder preview iframe
+  useEffect(() => {
+    if (!isEmbedded) return;
+    const style = document.createElement('style');
+    style.textContent = 'html{scrollbar-width:none}html::-webkit-scrollbar{display:none}';
+    document.head.appendChild(style);
+    return () => style.remove();
+  }, [isEmbedded]);
 
   const firstBlock = article.blocks[0];
   const startsWithHero = firstBlock?.type === 'hero';
 
   return (
     <div className="min-h-screen bg-white text-gray-900">
-      {/* Scroll progress bar */}
-      <motion.div
-        style={{ scaleX: progressBar }}
-        className="fixed top-0 left-0 right-0 h-0.5 bg-gray-900 origin-left z-50"
-        aria-hidden="true"
-      />
-
       {/* Article title — only shown when a title is set and the first block isn't a hero */}
       {!startsWithHero && article.title.trim() && (
         <header className="mx-auto max-w-2xl px-6 py-16 text-center">
