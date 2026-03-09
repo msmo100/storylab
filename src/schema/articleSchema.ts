@@ -10,6 +10,10 @@ const blockStyleSchema = z.object({
   fontSize: z.string().optional(),
   lineHeight: z.string().optional(),
   letterSpacing: z.string().optional(),
+  boxShadow: z.string().optional(),
+  outlineColor: z.string().optional(),
+  outlineWidth: z.string().optional(),
+  borderRadius: z.string().optional(),
 }).optional();
 
 const baseBlockSchema = z.object({

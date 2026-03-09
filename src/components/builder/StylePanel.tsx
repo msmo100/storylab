@@ -28,6 +28,25 @@ const PRESET_SIZES = [10, 11, 12, 13, 14, 15, 16, 18, 20, 22, 24, 28, 32, 36, 42
 const LINE_HEIGHTS = ['1', '1.2', '1.3', '1.4', '1.5', '1.6', '1.75', '2'];
 const LETTER_SPACINGS = ['-0.05', '-0.02', '0', '0.02', '0.05', '0.1', '0.15', '0.2'];
 
+const SHADOW_PRESETS: { value: string; label: string }[] = [
+  { value: '', label: 'Ingen' },
+  { value: '0 1px 4px rgba(0,0,0,0.08),0 2px 8px rgba(0,0,0,0.06)', label: 'Lätt' },
+  { value: '0 4px 16px rgba(0,0,0,0.12),0 8px 24px rgba(0,0,0,0.08)', label: 'Medium' },
+  { value: '0 8px 32px rgba(0,0,0,0.18),0 16px 48px rgba(0,0,0,0.12)', label: 'Stark' },
+  { value: '0 20px 60px rgba(0,0,0,0.28),0 32px 80px rgba(0,0,0,0.18)', label: 'Extra' },
+];
+
+const OUTLINE_WIDTHS = ['1px', '2px', '3px', '4px', '6px', '8px'];
+const BORDER_RADII: { value: string; label: string }[] = [
+  { value: '', label: 'Ingen' },
+  { value: '4px', label: '4 px' },
+  { value: '8px', label: '8 px' },
+  { value: '12px', label: '12 px' },
+  { value: '16px', label: '16 px' },
+  { value: '24px', label: '24 px' },
+  { value: '9999px', label: 'Rund' },
+];
+
 const INPUT_CLASS = 'text-sm rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-gray-400';
 
 export function StylePanel({ block, onClose }: Props) {
@@ -193,6 +212,92 @@ export function StylePanel({ block, onClose }: Props) {
 
           </div>
         </section>
+
+        {/* DEKORATION */}
+        <section>
+          <p className="text-[10px] font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-3">
+            Dekoration
+          </p>
+          <div className="flex flex-col gap-3">
+
+            {/* Drop shadow */}
+            <div>
+              <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">Skugga</label>
+              <select
+                value={block.styles?.boxShadow ?? ''}
+                onChange={(e) => update({ boxShadow: e.target.value || undefined })}
+                className={`w-full ${INPUT_CLASS}`}
+              >
+                {SHADOW_PRESETS.map((p) => (
+                  <option key={p.label} value={p.value}>{p.label}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Outline */}
+            <div>
+              <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">Kontur</label>
+              <div className="flex gap-2 items-center">
+                <div className="relative flex-shrink-0">
+                  <input
+                    type="color"
+                    value={block.styles?.outlineColor ?? '#000000'}
+                    onChange={(e) => update({ outlineColor: e.target.value, outlineWidth: block.styles?.outlineWidth ?? '2px' })}
+                    className="w-8 h-8 rounded cursor-pointer border border-gray-200 dark:border-gray-700 bg-transparent p-0.5"
+                    title="Konturfärg"
+                  />
+                  {!block.styles?.outlineColor && (
+                    <div
+                      className="absolute inset-0.5 rounded pointer-events-none"
+                      style={{
+                        backgroundImage:
+                          'linear-gradient(45deg,#ccc 25%,transparent 25%),linear-gradient(-45deg,#ccc 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#ccc 75%),linear-gradient(-45deg,transparent 75%,#ccc 75%)',
+                        backgroundSize: '6px 6px',
+                        backgroundPosition: '0 0,0 3px,3px -3px,-3px 0px',
+                        opacity: 0.6,
+                      }}
+                    />
+                  )}
+                </div>
+                <select
+                  value={block.styles?.outlineWidth ?? ''}
+                  onChange={(e) => update({ outlineWidth: e.target.value || undefined })}
+                  className={`flex-1 ${INPUT_CLASS}`}
+                >
+                  <option value="">Bredd</option>
+                  {OUTLINE_WIDTHS.map((w) => (
+                    <option key={w} value={w}>{w}</option>
+                  ))}
+                </select>
+                {block.styles?.outlineColor && (
+                  <button
+                    onClick={() => update({ outlineColor: undefined, outlineWidth: undefined })}
+                    className="text-xs text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors flex-shrink-0"
+                    title="Återställ"
+                  >
+                    Återst.
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* Border radius */}
+            <div>
+              <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">Rundade hörn</label>
+              <select
+                value={block.styles?.borderRadius ?? ''}
+                onChange={(e) => update({ borderRadius: e.target.value || undefined })}
+                className={`w-full ${INPUT_CLASS}`}
+              >
+                {BORDER_RADII.map((r) => (
+                  <option key={r.label} value={r.value}>{r.label}</option>
+                ))}
+              </select>
+            </div>
+
+          </div>
+        </section>
+
       </div>
     </div>
   );

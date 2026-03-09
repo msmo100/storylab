@@ -32,6 +32,13 @@ export function VideoBlock({ block }: Props) {
         loop
         playsInline
         className="w-full object-cover"
+        style={{
+          boxShadow: block.styles?.boxShadow,
+          outline: block.styles?.outlineColor
+            ? `${block.styles.outlineWidth ?? '2px'} solid ${block.styles.outlineColor}`
+            : undefined,
+          borderRadius: block.styles?.borderRadius,
+        }}
       />
     </div>
   );

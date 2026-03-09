@@ -16,6 +16,12 @@ export function TextBlock({ block }: Props) {
           fontSize: resolveFontSize(block.styles?.fontSize),
           lineHeight: block.styles?.lineHeight,
           letterSpacing: block.styles?.letterSpacing ? `${block.styles.letterSpacing}em` : undefined,
+          boxShadow: block.styles?.boxShadow,
+          outline: block.styles?.outlineColor
+            ? `${block.styles.outlineWidth ?? '2px'} solid ${block.styles.outlineColor}`
+            : undefined,
+          borderRadius: block.styles?.borderRadius,
+          padding: (block.styles?.boxShadow || block.styles?.outlineColor || block.styles?.borderRadius) ? '0.75em 1em' : undefined,
         }}
       >
         {block.content}

@@ -9,7 +9,14 @@ export function QuoteBlock({ block }: Props) {
   return (
     <blockquote
       className="border-l-4 pl-6 my-6"
-      style={{ borderColor: block.styles?.accentColor ?? '#9ca3af' }}
+      style={{
+        borderColor: block.styles?.accentColor ?? '#9ca3af',
+        boxShadow: block.styles?.boxShadow,
+        outline: block.styles?.outlineColor
+          ? `${block.styles.outlineWidth ?? '2px'} solid ${block.styles.outlineColor}`
+          : undefined,
+        borderRadius: block.styles?.borderRadius,
+      }}
     >
       <p
         className="font-serif italic"

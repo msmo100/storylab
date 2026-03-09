@@ -11,6 +11,14 @@ export interface BlockStyle {
   lineHeight?: string;
   /** Letter spacing in em, e.g. "0.05". */
   letterSpacing?: string;
+  /** CSS box-shadow value. */
+  boxShadow?: string;
+  /** CSS outline-color value. */
+  outlineColor?: string;
+  /** CSS outline-width value, e.g. "2px". */
+  outlineWidth?: string;
+  /** CSS border-radius value, e.g. "8px". */
+  borderRadius?: string;
 }
 
 export type AnimationPreset = 'none' | 'fade' | 'slide-up' | 'slide-left' | 'zoom';
