@@ -42,7 +42,8 @@ export function RenderView() {
   // Priority: live (builder preview) > fetched (DB) > store (fallback)
   const article = liveArticle ?? fetchedArticle ?? (renderId ? null : storeArticle);
 
-  if (renderId && !article && !fetchError) {
+  // Still waiting for fetch or first BroadcastChannel message
+  if (!article && !fetchError) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-white">
         <span className="text-sm text-gray-400">Laddar…</span>
@@ -50,7 +51,8 @@ export function RenderView() {
     );
   }
 
-  if (fetchError || !article) {
+  // Fetch failed and nothing else provided an article (e.g. no BroadcastChannel)
+  if (!article) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-white">
         <span className="text-sm text-gray-400">Artikeln hittades inte.</span>
