@@ -42,12 +42,13 @@ export function RenderView() {
   // Detect whether we're running inside a CMS iframe
   const isEmbedded = window !== window.parent;
 
-  // Hide scrollbars and clip horizontal overflow when inside an iframe so that
-  // the carousel's wide flex layout doesn't inflate height measurements
+  // When embedded: kill all scrollbars and prevent any overflow from leaking out
   useEffect(() => {
     if (!isEmbedded) return;
     const style = document.createElement('style');
-    style.textContent = 'html,body{scrollbar-width:none;overflow-x:hidden}html::-webkit-scrollbar{display:none}';
+    style.textContent =
+      'html,body{overflow:hidden;scrollbar-width:none}' +
+      'html::-webkit-scrollbar,body::-webkit-scrollbar{display:none}';
     document.head.appendChild(style);
     return () => style.remove();
   }, [isEmbedded]);
@@ -57,8 +58,7 @@ export function RenderView() {
 
   const contentRef = useRef<HTMLDivElement>(null);
 
-  // Post content height to parent so the iframe can auto-resize.
-  // Depends on `article` so the effect re-runs once the content div is in the DOM.
+  // Post exact content height to parent so the CMS iframe can auto-resize
   useEffect(() => {
     if (!isEmbedded) return;
     const el = contentRef.current;
@@ -74,13 +74,13 @@ export function RenderView() {
         );
       });
     };
-    const observer = new ResizeObserver(sendHeight);
-    observer.observe(el);
+    const ro = new ResizeObserver(sendHeight);
+    ro.observe(el);
     window.addEventListener('resize', sendHeight);
     sendHeight();
     return () => {
       cancelAnimationFrame(rafId);
-      observer.disconnect();
+      ro.disconnect();
       window.removeEventListener('resize', sendHeight);
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -105,7 +105,7 @@ export function RenderView() {
   }
 
   return (
-    <div ref={contentRef} className={`bg-white text-gray-900${isEmbedded ? '' : ' min-h-screen'}`}>
+    <div ref={contentRef} className={`bg-white text-gray-900${isEmbedded ? ' overflow-hidden' : ' min-h-screen'}`}>
       {/* Block feed */}
       <main>
         {article.blocks.length === 0 ? (
@@ -156,7 +156,7 @@ function BlockWrapper({ block }: { block: Block }) {
 
   if (block.type === 'carousel') {
     return (
-      <div className="mt-6 pb-4" style={sizeStyle}>
+      <div className="my-6" style={sizeStyle}>
         <AnimatedBlock block={block} />
       </div>
     );
