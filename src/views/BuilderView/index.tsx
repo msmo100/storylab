@@ -108,7 +108,7 @@ export function BuilderView() {
   const base = window.location.origin + window.location.pathname;
   const previewSrc = projectId ? `${base}#/render?id=${projectId}` : `${base}#/render`;
   const iframeId = `sl-${projectId ?? 'preview'}`;
-  const embedCode = `<iframe id="${iframeId}" src="${previewSrc}" width="100%" frameborder="0" allow="autoplay" style="border:none;display:block;width:100%;"></iframe>\n<script>window.addEventListener('message',function(e){if(e.data&&e.data.type==='storylab-resize'){var f=document.getElementById('${iframeId}');if(f)f.style.height=e.data.height+'px';}});<\/script>`;
+  const embedCode = `<iframe id="${iframeId}" src="${previewSrc}" width="100%" frameborder="0" allow="autoplay" style="border:none;display:block;width:100%;"></iframe>\n<script>(function(){var f=document.getElementById('${iframeId}');window.addEventListener('message',function(e){if(e.data&&e.data.type==='storylab-resize'&&f&&e.source===f.contentWindow)f.style.height=e.data.height+'px';});})();<\/script>`;
 
   function copyEmbedCode() {
     navigator.clipboard.writeText(embedCode).then(() => {
