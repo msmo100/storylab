@@ -55,13 +55,16 @@ export function RenderView() {
   useEffect(() => {
     if (!isEmbedded) return;
     const sendHeight = () => {
-      window.parent.postMessage(
-        { type: 'storylab-resize', height: document.body.scrollHeight },
-        '*'
+      const height = Math.max(
+        document.body.scrollHeight,
+        document.body.offsetHeight,
+        document.documentElement.scrollHeight,
+        document.documentElement.offsetHeight,
       );
+      window.parent.postMessage({ type: 'storylab-resize', height }, '*');
     };
     const observer = new ResizeObserver(sendHeight);
-    observer.observe(document.body);
+    observer.observe(document.documentElement);
     sendHeight();
     return () => observer.disconnect();
   }, [isEmbedded]);
