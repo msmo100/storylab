@@ -140,7 +140,7 @@ function BlockWrapper({ block }: { block: Block }) {
 
   if (block.type === 'carousel') {
     return (
-      <div className="my-6" style={sizeStyle}>
+      <div className="mt-6" style={sizeStyle}>
         <AnimatedBlock block={block} />
       </div>
     );
