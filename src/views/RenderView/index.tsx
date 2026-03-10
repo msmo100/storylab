@@ -39,6 +39,18 @@ export function RenderView() {
     return () => channel.close();
   }, []);
 
+  // Detect whether we're running inside a CMS iframe
+  const isEmbedded = window !== window.parent;
+
+  // Hide the native scrollbar when rendered inside the builder preview iframe
+  useEffect(() => {
+    if (!isEmbedded) return;
+    const style = document.createElement('style');
+    style.textContent = 'html{scrollbar-width:none}html::-webkit-scrollbar{display:none}';
+    document.head.appendChild(style);
+    return () => style.remove();
+  }, [isEmbedded]);
+
   // Priority: live (builder preview) > fetched (DB) > store (fallback)
   const article = liveArticle ?? fetchedArticle ?? (renderId ? null : storeArticle);
 
@@ -59,18 +71,6 @@ export function RenderView() {
       </div>
     );
   }
-
-  // Detect whether we're running inside a CMS iframe
-  const isEmbedded = window !== window.parent;
-
-  // Hide the native scrollbar when rendered inside the builder preview iframe
-  useEffect(() => {
-    if (!isEmbedded) return;
-    const style = document.createElement('style');
-    style.textContent = 'html{scrollbar-width:none}html::-webkit-scrollbar{display:none}';
-    document.head.appendChild(style);
-    return () => style.remove();
-  }, [isEmbedded]);
 
   const firstBlock = article.blocks[0];
   const startsWithHero = firstBlock?.type === 'hero';
