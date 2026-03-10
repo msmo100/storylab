@@ -59,7 +59,7 @@ export function RenderView() {
     if (!isEmbedded) return;
     const sendHeight = () => {
       const height = contentRef.current
-        ? contentRef.current.scrollHeight
+        ? Math.ceil(contentRef.current.getBoundingClientRect().height)
         : document.body.scrollHeight;
       window.parent.postMessage({ type: 'storylab-resize', height }, '*');
     };
@@ -143,7 +143,7 @@ function BlockWrapper({ block }: { block: Block }) {
 
   if (block.type === 'carousel') {
     return (
-      <div className="mt-6" style={sizeStyle}>
+      <div className="mt-6 pb-4" style={sizeStyle}>
         <AnimatedBlock block={block} />
       </div>
     );
