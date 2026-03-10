@@ -128,8 +128,8 @@ export function RenderView() {
         )}
       </main>
 
-      {/* Edit button — only shown when opened as a standalone tab, not inside a CMS iframe */}
-      {!isEmbedded && (
+      {/* Edit button — only shown when opened as a standalone tab, not inside the builder preview or a CMS iframe */}
+      {!isEmbedded && !isPreview && (
         <a
           href="#/"
           className="fixed bottom-5 right-5 z-50 rounded-full bg-gray-900/80 px-4 py-2 text-xs font-medium text-white opacity-50 backdrop-blur hover:opacity-100 transition-opacity"
