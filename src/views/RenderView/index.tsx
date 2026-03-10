@@ -64,22 +64,32 @@ export function RenderView() {
     const el = contentRef.current;
     if (!el) return;
 
-    let rafId: ReturnType<typeof requestAnimationFrame>;
+    const post = () =>
+      window.parent.postMessage(
+        { type: 'storylab-resize', height: Math.ceil(el.getBoundingClientRect().height) },
+        '*'
+      );
+
+    // Debounced version for ResizeObserver / resize events
+    let timer: ReturnType<typeof setTimeout>;
     const sendHeight = () => {
-      cancelAnimationFrame(rafId);
-      rafId = requestAnimationFrame(() => {
-        window.parent.postMessage(
-          { type: 'storylab-resize', height: Math.ceil(el.getBoundingClientRect().height) },
-          '*'
-        );
-      });
+      clearTimeout(timer);
+      timer = setTimeout(post, 50);
     };
+
     const ro = new ResizeObserver(sendHeight);
     ro.observe(el);
     window.addEventListener('resize', sendHeight);
-    sendHeight();
+
+    // Fire immediately + safety shots for late-loading media
+    post();
+    const t1 = setTimeout(post, 200);
+    const t2 = setTimeout(post, 1000);
+
     return () => {
-      cancelAnimationFrame(rafId);
+      clearTimeout(timer);
+      clearTimeout(t1);
+      clearTimeout(t2);
       ro.disconnect();
       window.removeEventListener('resize', sendHeight);
     };
