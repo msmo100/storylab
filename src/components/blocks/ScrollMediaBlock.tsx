@@ -134,7 +134,7 @@ export function ScrollMediaBlock({ block }: Props) {
               style={{ background: block.styles.accentColor }}
             />
           )}
-          {text ? (
+          {text && (
             <p
               className="text-white text-2xl md:text-4xl font-semibold leading-snug drop-shadow-lg"
               style={{
@@ -149,8 +149,6 @@ export function ScrollMediaBlock({ block }: Props) {
             >
               {text}
             </p>
-          ) : (
-            <p className="text-white/40 text-base italic">Ingen text tillagd</p>
           )}
         </motion.div>
       </motion.div>
