@@ -52,6 +52,9 @@ export function RenderView() {
     return () => style.remove();
   }, [isEmbedded]);
 
+  // Priority: live (builder preview) > fetched (DB) > store (fallback)
+  const article = liveArticle ?? fetchedArticle ?? (renderId ? null : storeArticle);
+
   const contentRef = useRef<HTMLDivElement>(null);
 
   // Post content height to parent so the iframe can auto-resize.
@@ -82,9 +85,6 @@ export function RenderView() {
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isEmbedded, article]);
-
-  // Priority: live (builder preview) > fetched (DB) > store (fallback)
-  const article = liveArticle ?? fetchedArticle ?? (renderId ? null : storeArticle);
 
   // Still waiting for fetch or first BroadcastChannel message
   if (!article && !fetchError) {
