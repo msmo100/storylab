@@ -42,11 +42,12 @@ export function RenderView() {
   // Detect whether we're running inside a CMS iframe
   const isEmbedded = window !== window.parent;
 
-  // Hide the native scrollbar when rendered inside an iframe
+  // Hide scrollbars and clip horizontal overflow when inside an iframe so that
+  // the carousel's wide flex layout doesn't inflate height measurements
   useEffect(() => {
     if (!isEmbedded) return;
     const style = document.createElement('style');
-    style.textContent = 'html{scrollbar-width:none}html::-webkit-scrollbar{display:none}';
+    style.textContent = 'html,body{scrollbar-width:none;overflow-x:hidden}html::-webkit-scrollbar{display:none}';
     document.head.appendChild(style);
     return () => style.remove();
   }, [isEmbedded]);
@@ -55,16 +56,13 @@ export function RenderView() {
   useEffect(() => {
     if (!isEmbedded) return;
     const sendHeight = () => {
-      const height = Math.max(
-        document.body.scrollHeight,
-        document.body.offsetHeight,
-        document.documentElement.scrollHeight,
-        document.documentElement.offsetHeight,
+      window.parent.postMessage(
+        { type: 'storylab-resize', height: document.body.scrollHeight },
+        '*'
       );
-      window.parent.postMessage({ type: 'storylab-resize', height }, '*');
     };
     const observer = new ResizeObserver(sendHeight);
-    observer.observe(document.documentElement);
+    observer.observe(document.body);
     sendHeight();
     return () => observer.disconnect();
   }, [isEmbedded]);
