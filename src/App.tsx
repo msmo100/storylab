@@ -47,7 +47,7 @@ function App() {
     }
   }, [user, loading, guestMode, view]);
 
-  // Spinner while the initial Supabase session resolves
+  // Spinner while the initial Supabase session resolve
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-950">
