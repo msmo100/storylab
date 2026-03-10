@@ -7,6 +7,8 @@ interface Props {
 
 export function CarouselBlock({ block }: Props) {
   const { items } = block;
+  const accentColor = block.styles?.accentColor;
+  const textColor = block.styles?.textColor;
   const [activeIndex, setActiveIndex] = useState(0);
   const activeIndexRef = useRef(0);
   const trackRef = useRef<HTMLDivElement>(null);
@@ -118,7 +120,10 @@ export function CarouselBlock({ block }: Props) {
                   className="w-full block rounded-lg bg-black"
                 />
                 {item.caption && (
-                  <p className="text-xs text-gray-500 dark:text-gray-400 text-center mt-1.5 px-1">
+                  <p
+                    className="text-xs text-center mt-1.5 px-1"
+                    style={{ color: textColor ?? undefined }}
+                  >
                     {item.caption}
                   </p>
                 )}
@@ -159,9 +164,10 @@ export function CarouselBlock({ block }: Props) {
               aria-label={`Gå till video ${i + 1}`}
               className={`h-1.5 rounded-full transition-all duration-200 ${
                 i === activeIndex
-                  ? 'w-5 bg-gray-800 dark:bg-gray-200'
+                  ? `w-5${accentColor ? '' : ' bg-gray-800 dark:bg-gray-200'}`
                   : 'w-1.5 bg-gray-300 dark:bg-gray-600 hover:bg-gray-400 dark:hover:bg-gray-500'
               }`}
+              style={i === activeIndex && accentColor ? { backgroundColor: accentColor } : undefined}
             />
           ))}
         </div>

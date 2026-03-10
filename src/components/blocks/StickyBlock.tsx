@@ -16,11 +16,13 @@ function OverlayText({
   index,
   total,
   scrollYProgress,
+  styles,
 }: {
   text: string;
   index: number;
   total: number;
   scrollYProgress: MotionValue<number>;
+  styles?: StickyBlockType['styles'];
 }) {
   const slotSize = 1 / total;
   const slotStart = index * slotSize;
@@ -48,9 +50,26 @@ function OverlayText({
       style={{ opacity, y }}
       className="absolute inset-0 flex items-center justify-center px-8"
     >
-      <p className="text-white text-2xl md:text-4xl font-semibold text-center leading-snug max-w-2xl drop-shadow-lg">
-        {text}
-      </p>
+      <div className="text-center max-w-2xl">
+        {styles?.accentColor && (
+          <div
+            className="mb-3 h-1 w-10 rounded-full mx-auto"
+            style={{ background: styles.accentColor }}
+          />
+        )}
+        <p
+          className="text-white text-2xl md:text-4xl font-semibold leading-snug drop-shadow-lg"
+          style={{
+            color: styles?.textColor,
+            fontFamily: styles?.fontFamily,
+            fontSize: styles?.fontSize ? `${styles.fontSize}px` : undefined,
+            lineHeight: styles?.lineHeight,
+            letterSpacing: styles?.letterSpacing ? `${styles.letterSpacing}em` : undefined,
+          }}
+        >
+          {text}
+        </p>
+      </div>
     </motion.div>
   );
 }
@@ -122,6 +141,7 @@ export function StickyBlock({ block }: Props) {
                 text={text}
                 index={i}
                 total={overlays.length}
+                styles={block.styles}
                 scrollYProgress={scrollYProgress}
               />
             ))

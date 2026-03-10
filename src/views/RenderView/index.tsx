@@ -4,15 +4,16 @@ import { getProject } from '../../services/projectService';
 import { AnimatedBlock } from '../../components/blocks/AnimatedBlock';
 import type { Article, Block } from '../../types';
 
-function getRenderId(): string | null {
-  return new URLSearchParams(
+function getHashParams() {
+  const params = new URLSearchParams(
     window.location.hash.replace(/^#\/render\??/, '')
-  ).get('id');
+  );
+  return { id: params.get('id'), preview: params.get('preview') === '1' };
 }
 
 export function RenderView() {
   const storeArticle = useBuilderStore((state) => state.article);
-  const renderId = getRenderId();
+  const { id: renderId, preview: isPreview } = getHashParams();
 
   // Article fetched from DB when a render ID is present in the URL
   const [fetchedArticle, setFetchedArticle] = useState<Article | null>(null);
@@ -39,8 +40,8 @@ export function RenderView() {
     return () => channel.close();
   }, []);
 
-  // Detect whether we're running inside a CMS iframe
-  const isEmbedded = window !== window.parent;
+  // Detect whether we're running inside a real CMS iframe (not the builder's own preview)
+  const isEmbedded = !isPreview && window !== window.parent;
 
   // When embedded: kill all scrollbars and prevent any overflow from leaking out
   useEffect(() => {
@@ -115,7 +116,7 @@ export function RenderView() {
   }
 
   return (
-    <div ref={contentRef} className={`bg-white text-gray-900${isEmbedded ? ' overflow-hidden' : ' min-h-screen'}`}>
+    <div ref={contentRef} className={`text-gray-900${isEmbedded ? ' overflow-hidden' : ' bg-white min-h-screen'}`}>
       {/* Block feed */}
       <main>
         {article.blocks.length === 0 ? (

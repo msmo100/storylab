@@ -9,8 +9,8 @@ interface Props {
   onClose: () => void;
 }
 
-const ACCENT_TYPES: Block['type'][] = ['quote', 'timeline', 'hero', 'sticky', 'scrollmedia'];
-const FONTSIZE_TYPES: Block['type'][] = ['text', 'quote'];
+const ACCENT_TYPES: Block['type'][] = ['quote', 'timeline', 'hero', 'sticky', 'scrollmedia', 'chat', 'carousel'];
+const FONTSIZE_TYPES: Block['type'][] = ['text', 'quote', 'timeline', 'hero', 'sticky', 'chat'];
 
 const FONTS: { value: string; label: string }[] = [
   { value: '', label: 'Standard (ärvd)' },

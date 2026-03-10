@@ -10,11 +10,17 @@ function Bubble({
   senderName,
   receiverName,
   showNames,
+  accentColor,
+  fontSize,
+  fontFamily,
 }: {
   msg: ChatMessage;
   senderName?: string;
   receiverName?: string;
   showNames?: boolean;
+  accentColor?: string;
+  fontSize?: string;
+  fontFamily?: string;
 }) {
   const isSender = msg.role === 'sender';
   const Tag = msg.animate ? motion.div : 'div';
@@ -35,13 +41,16 @@ function Bubble({
         <span className="text-[11px] text-gray-400 mb-0.5 px-1">{name}</span>
       )}
       <div
-        className={`
-          max-w-[75%] px-4 py-2.5 text-sm leading-relaxed break-words
-          ${isSender
-            ? 'bg-[#007AFF] text-white rounded-[22px] rounded-br-[6px]'
+        className={`max-w-[75%] px-4 py-2.5 text-sm leading-relaxed break-words ${
+          isSender
+            ? 'text-white rounded-[22px] rounded-br-[6px]'
             : 'bg-[#E5E5EA] text-gray-900 rounded-[22px] rounded-bl-[6px]'
-          }
-        `}
+        }`}
+        style={{
+          backgroundColor: isSender ? (accentColor ?? '#007AFF') : undefined,
+          fontSize: fontSize ? `${fontSize}px` : undefined,
+          fontFamily: fontFamily,
+        }}
       >
         {msg.text || <span className="opacity-40 italic">Tomt meddelande</span>}
       </div>
@@ -104,6 +113,9 @@ export function ChatBlock({ block }: Props) {
             senderName={block.senderName}
             receiverName={block.receiverName}
             showNames={block.showNames}
+            accentColor={block.styles?.accentColor}
+            fontSize={block.styles?.fontSize}
+            fontFamily={block.styles?.fontFamily}
           />
         ))}
       </div>
@@ -123,14 +135,23 @@ export function ChatBlock({ block }: Props) {
     </>
   );
 
+  const frameStyle = {
+    boxShadow: block.styles?.boxShadow,
+    outline: block.styles?.outlineColor
+      ? `${block.styles.outlineWidth ?? '2px'} solid ${block.styles.outlineColor}`
+      : undefined,
+    borderRadius: block.styles?.borderRadius,
+    backgroundColor: block.styles?.backgroundColor,
+  };
+
   return (
     <div className="mx-auto max-w-sm">
       {showPhoneFrame ? (
-        <div className="rounded-[40px] border border-gray-200 bg-white overflow-hidden shadow-lg">
+        <div className="rounded-[40px] border border-gray-200 bg-white overflow-hidden shadow-lg" style={frameStyle}>
           {inner}
         </div>
       ) : (
-        <div className="bg-white overflow-hidden">
+        <div className="bg-white overflow-hidden" style={frameStyle}>
           {inner}
         </div>
       )}

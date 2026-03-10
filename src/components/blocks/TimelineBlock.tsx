@@ -60,9 +60,25 @@ export function TimelineBlock({ block }: Props) {
   const lineWidth = block.lineWidth ?? 1;
   const accentColor = block.styles?.accentColor;
   const textColor = block.styles?.textColor;
+  const s = block.styles ?? {};
+  const hasDecor = s.boxShadow || s.outlineColor || s.borderRadius || s.backgroundColor;
 
   return (
-    <div className="relative">
+    <div
+      className="relative"
+      style={{
+        color: textColor,
+        backgroundColor: s.backgroundColor,
+        fontFamily: s.fontFamily,
+        fontSize: s.fontSize ? `${s.fontSize}px` : undefined,
+        lineHeight: s.lineHeight,
+        letterSpacing: s.letterSpacing ? `${s.letterSpacing}em` : undefined,
+        boxShadow: s.boxShadow,
+        outline: s.outlineColor ? `${s.outlineWidth ?? '2px'} solid ${s.outlineColor}` : undefined,
+        borderRadius: s.borderRadius,
+        padding: hasDecor ? '1rem' : undefined,
+      }}
+    >
       {/* Vertical line */}
       <div
         className="absolute top-2 bottom-2 opacity-20"
@@ -95,7 +111,6 @@ export function TimelineBlock({ block }: Props) {
             <Tag
               key={entry.id}
               className="relative pl-10"
-              style={{ color: textColor }}
               {...animProps}
             >
               {/* Dot inherits accentColor via `color` on this wrapper */}

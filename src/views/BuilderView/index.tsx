@@ -82,6 +82,15 @@ export function BuilderView() {
     return () => clearTimeout(id);
   }, [article]);
 
+  // Re-broadcast article when switching device views (belt-and-suspenders)
+  useEffect(() => {
+    const id = setTimeout(() => {
+      channelRef.current?.postMessage({ type: 'update', article });
+    }, 100);
+    return () => clearTimeout(id);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [device]);
+
   // Debounced auto-save (skip in guest mode)
   const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   useEffect(() => {
@@ -106,7 +115,7 @@ export function BuilderView() {
   }
 
   const base = window.location.origin + window.location.pathname;
-  const previewSrc = projectId ? `${base}#/render?id=${projectId}` : `${base}#/render`;
+  const previewSrc = projectId ? `${base}#/render?id=${projectId}&preview=1` : `${base}#/render?preview=1`;
   const iframeId = `sl-${projectId ?? 'preview'}`;
   const embedCode = `<iframe id="${iframeId}" src="${previewSrc}" width="100%" frameborder="0" allow="autoplay" style="border:none;display:block;width:100%;"></iframe>\n<script>(function(){var f=document.getElementById('${iframeId}');window.addEventListener('message',function(e){if(e.data&&e.data.type==='storylab-resize'&&f&&e.source===f.contentWindow)f.style.height=e.data.height+'px';});})();<\/script>`;
 
@@ -241,32 +250,33 @@ export function BuilderView() {
           </div>
         </div>
 
-        {/* Preview canvas */}
-        {device === 'desktop' ? (
+        {/* Preview canvas — always the same iframe element to avoid remounting */}
+        <div className={cn(
+          'flex-1 min-h-0',
+          device !== 'desktop' && 'overflow-auto bg-gray-100 dark:bg-gray-950 flex justify-center py-6',
+        )}>
           <iframe
             src={previewSrc}
-            className="flex-1 w-full border-none"
             title="Förhandsgranskning av artikel"
             allow="autoplay"
-          />
-        ) : (
-          <div className="flex-1 overflow-auto bg-gray-100 dark:bg-gray-950 flex justify-center py-6">
-            <iframe
-              src={previewSrc}
-              title="Förhandsgranskning av artikel"
-              allow="autoplay"
-              style={{
+            className="border-none"
+            style={{
+              backgroundColor: 'white',
+              ...(device === 'desktop' ? {
+                width: '100%',
+                height: '100%',
+                display: 'block',
+              } : {
                 width: activeDevice.width!,
                 height: '100%',
                 minHeight: '600px',
-                border: 'none',
                 borderRadius: '1rem',
                 boxShadow: '0 0 0 1px rgba(0,0,0,0.08), 0 20px 60px -10px rgba(0,0,0,0.25)',
                 flexShrink: 0,
-              }}
-            />
-          </div>
-        )}
+              }),
+            }}
+          />
+        </div>
       </div>
 
       {/* ── Right: Style panel (when a block is selected) ─────────── */}

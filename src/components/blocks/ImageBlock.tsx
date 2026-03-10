@@ -21,7 +21,12 @@ export function ImageBlock({ block }: Props) {
         }}
       />
       {block.caption && (
-        <figcaption className="mt-2 text-sm text-center text-gray-500">{block.caption}</figcaption>
+        <figcaption
+          className="mt-2 text-sm text-center text-gray-500"
+          style={{ color: block.styles?.textColor }}
+        >
+          {block.caption}
+        </figcaption>
       )}
     </figure>
   );

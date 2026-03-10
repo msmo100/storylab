@@ -61,7 +61,13 @@ export function HeroBlock({ block }: Props) {
       >
         <h1
           className="text-5xl md:text-7xl font-bold leading-tight tracking-tight drop-shadow-md"
-          style={{ color: block.styles?.accentColor }}
+          style={{
+            color: block.styles?.textColor ?? block.styles?.accentColor,
+            fontFamily: block.styles?.fontFamily,
+            fontSize: block.styles?.fontSize ? `${block.styles.fontSize}px` : undefined,
+            lineHeight: block.styles?.lineHeight,
+            letterSpacing: block.styles?.letterSpacing ? `${block.styles.letterSpacing}em` : undefined,
+          }}
         >
           {block.heading || 'Hero heading'}
         </h1>
