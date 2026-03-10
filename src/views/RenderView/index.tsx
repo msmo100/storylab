@@ -73,7 +73,7 @@ export function RenderView() {
   // Still waiting for fetch or first BroadcastChannel message
   if (!article && !fetchError) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-white">
+      <div className="flex items-center justify-center bg-white" style={{ height: '4rem' }}>
         <span className="text-sm text-gray-400">Laddar…</span>
       </div>
     );
@@ -82,14 +82,14 @@ export function RenderView() {
   // Fetch failed and nothing else provided an article (e.g. no BroadcastChannel)
   if (!article) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-white">
+      <div className="flex items-center justify-center bg-white" style={{ height: '4rem' }}>
         <span className="text-sm text-gray-400">Artikeln hittades inte.</span>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-white text-gray-900">
+    <div className={`bg-white text-gray-900${isEmbedded ? '' : ' min-h-screen'}`}>
       {/* Block feed */}
       <main>
         {article.blocks.length === 0 ? (
