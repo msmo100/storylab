@@ -57,17 +57,25 @@ export function RenderView() {
   // Post content height to parent so the iframe can auto-resize
   useEffect(() => {
     if (!isEmbedded) return;
+    let rafId: ReturnType<typeof requestAnimationFrame>;
     const sendHeight = () => {
-      const height = contentRef.current
-        ? Math.ceil(contentRef.current.getBoundingClientRect().height)
-        : document.body.scrollHeight;
-      window.parent.postMessage({ type: 'storylab-resize', height }, '*');
+      cancelAnimationFrame(rafId);
+      rafId = requestAnimationFrame(() => {
+        const height = contentRef.current
+          ? Math.ceil(contentRef.current.getBoundingClientRect().height)
+          : document.body.scrollHeight;
+        window.parent.postMessage({ type: 'storylab-resize', height }, '*');
+      });
     };
     const observer = new ResizeObserver(sendHeight);
-    const target = contentRef.current ?? document.body;
-    observer.observe(target);
+    observer.observe(document.body);
+    window.addEventListener('resize', sendHeight);
     sendHeight();
-    return () => observer.disconnect();
+    return () => {
+      cancelAnimationFrame(rafId);
+      observer.disconnect();
+      window.removeEventListener('resize', sendHeight);
+    };
   }, [isEmbedded]);
 
   // Priority: live (builder preview) > fetched (DB) > store (fallback)
