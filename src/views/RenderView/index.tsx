@@ -42,13 +42,28 @@ export function RenderView() {
   // Detect whether we're running inside a CMS iframe
   const isEmbedded = window !== window.parent;
 
-  // Hide the native scrollbar when rendered inside the builder preview iframe
+  // Hide the native scrollbar when rendered inside an iframe
   useEffect(() => {
     if (!isEmbedded) return;
     const style = document.createElement('style');
     style.textContent = 'html{scrollbar-width:none}html::-webkit-scrollbar{display:none}';
     document.head.appendChild(style);
     return () => style.remove();
+  }, [isEmbedded]);
+
+  // Post content height to parent so the iframe can auto-resize
+  useEffect(() => {
+    if (!isEmbedded) return;
+    const sendHeight = () => {
+      window.parent.postMessage(
+        { type: 'storylab-resize', height: document.body.scrollHeight },
+        '*'
+      );
+    };
+    const observer = new ResizeObserver(sendHeight);
+    observer.observe(document.body);
+    sendHeight();
+    return () => observer.disconnect();
   }, [isEmbedded]);
 
   // Priority: live (builder preview) > fetched (DB) > store (fallback)
@@ -72,20 +87,8 @@ export function RenderView() {
     );
   }
 
-  const firstBlock = article.blocks[0];
-  const startsWithHero = firstBlock?.type === 'hero';
-
   return (
     <div className="min-h-screen bg-white text-gray-900">
-      {/* Article title — only shown when a title is set and the first block isn't a hero */}
-      {!startsWithHero && article.title.trim() && (
-        <header className="mx-auto max-w-2xl px-6 py-16 text-center">
-          <h1 className="text-4xl font-bold leading-tight tracking-tight md:text-5xl">
-            {article.title}
-          </h1>
-        </header>
-      )}
-
       {/* Block feed */}
       <main>
         {article.blocks.length === 0 ? (
