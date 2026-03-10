@@ -1,4 +1,4 @@
-import { useEffect, useState, type CSSProperties } from 'react';
+import { useEffect, useState, useRef, type CSSProperties } from 'react';
 import { useBuilderStore } from '../../store/builderStore';
 import { getProject } from '../../services/projectService';
 import { AnimatedBlock } from '../../components/blocks/AnimatedBlock';
@@ -52,17 +52,20 @@ export function RenderView() {
     return () => style.remove();
   }, [isEmbedded]);
 
+  const contentRef = useRef<HTMLDivElement>(null);
+
   // Post content height to parent so the iframe can auto-resize
   useEffect(() => {
     if (!isEmbedded) return;
     const sendHeight = () => {
-      window.parent.postMessage(
-        { type: 'storylab-resize', height: document.body.scrollHeight },
-        '*'
-      );
+      const height = contentRef.current
+        ? Math.ceil(contentRef.current.getBoundingClientRect().height)
+        : document.body.scrollHeight;
+      window.parent.postMessage({ type: 'storylab-resize', height }, '*');
     };
     const observer = new ResizeObserver(sendHeight);
-    observer.observe(document.body);
+    const target = contentRef.current ?? document.body;
+    observer.observe(target);
     sendHeight();
     return () => observer.disconnect();
   }, [isEmbedded]);
@@ -89,7 +92,7 @@ export function RenderView() {
   }
 
   return (
-    <div className={`bg-white text-gray-900${isEmbedded ? '' : ' min-h-screen'}`}>
+    <div ref={contentRef} className={`bg-white text-gray-900${isEmbedded ? '' : ' min-h-screen'}`}>
       {/* Block feed */}
       <main>
         {article.blocks.length === 0 ? (
