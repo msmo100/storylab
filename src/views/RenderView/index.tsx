@@ -54,21 +54,25 @@ export function RenderView() {
 
   const contentRef = useRef<HTMLDivElement>(null);
 
-  // Post content height to parent so the iframe can auto-resize
+  // Post content height to parent so the iframe can auto-resize.
+  // Depends on `article` so the effect re-runs once the content div is in the DOM.
   useEffect(() => {
     if (!isEmbedded) return;
+    const el = contentRef.current;
+    if (!el) return;
+
     let rafId: ReturnType<typeof requestAnimationFrame>;
     const sendHeight = () => {
       cancelAnimationFrame(rafId);
       rafId = requestAnimationFrame(() => {
-        const height = contentRef.current
-          ? Math.ceil(contentRef.current.getBoundingClientRect().height)
-          : document.body.scrollHeight;
-        window.parent.postMessage({ type: 'storylab-resize', height }, '*');
+        window.parent.postMessage(
+          { type: 'storylab-resize', height: Math.ceil(el.getBoundingClientRect().height) },
+          '*'
+        );
       });
     };
     const observer = new ResizeObserver(sendHeight);
-    observer.observe(document.body);
+    observer.observe(el);
     window.addEventListener('resize', sendHeight);
     sendHeight();
     return () => {
@@ -76,7 +80,8 @@ export function RenderView() {
       observer.disconnect();
       window.removeEventListener('resize', sendHeight);
     };
-  }, [isEmbedded]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isEmbedded, article]);
 
   // Priority: live (builder preview) > fetched (DB) > store (fallback)
   const article = liveArticle ?? fetchedArticle ?? (renderId ? null : storeArticle);
