@@ -59,7 +59,7 @@ export function RenderView() {
     if (!isEmbedded) return;
     const sendHeight = () => {
       const height = contentRef.current
-        ? Math.ceil(contentRef.current.getBoundingClientRect().height)
+        ? contentRef.current.scrollHeight
         : document.body.scrollHeight;
       window.parent.postMessage({ type: 'storylab-resize', height }, '*');
     };
