@@ -105,7 +105,8 @@ export function BuilderView() {
     }
   }
 
-  const previewSrc = window.location.origin + window.location.pathname + '#/render';
+  const base = window.location.origin + window.location.pathname;
+  const previewSrc = projectId ? `${base}#/render?id=${projectId}` : `${base}#/render`;
   const embedCode = `<iframe src="${previewSrc}" width="100%" height="800" frameborder="0" allow="autoplay" style="border:none;display:block;"></iframe>`;
 
   function copyEmbedCode() {

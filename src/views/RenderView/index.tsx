@@ -1,12 +1,33 @@
 import { useEffect, useState, type CSSProperties } from 'react';
 import { useBuilderStore } from '../../store/builderStore';
+import { getProject } from '../../services/projectService';
 import { AnimatedBlock } from '../../components/blocks/AnimatedBlock';
 import type { Article, Block } from '../../types';
 
+function getRenderId(): string | null {
+  return new URLSearchParams(
+    window.location.hash.replace(/^#\/render\??/, '')
+  ).get('id');
+}
+
 export function RenderView() {
   const storeArticle = useBuilderStore((state) => state.article);
+  const renderId = getRenderId();
 
-  // Live updates pushed from the builder via BroadcastChannel
+  // Article fetched from DB when a render ID is present in the URL
+  const [fetchedArticle, setFetchedArticle] = useState<Article | null>(null);
+  const [fetchError, setFetchError] = useState(false);
+
+  useEffect(() => {
+    if (!renderId) return;
+    getProject(renderId).then(({ data, error }) => {
+      if (error || !data) setFetchError(true);
+      else setFetchedArticle(data);
+    });
+  }, [renderId]);
+
+  // Live updates pushed from the builder via BroadcastChannel (used for the
+  // builder's own preview iframe — overrides the fetched/store article)
   const [liveArticle, setLiveArticle] = useState<Article | null>(null);
   useEffect(() => {
     const channel = new BroadcastChannel('gp-storylab-preview');
@@ -18,8 +39,24 @@ export function RenderView() {
     return () => channel.close();
   }, []);
 
-  // Prefer live article (from builder) over the last-persisted store value
-  const article = liveArticle ?? storeArticle;
+  // Priority: live (builder preview) > fetched (DB) > store (fallback)
+  const article = liveArticle ?? fetchedArticle ?? (renderId ? null : storeArticle);
+
+  if (renderId && !article && !fetchError) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-white">
+        <span className="text-sm text-gray-400">Laddar…</span>
+      </div>
+    );
+  }
+
+  if (fetchError || !article) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-white">
+        <span className="text-sm text-gray-400">Artikeln hittades inte.</span>
+      </div>
+    );
+  }
 
   // Detect whether we're running inside a CMS iframe
   const isEmbedded = window !== window.parent;
