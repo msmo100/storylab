@@ -6,7 +6,11 @@ import {
   useSensors,
   type DragEndEvent,
 } from '@dnd-kit/core';
-import { SortableContext, verticalListSortingStrategy, arrayMove } from '@dnd-kit/sortable';
+import {
+  SortableContext,
+  verticalListSortingStrategy,
+  arrayMove,
+} from '@dnd-kit/sortable';
 import { useBuilderStore } from '../../store/builderStore';
 import { BlockCard } from './BlockCard';
 
@@ -19,9 +23,11 @@ export function BlockList({ selectedBlockId, onSelect }: Props) {
   const { article, reorderBlocks } = useBuilderStore();
   const { blocks } = article;
 
-  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 8 } })
+  );
 
-  function onDragEnd(event: DragEndEvent) {
+  function handleDragEnd(event: DragEndEvent) {
     const { active, over } = event;
     if (!over || active.id === over.id) return;
     const oldIndex = blocks.findIndex((b) => b.id === active.id);
@@ -31,24 +37,21 @@ export function BlockList({ selectedBlockId, onSelect }: Props) {
 
   if (blocks.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-700 py-16 text-center text-gray-400 dark:text-gray-500">
-        <p className="text-sm font-medium">Inga block ännu</p>
-        <p className="text-xs mt-1">Använd knappen ovan för att lägga till ditt första block</p>
-      </div>
+      <p className="text-sm text-gray-400 dark:text-gray-500 text-center py-8">
+        Inga block ännu. Lägg till ett via knappen ovan.
+      </p>
     );
   }
 
   return (
-    <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
+    <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
       <SortableContext items={blocks.map((b) => b.id)} strategy={verticalListSortingStrategy}>
         <div className="flex flex-col gap-2">
-          {blocks.map((block, index) => (
+          {blocks.map((block, i) => (
             <BlockCard
               key={block.id}
               block={block}
-              isSelected={block.id === selectedBlockId}
-              isFirst={index === 0}
-              isLast={index === blocks.length - 1}
+              isSelected={selectedBlockId === block.id}
               onSelect={() => onSelect(block.id)}
             />
           ))}

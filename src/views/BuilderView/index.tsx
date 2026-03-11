@@ -5,6 +5,7 @@ import { useAuthStore } from '../../store/authStore';
 import { BlockList } from '../../components/builder/BlockList';
 import { AddBlockMenu } from '../../components/builder/AddBlockMenu';
 import { StylePanel } from '../../components/builder/StylePanel';
+import { HelpModal } from '../../components/ui/HelpModal';
 import { cn } from '../../utils/cn';
 
 type Device = 'mobile' | 'tablet' | 'desktop';
@@ -21,54 +22,33 @@ export function BuilderView() {
   const { guestMode, exitGuestMode } = useAuthStore();
   const [copied, setCopied] = useState(false);
   const [device, setDevice] = useState<Device>('mobile');
+  const [helpOpen, setHelpOpen] = useState(false);
   const [selectedBlockId, setSelectedBlockId] = useState<string | null>(null);
 
-  // Deselect if the block is removed
   const selectedBlock = article.blocks.find((b) => b.id === selectedBlockId) ?? null;
 
-  // Read projectId from hash: #/edit?id=<id>
   const projectId = new URLSearchParams(
     window.location.hash.replace(/^#\/edit\??/, '')
   ).get('id');
 
-  // Load the project on mount
   useEffect(() => {
-    if (projectId) {
-      loadProject(projectId);
-    }
+    if (projectId) loadProject(projectId);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [projectId]);
 
-  // Keyboard shortcuts
   useEffect(() => {
     function onKeyDown(e: KeyboardEvent) {
       const mod = e.metaKey || e.ctrlKey;
-      // Cmd/Ctrl+S — save immediately (skip in guest mode)
-      if (mod && e.key === 's') {
-        e.preventDefault();
-        if (projectId && !guestMode) saveProject();
-      }
-      // Cmd/Ctrl+Z — undo
-      if (mod && !e.shiftKey && e.key === 'z') {
-        e.preventDefault();
-        undo();
-      }
-      // Cmd/Ctrl+Shift+Z or Ctrl+Y — redo
-      if ((mod && e.shiftKey && e.key === 'z') || (e.ctrlKey && e.key === 'y')) {
-        e.preventDefault();
-        redo();
-      }
-      // Escape — close style panel
-      if (e.key === 'Escape') {
-        setSelectedBlockId(null);
-      }
+      if (mod && e.key === 's') { e.preventDefault(); if (projectId && !guestMode) saveProject(); }
+      if (mod && !e.shiftKey && e.key === 'z') { e.preventDefault(); undo(); }
+      if ((mod && e.shiftKey && e.key === 'z') || (e.ctrlKey && e.key === 'y')) { e.preventDefault(); redo(); }
+      if (e.key === 'Escape') setSelectedBlockId(null);
     }
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [projectId, guestMode, undo, redo]);
 
-  // BroadcastChannel pushes live article updates into the preview iframe
   const channelRef = useRef<BroadcastChannel | null>(null);
   useEffect(() => {
     channelRef.current = new BroadcastChannel('gp-storylab-preview');
@@ -76,55 +56,68 @@ export function BuilderView() {
   }, []);
 
   useEffect(() => {
-    const id = setTimeout(() => {
-      channelRef.current?.postMessage({ type: 'update', article });
-    }, 150);
+    const id = setTimeout(() => channelRef.current?.postMessage({ type: 'update', article }), 150);
     return () => clearTimeout(id);
   }, [article]);
 
-  // Re-broadcast article when switching device views (belt-and-suspenders)
   useEffect(() => {
-    const id = setTimeout(() => {
-      channelRef.current?.postMessage({ type: 'update', article });
-    }, 100);
+    const id = setTimeout(() => channelRef.current?.postMessage({ type: 'update', article }), 100);
     return () => clearTimeout(id);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [device]);
 
-  // Debounced auto-save (skip in guest mode)
   const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   useEffect(() => {
     if (!projectId || guestMode) return;
     if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
-    saveTimerRef.current = setTimeout(() => {
-      saveProject();
-    }, 1000);
-    return () => {
-      if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
-    };
+    saveTimerRef.current = setTimeout(() => saveProject(), 1000);
+    return () => { if (saveTimerRef.current) clearTimeout(saveTimerRef.current); };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [article, guestMode]);
 
   function handleBack() {
-    if (guestMode) {
-      exitGuestMode();
-      window.location.hash = '#/auth';
-    } else {
-      window.location.hash = '#/';
-    }
+    if (guestMode) { exitGuestMode(); window.location.hash = '#/auth'; }
+    else window.location.hash = '#/';
   }
 
   const base = window.location.origin + window.location.pathname;
-  const previewSrc = projectId ? `${base}#/render?id=${projectId}&preview=1` : `${base}#/render?preview=1`;
-  const embedSrc   = projectId ? `${base}#/render?id=${projectId}` : `${base}#/render`;
-  const iframeId = `sl-${projectId ?? 'preview'}`;
-  const embedCode = `<iframe id="${iframeId}" src="${embedSrc}" width="100%" frameborder="0" allow="autoplay" style="border:none;display:block;width:100%;"></iframe>\n<script>(function(){var f=document.getElementById('${iframeId}');window.addEventListener('message',function(e){if(e.data&&e.data.type==='storylab-resize'&&f&&e.source===f.contentWindow)f.style.height=e.data.height+'px';});})();<\/script>`;
+  const block = article.blocks[0];
+  const isScrolly = block?.type === 'scrollymedia';
+
+  // Preview src: scrollymedia blocks use the scrolly view; others use the render view
+  const previewSrc = isScrolly
+    ? (projectId ? `${base}#/scrolly?id=${projectId}&preview=1` : `${base}#/scrolly?preview=1`)
+    : (projectId ? `${base}#/render?id=${projectId}&preview=1` : `${base}#/render?preview=1`);
+
+  // Embed code
+  const embedSrc = projectId
+    ? (isScrolly ? `${base}#/scrolly?id=${projectId}` : `${base}#/render?id=${projectId}`)
+    : '';
+
+  let embedCode = '';
+  if (embedSrc && isScrolly && block?.type === 'scrollymedia') {
+    const n = block.slides.length;
+    const wId = `sl-w-${projectId}`;
+    const fId = `sl-f-${projectId}`;
+    embedCode =
+      `<div id="${wId}" style="height:${n * 100}vh;position:relative;">\n` +
+      `  <iframe id="${fId}" src="${embedSrc}" style="position:sticky;top:0;height:100vh;width:100%;border:none;display:block;" allow="autoplay"></iframe>\n` +
+      `</div>\n` +
+      `<script>(function(){` +
+      `var w=document.getElementById('${wId}'),f=document.getElementById('${fId}');` +
+      `window.addEventListener('message',function(e){if(e.data&&e.data.type==='storylab-scrolly-init'&&e.source===f.contentWindow){w.style.height=e.data.scrollHeight+'px';}});` +
+      `window.addEventListener('scroll',function(){if(!w||!f)return;var r=w.getBoundingClientRect(),h=window.innerHeight,sh=w.offsetHeight-h;if(sh<=0)return;var p=Math.max(0,Math.min(1,-r.top/sh));f.contentWindow.postMessage({type:'storylab-scroll',progress:p},'*');});` +
+      `})();<\/script>`;
+  } else if (embedSrc) {
+    const iframeId = `sl-${projectId}`;
+    embedCode =
+      `<iframe id="${iframeId}" src="${embedSrc}" width="100%" frameborder="0" allow="autoplay" style="border:none;display:block;width:100%;"></iframe>\n` +
+      `<script>(function(){var f=document.getElementById('${iframeId}');window.addEventListener('message',function(e){if(e.data&&e.data.type==='storylab-resize'&&f&&e.source===f.contentWindow)f.style.height=e.data.height+'px';});})();<\/script>`;
+  }
 
   function copyEmbedCode() {
-    navigator.clipboard.writeText(embedCode).then(() => {
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    });
+    if (!embedCode) return;
+    navigator.clipboard.writeText(embedCode).then(() => { setCopied(true); setTimeout(() => setCopied(false), 2000); });
   }
 
   const blockCount = article.blocks.length;
@@ -138,45 +131,29 @@ export function BuilderView() {
       {/* ── Left: Editor panel ──────────────────────────────────── */}
       <div className="flex flex-col w-[380px] flex-shrink-0 border-r border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
 
-        {/* Header */}
         <header className="flex-shrink-0 border-b border-gray-200 dark:border-gray-700 px-4 py-3 relative z-20">
           <div className="flex items-center justify-between mb-2.5">
             <div className="flex items-center gap-2">
-              <button
-                onClick={handleBack}
-                className="text-xs text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
-              >
+              <button onClick={handleBack} className="text-xs text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors">
                 ← {guestMode ? 'Logga in' : 'Tillbaka'}
               </button>
               <span className="text-sm font-bold tracking-tight text-gray-900 dark:text-gray-100">GP StoryLab</span>
             </div>
             <div className="flex items-center gap-1">
-              {/* Undo / Redo buttons */}
-              <button
-                onClick={undo}
-                disabled={!canUndo}
-                title="Ångra (⌘Z)"
-                aria-label="Ångra"
-                className="px-1.5 py-1 rounded text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 disabled:opacity-30 disabled:cursor-not-allowed transition-colors text-sm leading-none"
-              >
-                ↩
-              </button>
-              <button
-                onClick={redo}
-                disabled={!canRedo}
-                title="Gör om (⌘⇧Z)"
-                aria-label="Gör om"
-                className="px-1.5 py-1 rounded text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 disabled:opacity-30 disabled:cursor-not-allowed transition-colors text-sm leading-none"
-              >
-                ↪
-              </button>
-              <button
-                onClick={toggleDarkMode}
-                title={darkMode ? 'Växla till ljusläge' : 'Växla till mörkt läge'}
-                className="text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors text-base leading-none px-1 ml-1"
-                aria-label="Växla mörkt läge"
-              >
+              <button onClick={undo} disabled={!canUndo} title="Ångra (⌘Z)" aria-label="Ångra"
+                className="px-1.5 py-1 rounded text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 disabled:opacity-30 disabled:cursor-not-allowed transition-colors text-sm leading-none">↩</button>
+              <button onClick={redo} disabled={!canRedo} title="Gör om (⌘⇧Z)" aria-label="Gör om"
+                className="px-1.5 py-1 rounded text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 disabled:opacity-30 disabled:cursor-not-allowed transition-colors text-sm leading-none">↪</button>
+              <button onClick={toggleDarkMode} title={darkMode ? 'Växla till ljusläge' : 'Växla till mörkt läge'}
+                className="text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors text-base leading-none px-1 ml-1" aria-label="Växla mörkt läge">
                 {darkMode ? '☀' : '☽'}
+              </button>
+              <button
+                onClick={() => setHelpOpen(true)}
+                title="Hur man använder"
+                className="w-6 h-6 rounded-full border border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-400 hover:border-gray-400 dark:hover:border-gray-500 hover:text-gray-700 dark:hover:text-gray-300 text-xs font-bold transition-colors flex items-center justify-center"
+              >
+                ?
               </button>
               <AddBlockMenu />
             </div>
@@ -191,12 +168,10 @@ export function BuilderView() {
           />
         </header>
 
-        {/* Block list */}
         <main className="flex-1 overflow-y-auto px-4 py-4">
           <BlockList selectedBlockId={selectedBlockId} onSelect={setSelectedBlockId} />
         </main>
 
-        {/* Footer */}
         <footer className="flex-shrink-0 border-t border-gray-100 dark:border-gray-700 px-4 py-2.5 flex items-center justify-between text-xs text-gray-400 dark:text-gray-500">
           <span>{blockCount} block</span>
           {guestMode ? (
@@ -210,64 +185,41 @@ export function BuilderView() {
       {/* ── Middle: Preview panel ────────────────────────────────── */}
       <div className="flex flex-col flex-1 min-w-0">
 
-        {/* Preview toolbar */}
         <div className="flex-shrink-0 h-[41px] flex items-center justify-between px-4 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700">
-
-          {/* Device switcher */}
           <div className="flex items-center gap-1 bg-gray-100 dark:bg-gray-800 rounded-lg p-0.5">
             {DEVICES.map((d) => (
-              <button
-                key={d.id}
-                onClick={() => setDevice(d.id)}
-                title={d.label}
-                className={cn(
-                  'px-3 py-1 rounded-md text-xs font-medium transition-colors',
+              <button key={d.id} onClick={() => setDevice(d.id)} title={d.label}
+                className={cn('px-3 py-1 rounded-md text-xs font-medium transition-colors',
                   device === d.id
                     ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 shadow-sm'
-                    : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
-                )}
-              >
+                    : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300')}>
                 {d.label}
               </button>
             ))}
           </div>
-
-          {/* Actions */}
           <div className="flex items-center gap-2">
-            <button
-              onClick={copyEmbedCode}
-              className="text-xs px-3 py-1.5 rounded-md border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-400 font-medium transition-colors"
-            >
-              {copied ? 'Kopierat!' : 'Kopiera inbäddningskod'}
-            </button>
-            <a
-              href={previewSrc}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-xs px-3 py-1.5 rounded-md bg-gray-900 dark:bg-gray-100 hover:bg-gray-700 dark:hover:bg-gray-200 text-white dark:text-gray-900 font-medium transition-colors"
-            >
+            {projectId && (
+              <button onClick={copyEmbedCode} disabled={!embedCode}
+                className="text-xs px-3 py-1.5 rounded-md border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-400 font-medium transition-colors disabled:opacity-40">
+                {copied ? 'Kopierat!' : 'Kopiera inbäddningskod'}
+              </button>
+            )}
+            <a href={previewSrc} target="_blank" rel="noopener noreferrer"
+              className="text-xs px-3 py-1.5 rounded-md bg-gray-900 dark:bg-gray-100 hover:bg-gray-700 dark:hover:bg-gray-200 text-white dark:text-gray-900 font-medium transition-colors">
               Öppna ↗
             </a>
           </div>
         </div>
 
-        {/* Preview canvas — always the same iframe element to avoid remounting */}
-        <div className={cn(
-          'flex-1 min-h-0',
-          device !== 'desktop' && 'overflow-auto bg-gray-100 dark:bg-gray-950 flex justify-center py-6',
-        )}>
+        <div className={cn('flex-1 min-h-0', device !== 'desktop' && 'overflow-auto bg-gray-100 dark:bg-gray-950 flex justify-center py-6')}>
           <iframe
             src={previewSrc}
             title="Förhandsgranskning av artikel"
             allow="autoplay"
             className="border-none"
             style={{
-              backgroundColor: 'white',
-              ...(device === 'desktop' ? {
-                width: '100%',
-                height: '100%',
-                display: 'block',
-              } : {
+              backgroundColor: isScrolly ? '#000' : 'white',
+              ...(device === 'desktop' ? { width: '100%', height: '100%', display: 'block' } : {
                 width: activeDevice.width!,
                 height: '100%',
                 minHeight: '600px',
@@ -280,26 +232,19 @@ export function BuilderView() {
         </div>
       </div>
 
-      {/* ── Right: Style panel (when a block is selected) ─────────── */}
+      {/* ── Right: Style panel ─────────────────────────────────── */}
       {selectedBlock && (
-        <StylePanel
-          block={selectedBlock}
-          onClose={() => setSelectedBlockId(null)}
-        />
+        <StylePanel block={selectedBlock} onClose={() => setSelectedBlockId(null)} />
       )}
+
+      <HelpModal open={helpOpen} onClose={() => setHelpOpen(false)} />
     </div>
   );
 }
-
-// ─── Save indicator ───────────────────────────────────────────────────────────
 
 function SaveIndicator({ status, updatedAt }: { status: SaveStatus; updatedAt: string }) {
   if (status === 'saving') return <span>Sparar…</span>;
   if (status === 'error') return <span className="text-red-500 dark:text-red-400">Kunde inte spara</span>;
   if (status === 'saved') return <span className="text-green-600 dark:text-green-400">Sparad</span>;
-  return (
-    <span>
-      Sparad {new Date(updatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-    </span>
-  );
+  return <span>Sparad {new Date(updatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>;
 }

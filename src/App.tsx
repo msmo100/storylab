@@ -5,15 +5,17 @@ import { AuthView } from './views/AuthView';
 import { DashboardView } from './views/DashboardView';
 import { BuilderView } from './views/BuilderView';
 import { RenderView } from './views/RenderView';
+import { ScrollyView } from './views/ScrollyView';
 import { ToastContainer } from './components/ui/Toast';
 
-type View = 'auth' | 'dashboard' | 'builder' | 'render';
+type View = 'auth' | 'dashboard' | 'builder' | 'render' | 'scrolly';
 
 function getView(): View {
   const hash = window.location.hash;
-  if (hash.startsWith('#/render')) return 'render';
-  if (hash.startsWith('#/edit'))   return 'builder';
-  if (hash.startsWith('#/auth'))   return 'auth';
+  if (hash.startsWith('#/scrolly')) return 'scrolly';
+  if (hash.startsWith('#/render'))  return 'render';
+  if (hash.startsWith('#/edit'))    return 'builder';
+  if (hash.startsWith('#/auth'))    return 'auth';
   return 'dashboard';
 }
 
@@ -22,32 +24,26 @@ function App() {
   const darkMode = useBuilderStore((s) => s.darkMode);
   const { user, loading, guestMode } = useAuthStore();
 
-  // Hash change listener
   useEffect(() => {
     const onHashChange = () => setView(getView());
     window.addEventListener('hashchange', onHashChange);
     return () => window.removeEventListener('hashchange', onHashChange);
   }, []);
 
-  // Keep <html> dark class in sync
   useEffect(() => {
     document.documentElement.classList.toggle('dark', darkMode);
   }, [darkMode]);
 
-  // Auth guards: run once auth state is known (skip for guest mode)
   useEffect(() => {
     if (loading || guestMode) return;
-
-    if (!user && view !== 'auth' && view !== 'render') {
+    if (!user && view !== 'auth' && view !== 'render' && view !== 'scrolly') {
       window.location.hash = '#/auth';
     }
-
     if (user && view === 'auth') {
       window.location.hash = '#/';
     }
   }, [user, loading, guestMode, view]);
 
-  // Spinner while the initial Supabase session resolve
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-950">
@@ -56,10 +52,10 @@ function App() {
     );
   }
 
-  // Render view is public — used inside CMS iframes with no auth context
-  if (view === 'render') return <RenderView />;
+  // Public views — used inside CMS iframes
+  if (view === 'scrolly') return <ScrollyView />;
+  if (view === 'render')  return <RenderView />;
 
-  // Guest mode: skip auth and go straight to a blank builder
   if (guestMode) {
     return (
       <>
@@ -69,7 +65,6 @@ function App() {
     );
   }
 
-  // All other views require a logged-in user
   if (!user) return <AuthView />;
 
   return (

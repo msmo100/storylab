@@ -61,7 +61,6 @@ const BLOCK_OPTIONS: BlockOption[] = [
       overlays: [],
     },
   },
-
   {
     label: 'Tidslinje',
     description: 'Händelser med rubrik, tid och text längs en vertikal linje',
@@ -95,69 +94,61 @@ const BLOCK_OPTIONS: BlockOption[] = [
       items: [],
     },
   },
+  {
+    label: 'ScrollyMedia',
+    description: 'Scrollytelling med bilder/video och parallax — eget iframe-inbäddning',
+    emoji: '🎬',
+    defaultBlock: {
+      type: 'scrollymedia',
+      animation: 'none',
+      slides: [],
+    },
+  },
 ];
 
 export function AddBlockMenu() {
-  const { addBlock } = useBuilderStore();
+  const { addBlock, article } = useBuilderStore();
   const [open, setOpen] = useState(false);
   const [focusedIndex, setFocusedIndex] = useState(-1);
   const menuRef = useRef<HTMLDivElement>(null);
   const itemRefs = useRef<(HTMLButtonElement | null)[]>([]);
+
+  // One block per article — hide the add button once a block exists
+  const hasBlock = article.blocks.length > 0;
 
   const close = useCallback(() => {
     setOpen(false);
     setFocusedIndex(-1);
   }, []);
 
-  // Close on outside click
   useEffect(() => {
     if (!open) return;
     const handler = (e: MouseEvent) => {
-      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
-        close();
-      }
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) close();
     };
     document.addEventListener('mousedown', handler);
     return () => document.removeEventListener('mousedown', handler);
   }, [open, close]);
 
-  // Keyboard navigation
   useEffect(() => {
     if (!open) return;
     const handler = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        close();
-        return;
-      }
+      if (e.key === 'Escape') { close(); return; }
       if (e.key === 'ArrowDown') {
         e.preventDefault();
-        setFocusedIndex((i) => {
-          const next = Math.min(i + 1, BLOCK_OPTIONS.length - 1);
-          itemRefs.current[next]?.focus();
-          return next;
-        });
+        setFocusedIndex((i) => { const next = Math.min(i + 1, BLOCK_OPTIONS.length - 1); itemRefs.current[next]?.focus(); return next; });
       }
       if (e.key === 'ArrowUp') {
         e.preventDefault();
-        setFocusedIndex((i) => {
-          const next = Math.max(i - 1, 0);
-          itemRefs.current[next]?.focus();
-          return next;
-        });
+        setFocusedIndex((i) => { const next = Math.max(i - 1, 0); itemRefs.current[next]?.focus(); return next; });
       }
     };
     document.addEventListener('keydown', handler);
     return () => document.removeEventListener('keydown', handler);
   }, [open, close]);
 
-  // Focus first item when opened
   useEffect(() => {
-    if (open) {
-      setTimeout(() => {
-        itemRefs.current[0]?.focus();
-        setFocusedIndex(0);
-      }, 0);
-    }
+    if (open) setTimeout(() => { itemRefs.current[0]?.focus(); setFocusedIndex(0); }, 0);
   }, [open]);
 
   function handleAdd(option: BlockOption) {
@@ -165,14 +156,11 @@ export function AddBlockMenu() {
     close();
   }
 
+  if (hasBlock) return null;
+
   return (
     <div ref={menuRef} className="relative">
-      <Button
-        variant="primary"
-        onClick={() => setOpen((v) => !v)}
-        aria-haspopup="listbox"
-        aria-expanded={open}
-      >
+      <Button variant="primary" onClick={() => setOpen((v) => !v)} aria-haspopup="listbox" aria-expanded={open}>
         + Block
       </Button>
 

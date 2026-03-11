@@ -1,152 +1,66 @@
-import { useRef, useEffect } from 'react';
-import { motion, useScroll, useTransform, type MotionValue } from 'framer-motion';
-import { useIntersectionObserver } from '../../hooks/useIntersectionObserver';
+import { useRef } from 'react';
+import { motion, useScroll, useTransform } from 'framer-motion';
 import type { StickyBlock as StickyBlockType } from '../../types';
 
-interface Props {
-  block: StickyBlockType;
-}
-
-/**
- * One text overlay. Uses Framer Motion's useTransform to derive its opacity and
- * vertical position from the shared scroll progress of the parent container.
- */
-function OverlayText({
-  text,
-  index,
-  total,
-  scrollYProgress,
-  styles,
-}: {
-  text: string;
-  index: number;
-  total: number;
-  scrollYProgress: MotionValue<number>;
-  styles?: StickyBlockType['styles'];
-}) {
-  const slotSize = 1 / total;
-  const slotStart = index * slotSize;
-  const slotEnd = (index + 1) * slotSize;
-  const fade = slotSize * 0.08; // faster transitions
-  const isFirst = index === 0;
-  const isLast = index === total - 1;
-
-  // First overlay is visible immediately on section entry
-  const opacity = useTransform(
-    scrollYProgress,
-    [slotStart, slotStart + fade, slotEnd - fade, slotEnd],
-    [isFirst ? 1 : 0, 1, 1, isLast ? 1 : 0]
-  );
-
-  // First overlay starts at rest (no initial offset); subsequent ones slide up on entry
-  const y = useTransform(
-    scrollYProgress,
-    [slotStart, slotStart + fade],
-    [isFirst ? '0rem' : '1.5rem', '0rem']
-  );
-
-  return (
-    <motion.div
-      style={{ opacity, y }}
-      className="absolute inset-0 flex items-center justify-center px-8"
-    >
-      <div className="text-center max-w-2xl">
-        {styles?.accentColor && (
-          <div
-            className="mb-3 h-1 w-10 rounded-full mx-auto"
-            style={{ background: styles.accentColor }}
-          />
-        )}
-        <p
-          className="text-white text-2xl md:text-4xl font-semibold leading-snug drop-shadow-lg"
-          style={{
-            color: styles?.textColor,
-            fontFamily: styles?.fontFamily,
-            fontSize: styles?.fontSize ? `${styles.fontSize}px` : undefined,
-            lineHeight: styles?.lineHeight,
-            letterSpacing: styles?.letterSpacing ? `${styles.letterSpacing}em` : undefined,
-          }}
-        >
-          {text}
-        </p>
-      </div>
-    </motion.div>
-  );
-}
+interface Props { block: StickyBlockType }
 
 export function StickyBlock({ block }: Props) {
+  const { overlays } = block;
   const containerRef = useRef<HTMLDivElement>(null);
-  const videoRef = useRef<HTMLVideoElement>(null);
 
-  // IntersectionObserver drives video autoplay/pause
-  const { ref: stickyRef, isIntersecting } = useIntersectionObserver<HTMLDivElement>({
-    threshold: 0.1,
-    triggerOnce: false,
-  });
-
-  useEffect(() => {
-    const video = videoRef.current;
-    if (!video) return;
-    if (isIntersecting) {
-      video.play().catch(() => {});
-    } else {
-      video.pause();
-    }
-  }, [isIntersecting]);
-
-  // useScroll tracks progress through the full container height
   const { scrollYProgress } = useScroll({
     target: containerRef,
-    offset: ['start start', 'end start'],
+    offset: ['start start', 'end end'],
   });
 
-  const { overlays, backgroundType, backgroundSrc } = block;
-  // Each overlay gets 100vh of scroll room; minimum 100vh even with no overlays
-  const containerHeightVh = Math.max(overlays.length, 1) * 100;
-
   return (
-    <div ref={containerRef} style={{ height: `${containerHeightVh}vh` }}>
-      <div ref={stickyRef} className="sticky top-0 h-screen overflow-hidden">
+    <div
+      ref={containerRef}
+      style={{ height: `${(overlays.length + 1) * 100}vh` }}
+    >
+      <div style={{ position: 'sticky', top: 0, height: '100vh', overflow: 'hidden' }}>
         {/* Background */}
-        {backgroundType === 'image' ? (
-          <img
-            src={backgroundSrc || 'https://placehold.co/1920x1080/111827/111827'}
-            alt={block.backgroundAlt || ''}
-            className="absolute inset-0 w-full h-full object-cover"
-          />
-        ) : (
-          <video
-            ref={videoRef}
-            src={backgroundSrc}
-            muted
-            loop
-            playsInline
-            className="absolute inset-0 w-full h-full object-cover"
-          />
-        )}
-
-        {/* Dark overlay for text legibility */}
-        <div className="absolute inset-0 bg-black/55" />
-
-        {/* Overlay texts */}
         <div className="absolute inset-0">
-          {overlays.length === 0 ? (
-            <div className="absolute inset-0 flex items-center justify-center">
-              <p className="text-white/40 text-base">Inga överlager tillagda</p>
-            </div>
+          {block.backgroundType === 'video' ? (
+            <video
+              src={block.backgroundSrc}
+              autoPlay muted loop playsInline
+              className="w-full h-full object-cover"
+              style={{ objectPosition: block.styles?.objectPosition }}
+            />
           ) : (
-            overlays.map((text, i) => (
-              <OverlayText
-                key={i}
-                text={text}
-                index={i}
-                total={overlays.length}
-                styles={block.styles}
-                scrollYProgress={scrollYProgress}
-              />
-            ))
+            <img
+              src={block.backgroundSrc}
+              alt={block.backgroundAlt ?? ''}
+              className="w-full h-full object-cover"
+              style={{ objectPosition: block.styles?.objectPosition }}
+            />
           )}
+          <div className="absolute inset-0 bg-black/40" />
         </div>
+
+        {/* Text overlays */}
+        {overlays.map((text, i) => {
+          const start = (i) / (overlays.length + 1);
+          const mid = (i + 0.5) / (overlays.length + 1);
+          const end = (i + 1) / (overlays.length + 1);
+          const opacity = useTransform(scrollYProgress, [start, mid, end], [0, 1, 0]);
+          const y = useTransform(scrollYProgress, [start, end], ['40px', '-40px']);
+          return (
+            <motion.div
+              key={i}
+              style={{ opacity, y }}
+              className="absolute inset-0 flex items-center justify-center px-8"
+            >
+              <p
+                className="text-white text-center font-semibold drop-shadow-lg max-w-3xl"
+                style={{ fontSize: 'clamp(1.5rem, 4vw, 3rem)', lineHeight: 1.3 }}
+              >
+                {text}
+              </p>
+            </motion.div>
+          );
+        })}
       </div>
     </div>
   );

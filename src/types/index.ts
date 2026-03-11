@@ -1,4 +1,4 @@
-export type BlockType = 'text' | 'image' | 'video' | 'quote' | 'hero' | 'sticky' | 'timeline' | 'chat' | 'carousel';
+export type BlockType = 'text' | 'image' | 'video' | 'quote' | 'hero' | 'sticky' | 'timeline' | 'chat' | 'carousel' | 'scrollymedia';
 
 export interface BlockStyle {
   textColor?: string;
@@ -25,12 +25,11 @@ export interface BlockStyle {
 
 export type AnimationPreset = 'none' | 'fade' | 'slide-up' | 'slide-left' | 'zoom';
 
-
 export interface BaseBlock {
   id: string;
   type: BlockType;
   animation: AnimationPreset;
-  /** Entrance animation delay in seconds. Optional for backwards-compat with saved articles. */
+  /** Entrance animation delay in seconds. */
   animationDelay?: number;
   /** CSS max-width value (e.g. '800px', '60vw'). Undefined = automatic. */
   maxWidth?: string;
@@ -82,7 +81,6 @@ export interface StickyBlock extends BaseBlock {
   backgroundAlt?: string;
   overlays: string[];
 }
-
 
 export type TimelineDotStyle = 'filled' | 'ring' | 'solid' | 'diamond' | 'none';
 
@@ -140,6 +138,28 @@ export interface CarouselBlock extends BaseBlock {
   items: CarouselItem[];
 }
 
+/** A single section (slide) in a ScrollyMedia block. */
+export interface ScrollySlide {
+  id: string;
+  backgroundType: 'image' | 'video';
+  backgroundSrc: string;
+  backgroundPoster?: string;
+  /** Dark overlay opacity 0–1, default 0.5 */
+  overlayOpacity?: number;
+  headline?: string;
+  subheadline?: string;
+  body?: string;
+}
+
+/**
+ * Standalone scrollytelling block.
+ * Gets its own sticky-wrapper iframe embed — separate from the article.
+ */
+export interface ScrollyMediaBlock extends BaseBlock {
+  type: 'scrollymedia';
+  slides: ScrollySlide[];
+}
+
 export type Block =
   | TextBlock
   | ImageBlock
@@ -147,10 +167,10 @@ export type Block =
   | QuoteBlock
   | HeroBlock
   | StickyBlock
-
   | TimelineBlock
   | ChatBlock
-  | CarouselBlock;
+  | CarouselBlock
+  | ScrollyMediaBlock;
 
 // Distributive Omit — correctly strips 'id' from each union member
 export type BlockWithoutId =
@@ -160,10 +180,10 @@ export type BlockWithoutId =
   | Omit<QuoteBlock, 'id'>
   | Omit<HeroBlock, 'id'>
   | Omit<StickyBlock, 'id'>
-
   | Omit<TimelineBlock, 'id'>
   | Omit<ChatBlock, 'id'>
-  | Omit<CarouselBlock, 'id'>;
+  | Omit<CarouselBlock, 'id'>
+  | Omit<ScrollyMediaBlock, 'id'>;
 
 export interface Article {
   id: string;

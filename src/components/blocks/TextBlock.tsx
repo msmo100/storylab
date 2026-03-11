@@ -1,31 +1,25 @@
 import type { TextBlock as TextBlockType } from '../../types';
-import { resolveFontSize } from '../../utils/resolveFontSize';
 
-interface Props {
-  block: TextBlockType;
-}
+interface Props { block: TextBlockType }
 
 export function TextBlock({ block }: Props) {
+  const style: React.CSSProperties = {
+    maxWidth: block.maxWidth ?? '720px',
+    margin: '0 auto',
+    padding: '1.5rem 1.5rem',
+    color: block.styles?.textColor,
+    backgroundColor: block.styles?.backgroundColor,
+    fontFamily: block.styles?.fontFamily,
+    fontSize: block.styles?.fontSize ? `${block.styles.fontSize}px` : undefined,
+    lineHeight: block.styles?.lineHeight,
+    letterSpacing: block.styles?.letterSpacing ? `${block.styles.letterSpacing}em` : undefined,
+  };
   return (
-    <div className="prose prose-lg max-w-none">
-      <p
-        style={{
-          color: block.styles?.textColor,
-          backgroundColor: block.styles?.backgroundColor,
-          fontFamily: block.styles?.fontFamily,
-          fontSize: resolveFontSize(block.styles?.fontSize),
-          lineHeight: block.styles?.lineHeight,
-          letterSpacing: block.styles?.letterSpacing ? `${block.styles.letterSpacing}em` : undefined,
-          boxShadow: block.styles?.boxShadow,
-          outline: block.styles?.outlineColor
-            ? `${block.styles.outlineWidth ?? '2px'} solid ${block.styles.outlineColor}`
-            : undefined,
-          borderRadius: block.styles?.borderRadius,
-          padding: (block.styles?.boxShadow || block.styles?.outlineColor || block.styles?.borderRadius) ? '0.75em 1em' : undefined,
-        }}
-      >
-        {block.content}
-      </p>
+    <div style={style}>
+      <div
+        className="prose prose-neutral dark:prose-invert max-w-none"
+        dangerouslySetInnerHTML={{ __html: block.content }}
+      />
     </div>
   );
 }

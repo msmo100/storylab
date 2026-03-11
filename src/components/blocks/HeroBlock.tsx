@@ -1,108 +1,53 @@
-import { useRef, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { useIntersectionObserver } from '../../hooks/useIntersectionObserver';
+import { useRef } from 'react';
+import { motion, useScroll, useTransform } from 'framer-motion';
 import type { HeroBlock as HeroBlockType } from '../../types';
 
-interface Props {
-  block: HeroBlockType;
-}
+interface Props { block: HeroBlockType }
 
 export function HeroBlock({ block }: Props) {
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const { ref: wrapperRef, isIntersecting } = useIntersectionObserver<HTMLDivElement>({
-    threshold: 0.3,
-    triggerOnce: false,
-  });
-
-  useEffect(() => {
-    const video = videoRef.current;
-    if (!video) return;
-    if (isIntersecting) {
-      video.play().catch(() => {});
-    } else {
-      video.pause();
-    }
-  }, [isIntersecting]);
+  const ref = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({ target: ref, offset: ['start start', 'end start'] });
+  const bgY = useTransform(scrollYProgress, [0, 1], ['0%', '25%']);
+  const opacity = useTransform(scrollYProgress, [0, 0.6], [1, 0]);
 
   return (
-    <div
-      ref={wrapperRef}
-      className="relative h-screen w-full overflow-hidden flex items-center justify-center"
-    >
-      {/* Background */}
-      {block.backgroundType === 'image' ? (
-        <img
-          src={block.backgroundSrc || 'https://placehold.co/1920x1080/1a1a1a/1a1a1a'}
-          alt=""
-          aria-hidden="true"
-          className="absolute inset-0 w-full h-full object-cover"
-        />
-      ) : (
-        <video
-          ref={videoRef}
-          src={block.backgroundSrc}
-          muted
-          loop
-          playsInline
-          className="absolute inset-0 w-full h-full object-cover"
-        />
-      )}
-
-      {/* Gradient overlay */}
-      <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-black/40 to-black/70" />
-
-      {/* Content */}
+    <div ref={ref} className="relative h-screen overflow-hidden">
+      <motion.div className="absolute inset-0" style={{ y: bgY }}>
+        {block.backgroundType === 'video' ? (
+          <video
+            src={block.backgroundSrc}
+            autoPlay muted loop playsInline
+            className="absolute inset-0 w-full h-full object-cover"
+            style={{ objectPosition: block.styles?.objectPosition }}
+          />
+        ) : (
+          <img
+            src={block.backgroundSrc}
+            alt=""
+            className="absolute inset-0 w-full h-full object-cover"
+            style={{ objectPosition: block.styles?.objectPosition }}
+          />
+        )}
+        <div className="absolute inset-0 bg-black/40" />
+      </motion.div>
       <motion.div
-        initial={{ opacity: 0, y: 32 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, amount: 0.3 }}
-        transition={{ duration: 0.9, ease: 'easeOut', delay: 0.15 }}
-        className="relative z-10 text-center text-white max-w-3xl px-6"
+        style={{ opacity }}
+        className="relative z-10 h-full flex flex-col items-center justify-center text-center px-6"
       >
-        <h1
-          className="text-5xl md:text-7xl font-bold leading-tight tracking-tight drop-shadow-md"
-          style={{
-            color: block.styles?.textColor ?? block.styles?.accentColor,
-            fontFamily: block.styles?.fontFamily,
-            fontSize: block.styles?.fontSize ? `${block.styles.fontSize}px` : undefined,
-            lineHeight: block.styles?.lineHeight,
-            letterSpacing: block.styles?.letterSpacing ? `${block.styles.letterSpacing}em` : undefined,
-          }}
-        >
-          {block.heading || 'Hero heading'}
-        </h1>
+        {block.heading && (
+          <h1
+            className="text-white font-bold drop-shadow-lg"
+            style={{ fontSize: 'clamp(2rem, 6vw, 4.5rem)', lineHeight: 1.1 }}
+          >
+            {block.heading}
+          </h1>
+        )}
         {block.subheading && (
-          <p className="mt-6 text-xl md:text-2xl text-white/80 font-light leading-relaxed">
+          <p className="text-white/80 mt-4 text-xl max-w-2xl drop-shadow">
             {block.subheading}
           </p>
         )}
       </motion.div>
-
-      {/* Scroll hint */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        whileInView={{ opacity: 1 }}
-        viewport={{ once: true }}
-        transition={{ delay: 1.2, duration: 0.6 }}
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 text-white/60"
-        aria-hidden="true"
-      >
-        <span className="text-xs tracking-widest uppercase">Scroll</span>
-        <motion.div
-          animate={{ y: [0, 6, 0] }}
-          transition={{ repeat: Infinity, duration: 1.4, ease: 'easeInOut' }}
-        >
-          <ChevronDown />
-        </motion.div>
-      </motion.div>
     </div>
-  );
-}
-
-function ChevronDown() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <polyline points="4 6 8 10 12 6" />
-    </svg>
   );
 }

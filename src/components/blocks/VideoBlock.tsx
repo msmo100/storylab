@@ -1,49 +1,43 @@
-import { useRef, useEffect } from 'react';
-import { useIntersectionObserver } from '../../hooks/useIntersectionObserver';
+import { useEffect, useRef } from 'react';
 import type { VideoBlock as VideoBlockType } from '../../types';
 
-interface Props {
-  block: VideoBlockType;
-}
+interface Props { block: VideoBlockType }
 
 export function VideoBlock({ block }: Props) {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const { ref: wrapperRef, isIntersecting } = useIntersectionObserver<HTMLDivElement>({
-    threshold: 0.5,
-    triggerOnce: false,
-  });
 
   useEffect(() => {
     const video = videoRef.current;
-    if (!video) return;
-    if (isIntersecting) {
-      video.play().catch(() => {});
-    } else {
-      video.pause();
-    }
-  }, [isIntersecting]);
+    if (!video || !block.autoplay) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) video.play().catch(() => {});
+        else video.pause();
+      },
+      { threshold: 0.3 }
+    );
+    observer.observe(video);
+    return () => observer.disconnect();
+  }, [block.autoplay]);
 
-  const decorStyle = {
-    boxShadow: block.styles?.boxShadow,
-    outline: block.styles?.outlineColor
-      ? `${block.styles.outlineWidth ?? '2px'} solid ${block.styles.outlineColor}`
-      : undefined,
+  const style: React.CSSProperties = {
+    maxWidth: block.maxWidth ?? '100%',
+    margin: '0 auto',
     borderRadius: block.styles?.borderRadius,
+    overflow: 'hidden',
   };
 
   return (
-    <div ref={wrapperRef}>
+    <div style={style}>
       <video
         ref={videoRef}
         src={block.src}
         muted
         loop
         playsInline
-        className="w-full object-cover"
-        style={{
-          ...decorStyle,
-          objectPosition: block.styles?.objectPosition,
-        }}
+        controls={!block.autoplay}
+        className="w-full h-auto block"
+        style={{ objectPosition: block.styles?.objectPosition }}
       />
     </div>
   );

@@ -64,7 +64,6 @@ function makeBlankArticle(): Article {
   return { id: generateId(), title: '', blocks: [], createdAt: now, updatedAt: now };
 }
 
-/** Push current article onto history, clear future, return new history array. */
 function pushHistory(current: Article, history: Article[]): Article[] {
   return [...history.slice(-(HISTORY_LIMIT - 1)), current];
 }
@@ -75,7 +74,6 @@ export const useBuilderStore = create<BuilderStore>((set, get) => ({
   article: makeBlankArticle(),
   history: [],
   future: [],
-  // Persist dark mode preference without the full persist middleware
   darkMode: localStorage.getItem('sl-dark') === 'true',
   saveStatus: 'idle',
   projects: [],
@@ -272,19 +270,17 @@ export const useBuilderStore = create<BuilderStore>((set, get) => ({
   },
 
   removeProject: async (id) => {
-    // Optimistic removal
     set((state) => ({ projects: state.projects.filter((p) => p.id !== id) }));
     const result = await deleteProject(id);
     if (result.error) {
       toast.error('Kunde inte ta bort projektet');
-      get().loadProjects(); // roll back
+      get().loadProjects();
     } else {
       toast.success('Projekt borttaget');
     }
   },
 
   renameProject: async (id, newTitle) => {
-    // Optimistic update
     set((state) => ({
       projects: state.projects.map((p) =>
         p.id === id ? { ...p, title: newTitle } : p
@@ -293,7 +289,7 @@ export const useBuilderStore = create<BuilderStore>((set, get) => ({
     const result = await updateProject(id, { title: newTitle });
     if (result.error) {
       toast.error('Kunde inte byta namn');
-      get().loadProjects(); // roll back
+      get().loadProjects();
     }
   },
 

@@ -3,6 +3,7 @@ import { useBuilderStore } from '../../store/builderStore';
 import { useAuthStore } from '../../store/authStore';
 import { Button } from '../../components/ui/Button';
 import { ConfirmModal } from '../../components/ui/Modal';
+import { HelpModal } from '../../components/ui/HelpModal';
 import type { ProjectSummary } from '../../types';
 
 type SortOrder = 'updated' | 'created' | 'alpha';
@@ -15,6 +16,7 @@ export function DashboardView() {
   const [search, setSearch] = useState('');
   const [sortOrder, setSortOrder] = useState<SortOrder>('updated');
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
+  const [helpOpen, setHelpOpen] = useState(false);
 
   useEffect(() => {
     loadProjects();
@@ -63,6 +65,13 @@ export function DashboardView() {
         <span className="font-bold tracking-tight text-gray-900 dark:text-gray-100">GP StoryLab</span>
         <div className="flex items-center gap-3">
           <span className="text-sm text-gray-400 dark:text-gray-500 hidden sm:block">{user?.email}</span>
+          <button
+            onClick={() => setHelpOpen(true)}
+            title="Hur man använder"
+            className="w-7 h-7 rounded-full border border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-400 hover:border-gray-400 dark:hover:border-gray-500 hover:text-gray-700 dark:hover:text-gray-300 text-xs font-bold transition-colors flex items-center justify-center"
+          >
+            ?
+          </button>
           <Button variant="secondary" size="sm" onClick={signOut}>
             Logga ut
           </Button>
@@ -147,6 +156,7 @@ export function DashboardView() {
         onConfirm={handleDeleteConfirmed}
         onCancel={() => setDeleteTarget(null)}
       />
+      <HelpModal open={helpOpen} onClose={() => setHelpOpen(false)} />
     </div>
   );
 }

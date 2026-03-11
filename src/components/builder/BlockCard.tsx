@@ -10,8 +10,6 @@ import { cn } from '../../utils/cn';
 interface Props {
   block: Block;
   isSelected: boolean;
-  isFirst: boolean;
-  isLast: boolean;
   onSelect: () => void;
 }
 
@@ -22,10 +20,10 @@ const BLOCK_LABELS: Record<Block['type'], string> = {
   quote: 'Citat',
   hero: 'Hero',
   sticky: 'Klistrad',
-
   timeline: 'Tidslinje',
   chat: 'Chatt',
   carousel: 'Karusell',
+  scrollymedia: 'ScrollyMedia',
 };
 
 const BLOCK_COLORS: Record<Block['type'], string> = {
@@ -35,15 +33,14 @@ const BLOCK_COLORS: Record<Block['type'], string> = {
   quote: 'bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300',
   hero: 'bg-rose-100 text-rose-800 dark:bg-rose-900/40 dark:text-rose-300',
   sticky: 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/40 dark:text-indigo-300',
-
   timeline: 'bg-cyan-100 text-cyan-800 dark:bg-cyan-900/40 dark:text-cyan-300',
   chat: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300',
   carousel: 'bg-pink-100 text-pink-800 dark:bg-pink-900/40 dark:text-pink-300',
+  scrollymedia: 'bg-violet-100 text-violet-800 dark:bg-violet-900/40 dark:text-violet-300',
 };
 
-
-export function BlockCard({ block, isSelected, isFirst, isLast, onSelect }: Props) {
-  const { removeBlock, duplicateBlock, moveBlockUp, moveBlockDown } = useBuilderStore();
+export function BlockCard({ block, isSelected, onSelect }: Props) {
+  const { removeBlock, duplicateBlock } = useBuilderStore();
   const [expanded, setExpanded] = useState(false);
 
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
@@ -79,35 +76,12 @@ export function BlockCard({ block, isSelected, isFirst, isLast, onSelect }: Prop
             <DragIcon />
           </button>
 
-          {/* Block type badge */}
           <span className={cn('flex-shrink-0 rounded px-2 py-0.5 text-xs font-semibold', BLOCK_COLORS[block.type])}>
             {BLOCK_LABELS[block.type]}
           </span>
 
-          {/* Spacer */}
           <span className="flex-1" />
 
-          {/* Move up / down — hover only */}
-          <button
-            onClick={() => moveBlockUp(block.id)}
-            disabled={isFirst}
-            aria-label="Flytta upp"
-            title="Flytta upp"
-            className="flex-shrink-0 opacity-0 group-hover/row:opacity-100 p-1 rounded text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-0 disabled:cursor-not-allowed transition-opacity text-xs leading-none"
-          >
-            ▲
-          </button>
-          <button
-            onClick={() => moveBlockDown(block.id)}
-            disabled={isLast}
-            aria-label="Flytta ner"
-            title="Flytta ner"
-            className="flex-shrink-0 opacity-0 group-hover/row:opacity-100 p-1 rounded text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-0 disabled:cursor-not-allowed transition-opacity text-xs leading-none"
-          >
-            ▼
-          </button>
-
-          {/* Duplicate — hover only */}
           <Button
             variant="ghost"
             size="sm"
@@ -119,7 +93,6 @@ export function BlockCard({ block, isSelected, isFirst, isLast, onSelect }: Prop
             ⎘
           </Button>
 
-          {/* Style / Edit / Delete — always visible */}
           <Button className="flex-shrink-0" variant="ghost" size="sm" onClick={onSelect} aria-pressed={isSelected}>
             Stil
           </Button>
@@ -145,7 +118,6 @@ export function BlockCard({ block, isSelected, isFirst, isLast, onSelect }: Prop
 
         {expanded && <BlockEditor block={block} />}
       </div>
-
     </>
   );
 }

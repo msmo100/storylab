@@ -1,38 +1,30 @@
 import type { QuoteBlock as QuoteBlockType } from '../../types';
-import { resolveFontSize } from '../../utils/resolveFontSize';
 
-interface Props {
-  block: QuoteBlockType;
-}
+interface Props { block: QuoteBlockType }
 
 export function QuoteBlock({ block }: Props) {
+  const style: React.CSSProperties = {
+    maxWidth: block.maxWidth ?? '680px',
+    margin: '0 auto',
+    padding: '2rem 2rem',
+    color: block.styles?.textColor,
+    backgroundColor: block.styles?.backgroundColor,
+    borderRadius: block.styles?.borderRadius,
+    boxShadow: block.styles?.boxShadow,
+    borderLeft: `4px solid ${block.styles?.accentColor ?? '#6366f1'}`,
+  };
   return (
-    <blockquote
-      className="border-l-4 pl-6 my-6"
-      style={{
-        borderColor: block.styles?.accentColor ?? '#9ca3af',
-        boxShadow: block.styles?.boxShadow,
-        outline: block.styles?.outlineColor
-          ? `${block.styles.outlineWidth ?? '2px'} solid ${block.styles.outlineColor}`
-          : undefined,
-        borderRadius: block.styles?.borderRadius,
-      }}
-    >
+    <blockquote style={style}>
       <p
-        className="font-serif italic"
-        style={{
-          color: block.styles?.textColor,
-          backgroundColor: block.styles?.backgroundColor,
-          fontFamily: block.styles?.fontFamily,
-          fontSize: resolveFontSize(block.styles?.fontSize) ?? '1.5rem',
-          lineHeight: block.styles?.lineHeight,
-          letterSpacing: block.styles?.letterSpacing ? `${block.styles.letterSpacing}em` : undefined,
-        }}
+        className="text-xl leading-relaxed italic"
+        style={{ fontFamily: block.styles?.fontFamily, fontSize: block.styles?.fontSize ? `${block.styles.fontSize}px` : undefined }}
       >
         {block.text}
       </p>
       {block.attribution && (
-        <cite className="mt-2 block text-sm text-gray-500 not-italic">— {block.attribution}</cite>
+        <footer className="mt-3 text-sm text-gray-500 dark:text-gray-400 not-italic">
+          — {block.attribution}
+        </footer>
       )}
     </blockquote>
   );
