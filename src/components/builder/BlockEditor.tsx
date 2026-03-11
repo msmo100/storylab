@@ -1,5 +1,5 @@
 import { useBuilderStore } from '../../store/builderStore';
-import type { Block, ScrollImage, TextEntrance, TimelineEntry, TimelineDotStyle, ChatMessage, CarouselItem } from '../../types';
+import type { Block, TimelineEntry, TimelineDotStyle, ChatMessage, CarouselItem } from '../../types';
 import { generateId } from '../../utils/generateId';
 import { Input } from '../ui/Input';
 import { Textarea } from '../ui/Textarea';
@@ -21,9 +21,9 @@ export function BlockEditor({ block }: Props) {
 
   const update = (fields: Partial<Block>) => updateBlock(block.id, fields);
 
-  // Hero, sticky, and scrollmedia blocks have built-in scroll behavior — animation preset unused
+  // Hero and sticky blocks have built-in scroll behavior — animation preset unused
   const showAnimationSelect =
-    block.type !== 'hero' && block.type !== 'sticky' && block.type !== 'scrollmedia' && block.type !== 'timeline' && block.type !== 'chat' && block.type !== 'carousel';
+    block.type !== 'hero' && block.type !== 'sticky' && block.type !== 'timeline' && block.type !== 'chat' && block.type !== 'carousel';
 
   return (
     <div className="mt-3 flex flex-col gap-3 border-t border-gray-200 dark:border-gray-700 pt-3">
@@ -215,139 +215,6 @@ export function BlockEditor({ block }: Props) {
               onClick={() => update({ overlays: [...block.overlays, ''] } as Partial<Block>)}
             >
               + Lägg till överlager
-            </Button>
-          </div>
-        </>
-      )}
-      {block.type === 'scrollmedia' && (
-        <>
-          <Select
-            label="Textjustering"
-            value={block.textPosition}
-            options={[
-              { value: 'left', label: 'Vänster' },
-              { value: 'center', label: 'Mitten' },
-              { value: 'right', label: 'Höger' },
-            ]}
-            onChange={(e) =>
-              update({ textPosition: e.target.value as 'left' | 'center' | 'right' } as Partial<Block>)
-            }
-          />
-          <Select
-            label="Textentré"
-            value={block.textEntrance}
-            options={[
-              { value: 'none', label: 'Ingen' },
-              { value: 'fade', label: 'Tona in' },
-              { value: 'from-left', label: 'Från vänster' },
-              { value: 'from-right', label: 'Från höger' },
-            ]}
-            onChange={(e) =>
-              update({ textEntrance: e.target.value as TextEntrance } as Partial<Block>)
-            }
-          />
-          <Select
-            label="Mediatyp"
-            value={block.mediaType}
-            options={[
-              { value: 'image', label: 'Bild' },
-              { value: 'video', label: 'Video' },
-            ]}
-            onChange={(e) =>
-              update({ mediaType: e.target.value as 'image' | 'video' } as Partial<Block>)
-            }
-          />
-          <Textarea
-            label="Klistrad text"
-            rows={4}
-            value={block.text}
-            placeholder="Berättartext som stannar kvar medan bilder rullar förbi…"
-            onChange={(e) => update({ text: e.target.value } as Partial<Block>)}
-          />
-
-          <div className="flex flex-col gap-2">
-            <span className="text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wide">
-              Scrollande bilder
-            </span>
-            <p className="text-xs text-gray-400 dark:text-gray-500">
-              Justera scrollningstid för att kontrollera hur länge läsaren ser varje bild (1 = en vyportshöjd).
-            </p>
-
-            {block.images.map((img, i) => (
-              <div key={img.id} className="rounded-lg border border-gray-200 dark:border-gray-700 p-3 flex flex-col gap-2">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-medium text-gray-600 dark:text-gray-400">
-                    {block.mediaType === 'video' ? 'Video' : 'Bild'} {i + 1}
-                  </span>
-                  <Button
-                    variant="danger"
-                    size="sm"
-                    onClick={() =>
-                      update({
-                        images: block.images.filter((im) => im.id !== img.id),
-                      } as Partial<Block>)
-                    }
-                  >
-                    ✕
-                  </Button>
-                </div>
-                <Input
-                  label="URL"
-                  value={img.src}
-                  placeholder="https://… (bild eller .mp4)"
-                  onChange={(e) =>
-                    update({
-                      images: block.images.map((im) =>
-                        im.id === img.id ? { ...im, src: e.target.value } : im
-                      ),
-                    } as Partial<Block>)
-                  }
-                />
-                <Input
-                  label="Alt-text (valfri)"
-                  value={img.alt ?? ''}
-                  placeholder="Beskriv för skärmläsare"
-                  onChange={(e) =>
-                    update({
-                      images: block.images.map((im) =>
-                        im.id === img.id ? { ...im, alt: e.target.value } : im
-                      ),
-                    } as Partial<Block>)
-                  }
-                />
-                <div className="flex flex-col gap-1">
-                  <label className="text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wide">
-                    Scrollningstid — {img.scrollVh ?? 1}× vyport
-                  </label>
-                  <input
-                    type="range"
-                    min={0.5}
-                    max={5}
-                    step={0.5}
-                    value={img.scrollVh ?? 1}
-                    onChange={(e) =>
-                      update({
-                        images: block.images.map((im) =>
-                          im.id === img.id ? { ...im, scrollVh: Number(e.target.value) } : im
-                        ),
-                      } as Partial<Block>)
-                    }
-                    className="w-full accent-gray-900 dark:accent-gray-400"
-                  />
-                </div>
-              </div>
-            ))}
-
-            <Button
-              variant="secondary"
-              size="sm"
-              className="self-start"
-              onClick={() => {
-                const newImage: ScrollImage = { id: generateId(), src: '', alt: '' };
-                update({ images: [...block.images, newImage] } as Partial<Block>);
-              }}
-            >
-              + Lägg till {block.mediaType === 'video' ? 'video' : 'bild'}
             </Button>
           </div>
         </>

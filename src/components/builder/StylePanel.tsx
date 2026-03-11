@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useBuilderStore } from '../../store/builderStore';
-import type { Block, BlockStyle, ImageBlock, ScrollMediaBlock } from '../../types';
+import type { Block, BlockStyle, ImageBlock } from '../../types';
 import { cn } from '../../utils/cn';
 import { FocalPointModal } from './FocalPointModal';
 
@@ -9,7 +9,7 @@ interface Props {
   onClose: () => void;
 }
 
-const ACCENT_TYPES: Block['type'][] = ['quote', 'timeline', 'hero', 'sticky', 'scrollmedia', 'chat', 'carousel'];
+const ACCENT_TYPES: Block['type'][] = ['quote', 'timeline', 'hero', 'sticky', 'chat', 'carousel'];
 const FONTSIZE_TYPES: Block['type'][] = ['text', 'quote', 'timeline', 'hero', 'sticky', 'chat'];
 
 const FONTS: { value: string; label: string }[] = [
@@ -72,11 +72,10 @@ export function StylePanel({ block, onClose }: Props) {
   const hasAnyStyle = block.styles && Object.keys(block.styles).length > 0;
   const showAccent = ACCENT_TYPES.includes(block.type);
   const showFontSize = FONTSIZE_TYPES.includes(block.type);
-  const showFocalPoint = block.type === 'image' || block.type === 'video' || block.type === 'scrollmedia';
+  const showFocalPoint = block.type === 'image' || block.type === 'video';
 
   const focalSrc =
-    block.type === 'image'       ? (block as ImageBlock).src || undefined :
-    block.type === 'scrollmedia' ? (block as ScrollMediaBlock).images[0]?.src || undefined :
+    block.type === 'image' ? (block as ImageBlock).src || undefined :
     undefined;
 
   // fontSize stored as plain number string e.g. "16"

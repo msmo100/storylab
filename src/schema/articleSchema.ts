@@ -65,21 +65,6 @@ const stickyBlockSchema = baseBlockSchema.extend({
   overlays: z.array(z.string()),
 });
 
-const scrollImageSchema = z.object({
-  id: z.string(),
-  src: z.string(),
-  alt: z.string().optional(),
-  scrollVh: z.number().min(0.5).optional(),
-});
-
-const scrollMediaBlockSchema = baseBlockSchema.extend({
-  type: z.literal('scrollmedia'),
-  text: z.string(),
-  textPosition: z.enum(['left', 'center', 'right']),
-  textEntrance: z.enum(['none', 'fade', 'from-left', 'from-right']),
-  mediaType: z.enum(['image', 'video']),
-  images: z.array(scrollImageSchema),
-});
 
 const timelineDotStyleSchema = z.enum(['filled', 'ring', 'solid', 'diamond', 'none']);
 
@@ -138,7 +123,7 @@ export const blockSchema = z.discriminatedUnion('type', [
   quoteBlockSchema,
   heroBlockSchema,
   stickyBlockSchema,
-  scrollMediaBlockSchema,
+
   timelineBlockSchema,
   chatBlockSchema,
   carouselBlockSchema,

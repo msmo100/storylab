@@ -61,20 +61,7 @@ const BLOCK_OPTIONS: BlockOption[] = [
       overlays: [],
     },
   },
-  {
-    label: 'Scrollmedia',
-    description: 'Texten sitter fast medan bilder rullar förbi bredvid',
-    emoji: '↕',
-    defaultBlock: {
-      type: 'scrollmedia',
-      animation: 'none',
-      text: '',
-      textPosition: 'center',
-      textEntrance: 'none',
-      mediaType: 'image',
-      images: [],
-    },
-  },
+
   {
     label: 'Tidslinje',
     description: 'Händelser med rubrik, tid och text längs en vertikal linje',

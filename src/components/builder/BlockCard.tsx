@@ -22,7 +22,7 @@ const BLOCK_LABELS: Record<Block['type'], string> = {
   quote: 'Citat',
   hero: 'Hero',
   sticky: 'Klistrad',
-  scrollmedia: 'Scroll',
+
   timeline: 'Tidslinje',
   chat: 'Chatt',
   carousel: 'Karusell',
@@ -35,7 +35,7 @@ const BLOCK_COLORS: Record<Block['type'], string> = {
   quote: 'bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300',
   hero: 'bg-rose-100 text-rose-800 dark:bg-rose-900/40 dark:text-rose-300',
   sticky: 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/40 dark:text-indigo-300',
-  scrollmedia: 'bg-orange-100 text-orange-800 dark:bg-orange-900/40 dark:text-orange-300',
+
   timeline: 'bg-cyan-100 text-cyan-800 dark:bg-cyan-900/40 dark:text-cyan-300',
   chat: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300',
   carousel: 'bg-pink-100 text-pink-800 dark:bg-pink-900/40 dark:text-pink-300',

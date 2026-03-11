@@ -146,11 +146,7 @@ function BlockWrapper({ block }: { block: Block }) {
     ? { maxWidth: block.maxWidth, marginLeft: 'auto', marginRight: 'auto' }
     : {};
 
-  if (
-    block.type === 'hero' ||
-    block.type === 'sticky' ||
-    block.type === 'scrollmedia'
-  ) {
+  if (block.type === 'hero' || block.type === 'sticky') {
     if (block.maxWidth) {
       return <div style={sizeStyle}><AnimatedBlock block={block} /></div>;
     }

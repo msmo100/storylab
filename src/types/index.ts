@@ -1,4 +1,4 @@
-export type BlockType = 'text' | 'image' | 'video' | 'quote' | 'hero' | 'sticky' | 'scrollmedia' | 'timeline' | 'chat' | 'carousel';
+export type BlockType = 'text' | 'image' | 'video' | 'quote' | 'hero' | 'sticky' | 'timeline' | 'chat' | 'carousel';
 
 export interface BlockStyle {
   textColor?: string;
@@ -25,8 +25,6 @@ export interface BlockStyle {
 
 export type AnimationPreset = 'none' | 'fade' | 'slide-up' | 'slide-left' | 'zoom';
 
-/** Entrance animation for the sticky text in a ScrollMedia block. */
-export type TextEntrance = 'none' | 'fade' | 'from-left' | 'from-right';
 
 export interface BaseBlock {
   id: string;
@@ -85,27 +83,6 @@ export interface StickyBlock extends BaseBlock {
   overlays: string[];
 }
 
-/** A single item (image or video URL) in the scrolling media column. */
-export interface ScrollImage {
-  id: string;
-  src: string;
-  alt?: string;
-  /** How many viewport-heights this item occupies during scroll. Default: 1. */
-  scrollVh?: number;
-}
-
-/**
- * Scroll-media block.
- * Text is sticky on one side while a series of images or videos scroll past on the other.
- */
-export interface ScrollMediaBlock extends BaseBlock {
-  type: 'scrollmedia';
-  text: string;
-  textPosition: 'left' | 'center' | 'right';
-  textEntrance: TextEntrance;
-  mediaType: 'image' | 'video';
-  images: ScrollImage[];
-}
 
 export type TimelineDotStyle = 'filled' | 'ring' | 'solid' | 'diamond' | 'none';
 
@@ -170,7 +147,7 @@ export type Block =
   | QuoteBlock
   | HeroBlock
   | StickyBlock
-  | ScrollMediaBlock
+
   | TimelineBlock
   | ChatBlock
   | CarouselBlock;
@@ -183,7 +160,7 @@ export type BlockWithoutId =
   | Omit<QuoteBlock, 'id'>
   | Omit<HeroBlock, 'id'>
   | Omit<StickyBlock, 'id'>
-  | Omit<ScrollMediaBlock, 'id'>
+
   | Omit<TimelineBlock, 'id'>
   | Omit<ChatBlock, 'id'>
   | Omit<CarouselBlock, 'id'>;
