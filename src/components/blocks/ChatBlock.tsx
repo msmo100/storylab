@@ -5,9 +5,12 @@ interface Props { block: ChatBlockType }
 
 export function ChatBlock({ block }: Props) {
   const { messages, showPhoneFrame, showContactHeader, showInputBar } = block;
+  const senderColor = block.styles?.accentColor ?? '#3b82f6';
+  const fontFamily = block.styles?.fontFamily;
+  const fontSize = block.styles?.fontSize ? `${block.styles.fontSize}px` : undefined;
 
   const inner = (
-    <div className="flex flex-col gap-1 p-3 overflow-y-auto flex-1">
+    <div className="flex flex-col gap-1 p-3 overflow-y-auto flex-1" style={{ backgroundColor: block.styles?.backgroundColor, fontFamily, fontSize }}>
       {showContactHeader && (
         <div className="text-center text-xs text-gray-400 dark:text-gray-500 py-2">
           {block.senderName ?? 'Kontakt'}
@@ -25,9 +28,10 @@ export function ChatBlock({ block }: Props) {
           <div
             className={`max-w-[75%] rounded-2xl px-3 py-2 text-sm ${
               msg.role === 'sender'
-                ? 'bg-blue-500 text-white rounded-br-sm'
+                ? 'text-white rounded-br-sm'
                 : 'bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-bl-sm'
             }`}
+            style={msg.role === 'sender' ? { backgroundColor: senderColor } : undefined}
           >
             {msg.text}
           </div>

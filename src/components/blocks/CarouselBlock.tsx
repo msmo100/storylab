@@ -44,7 +44,10 @@ export function CarouselBlock({ block }: Props) {
                 <img src={item.src} alt={item.caption ?? ''} className="w-full h-auto block" />
               )}
               {item.caption && (
-                <p className="text-center text-sm text-gray-500 dark:text-gray-400 py-2">{item.caption}</p>
+                <p
+                  className="text-center text-sm text-gray-500 dark:text-gray-400 py-2"
+                  style={{ fontFamily: block.styles?.fontFamily, fontSize: block.styles?.fontSize ? `${block.styles.fontSize}px` : undefined }}
+                >{item.caption}</p>
               )}
             </div>
           ))}

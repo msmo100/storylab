@@ -13,12 +13,13 @@ function Dot({ style }: { style: TimelineDotStyle }) {
 
 export function TimelineBlock({ block }: Props) {
   const lineWidth = block.lineWidth ?? 2;
+  const accentColor = block.styles?.accentColor;
   return (
-    <div style={{ maxWidth: block.maxWidth ?? '720px', margin: '0 auto', padding: '2rem 1.5rem' }}>
+    <div style={{ maxWidth: block.maxWidth ?? '720px', margin: '0 auto', padding: '2rem 1.5rem', backgroundColor: block.styles?.backgroundColor, color: block.styles?.textColor, fontFamily: block.styles?.fontFamily, fontSize: block.styles?.fontSize ? `${block.styles.fontSize}px` : undefined }}>
       <div className="relative">
         <div
-          className="absolute left-[5px] top-0 bottom-0 bg-gray-200 dark:bg-gray-700"
-          style={{ width: lineWidth }}
+          className={accentColor ? undefined : 'absolute left-[5px] top-0 bottom-0 bg-gray-200 dark:bg-gray-700'}
+          style={{ position: 'absolute', left: 5, top: 0, bottom: 0, width: lineWidth, backgroundColor: accentColor ?? undefined }}
         />
         <div className="flex flex-col gap-8">
           {block.entries.map((entry) => (

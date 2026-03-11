@@ -19,7 +19,10 @@ export function ImageBlock({ block }: Props) {
         className="w-full h-auto block"
       />
       {block.caption && (
-        <figcaption className="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 px-4">
+        <figcaption
+          className="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 px-4"
+          style={{ fontFamily: block.styles?.fontFamily, fontSize: block.styles?.fontSize ? `${block.styles.fontSize}px` : undefined }}
+        >
           {block.caption}
         </figcaption>
       )}

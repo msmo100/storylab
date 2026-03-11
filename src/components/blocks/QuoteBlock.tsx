@@ -17,7 +17,12 @@ export function QuoteBlock({ block }: Props) {
     <blockquote style={style}>
       <p
         className="text-xl leading-relaxed italic"
-        style={{ fontFamily: block.styles?.fontFamily, fontSize: block.styles?.fontSize ? `${block.styles.fontSize}px` : undefined }}
+        style={{
+          fontFamily: block.styles?.fontFamily,
+          fontSize: block.styles?.fontSize ? `${block.styles.fontSize}px` : undefined,
+          lineHeight: block.styles?.lineHeight,
+          letterSpacing: block.styles?.letterSpacing ? `${block.styles.letterSpacing}em` : undefined,
+        }}
       >
         {block.text}
       </p>
