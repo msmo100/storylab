@@ -21,7 +21,7 @@ export function CarouselBlock({ block }: Props) {
 
   return (
     <div
-      style={{ maxWidth: block.maxWidth ?? '100%', margin: '0 auto' }}
+      style={{ maxWidth: block.maxWidth ?? '600px', margin: '0 auto' }}
       onTouchStart={onTouchStart}
       onTouchEnd={onTouchEnd}
     >
