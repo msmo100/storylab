@@ -247,7 +247,7 @@ export const useBuilderStore = create<BuilderStore>((set, get) => ({
       set({ saveStatus: 'error' });
       toast.error('Kunde inte spara projektet');
     } else {
-      set({ article: result.data!, saveStatus: 'saved' });
+      set({ saveStatus: 'saved' });
     }
   },
 
