@@ -61,7 +61,7 @@ export function RenderView() {
 
   if (!article && !fetchError) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-white dark:bg-gray-950">
+      <div className="min-h-screen flex items-center justify-center bg-white">
         <span className="text-sm text-gray-400">Laddar…</span>
       </div>
     );
@@ -69,14 +69,14 @@ export function RenderView() {
 
   if (!article || article.blocks.length === 0) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-white dark:bg-gray-950">
+      <div className="min-h-screen flex items-center justify-center bg-white">
         <span className="text-sm text-gray-400">Inget innehåll.</span>
       </div>
     );
   }
 
   return (
-    <div ref={contentRef} className="bg-white dark:bg-gray-950 min-h-screen">
+    <div ref={contentRef} className="bg-white min-h-screen">
       {article.blocks.map((block) => (
         <AnimatedBlock key={block.id} block={block} />
       ))}

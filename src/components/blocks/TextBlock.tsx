@@ -17,7 +17,7 @@ export function TextBlock({ block }: Props) {
   return (
     <div style={style}>
       <div
-        className="prose prose-neutral dark:prose-invert max-w-none"
+        className="prose prose-neutral max-w-none"
         dangerouslySetInnerHTML={{ __html: block.content }}
       />
     </div>

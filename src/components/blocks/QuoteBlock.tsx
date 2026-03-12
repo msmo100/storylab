@@ -27,7 +27,7 @@ export function QuoteBlock({ block }: Props) {
         {block.text}
       </p>
       {block.attribution && (
-        <footer className="mt-3 text-sm text-gray-500 dark:text-gray-400 not-italic">
+        <footer className="mt-3 text-sm text-gray-500 not-italic">
           — {block.attribution}
         </footer>
       )}

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useBuilderStore } from '../../store/builderStore';
 import type {
   Block, TextBlock, ImageBlock, VideoBlock, QuoteBlock,
-  HeroBlock, StickyBlock, TimelineBlock, TimelineEntry,
+  HeroBlock, StickyBlock, TimelineBlock, TimelineEntry, TimelineDotStyle,
   ChatBlock, ChatMessage, CarouselBlock, CarouselItem,
   ScrollyMediaBlock, ScrollySlide,
 } from '../../types';
@@ -211,7 +211,7 @@ function StickyEditor({ block }: { block: StickyBlock }) {
                 upd({ overlays: next });
               }}
               placeholder={`Överläggstext ${i + 1}…`}
-              className={cn(INPUT, 'flex-1')}
+              className={cn(INPUT, 'flex-1 min-w-0')}
             />
             <button onClick={() => upd({ overlays: block.overlays.filter((_, j) => j !== i) })}
               className="px-2 py-1 text-xs text-red-500 hover:bg-red-50 dark:hover:bg-red-950 rounded">✕</button>
@@ -245,14 +245,42 @@ function TimelineEditor({ block }: { block: TimelineBlock }) {
 
   return (
     <div className={SECTION}>
+      <div>
+        <label className={LABEL}>Linjebredd (px)</label>
+        <input type="number" min={1} max={8} value={block.lineWidth ?? 2} onChange={(e) => upd({ lineWidth: parseInt(e.target.value) })} className={INPUT} />
+      </div>
+      <label className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300 cursor-pointer">
+        <input type="checkbox" checked={block.entryAnimation ?? false} onChange={(e) => upd({ entryAnimation: e.target.checked })} className="rounded" />
+        Animera händelser
+      </label>
       {block.entries.map((entry) => (
         <div key={entry.id} className="border border-gray-100 dark:border-gray-700 rounded-lg p-2.5 flex flex-col gap-2">
-          <div className="flex gap-2">
-            <input type="text" value={entry.time} onChange={(e) => updateEntry(entry.id, { time: e.target.value })} placeholder="Tid…" className={cn(INPUT, 'w-24')} />
-            <input type="text" value={entry.title} onChange={(e) => updateEntry(entry.id, { title: e.target.value })} placeholder="Rubrik…" className={cn(INPUT, 'flex-1')} />
-            <button onClick={() => removeEntry(entry.id)} className="text-xs text-red-500 px-1">✕</button>
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-medium text-gray-400 dark:text-gray-500">Händelse</span>
+            <button onClick={() => removeEntry(entry.id)} className="text-xs text-red-500 px-2 py-0.5 hover:bg-red-50 dark:hover:bg-red-950 rounded">✕</button>
           </div>
-          <textarea rows={2} value={entry.text} onChange={(e) => updateEntry(entry.id, { text: e.target.value })} placeholder="Brödtext…" className={cn(INPUT, 'resize-none')} />
+          <div>
+            <label className={LABEL}>Tid</label>
+            <input type="text" value={entry.time} onChange={(e) => updateEntry(entry.id, { time: e.target.value })} placeholder="t.ex. 2023" className={INPUT} />
+          </div>
+          <div>
+            <label className={LABEL}>Rubrik</label>
+            <input type="text" value={entry.title} onChange={(e) => updateEntry(entry.id, { title: e.target.value })} placeholder="Rubrik…" className={INPUT} />
+          </div>
+          <div>
+            <label className={LABEL}>Brödtext</label>
+            <textarea rows={2} value={entry.text} onChange={(e) => updateEntry(entry.id, { text: e.target.value })} placeholder="Brödtext…" className={cn(INPUT, 'resize-none')} />
+          </div>
+          <div>
+            <label className={LABEL}>Punkt-stil</label>
+            <select value={entry.dotStyle ?? 'filled'} onChange={(e) => updateEntry(entry.id, { dotStyle: e.target.value as TimelineDotStyle })} className={INPUT}>
+              <option value="filled">Fylld cirkel</option>
+              <option value="ring">Ring</option>
+              <option value="solid">Solid</option>
+              <option value="diamond">Diamant</option>
+              <option value="none">Ingen</option>
+            </select>
+          </div>
         </div>
       ))}
       <button onClick={addEntry} className="text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 py-1">
@@ -282,23 +310,35 @@ function ChatEditor({ block }: { block: ChatBlock }) {
   return (
     <div className={SECTION}>
       <div className="flex flex-col gap-2">
-        {(['showPhoneFrame', 'showStatusBar', 'showContactHeader', 'showInputBar'] as const).map((key) => (
+        {(['showPhoneFrame', 'showStatusBar', 'showContactHeader', 'showInputBar', 'showNames'] as const).map((key) => (
           <label key={key} className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300 cursor-pointer">
             <input type="checkbox" checked={block[key] ?? false} onChange={(e) => upd({ [key]: e.target.checked })} className="rounded" />
-            {key === 'showPhoneFrame' ? 'Visa telefon-ram' : key === 'showStatusBar' ? 'Statusrad' : key === 'showContactHeader' ? 'Kontakthuvud' : 'Inmatningsfält'}
+            {key === 'showPhoneFrame' ? 'Visa telefon-ram' : key === 'showStatusBar' ? 'Statusrad' : key === 'showContactHeader' ? 'Kontakthuvud' : key === 'showInputBar' ? 'Inmatningsfält' : 'Visa namn'}
           </label>
         ))}
       </div>
-      <div className="flex flex-col gap-1.5">
+      <div className="flex gap-2">
+        <div className="flex-1">
+          <label className={LABEL}>Avsändarens namn</label>
+          <input type="text" value={block.senderName ?? ''} onChange={(e) => upd({ senderName: e.target.value || undefined })} placeholder="Du" className={INPUT} />
+        </div>
+        <div className="flex-1">
+          <label className={LABEL}>Mottagarens namn</label>
+          <input type="text" value={block.receiverName ?? ''} onChange={(e) => upd({ receiverName: e.target.value || undefined })} placeholder="Kontakt" className={INPUT} />
+        </div>
+      </div>
+      <div className="flex flex-col gap-2">
         {block.messages.map((msg) => (
-          <div key={msg.id} className="flex gap-1.5 items-start">
-            <select value={msg.role} onChange={(e) => updateMsg(msg.id, { role: e.target.value as ChatMessage['role'] })}
-              className={cn(INPUT, 'w-24 flex-shrink-0')}>
-              <option value="sender">Skickar</option>
-              <option value="receiver">Mottag.</option>
-            </select>
-            <input type="text" value={msg.text} onChange={(e) => updateMsg(msg.id, { text: e.target.value })} placeholder="Meddelande…" className={cn(INPUT, 'flex-1')} />
-            <button onClick={() => removeMsg(msg.id)} className="text-xs text-red-500 px-1 pt-1.5">✕</button>
+          <div key={msg.id} className="border border-gray-100 dark:border-gray-700 rounded-lg p-2 flex flex-col gap-1.5">
+            <div className="flex gap-1.5 items-center">
+              <select value={msg.role} onChange={(e) => updateMsg(msg.id, { role: e.target.value as ChatMessage['role'] })}
+                className={cn(INPUT, 'flex-1')}>
+                <option value="sender">Avsändare</option>
+                <option value="receiver">Mottagare</option>
+              </select>
+              <button onClick={() => removeMsg(msg.id)} className="text-xs text-red-500 px-2 py-1 hover:bg-red-50 dark:hover:bg-red-950 rounded">✕</button>
+            </div>
+            <input type="text" value={msg.text} onChange={(e) => updateMsg(msg.id, { text: e.target.value })} placeholder="Meddelande…" className={INPUT} />
           </div>
         ))}
         <button onClick={addMessage} className="text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 py-1">
@@ -331,7 +371,7 @@ function CarouselEditor({ block }: { block: CarouselBlock }) {
       {block.items.map((item) => (
         <div key={item.id} className="border border-gray-100 dark:border-gray-700 rounded-lg p-2.5 flex flex-col gap-2">
           <div className="flex gap-1.5">
-            <input type="url" value={item.src} onChange={(e) => updateItem(item.id, { src: e.target.value })} placeholder="URL (bild eller video)…" className={cn(INPUT, 'flex-1')} />
+            <input type="url" value={item.src} onChange={(e) => updateItem(item.id, { src: e.target.value })} placeholder="URL (bild eller video)…" className={cn(INPUT, 'flex-1 min-w-0')} />
             <button onClick={() => removeItem(item.id)} className="text-xs text-red-500 px-1">✕</button>
           </div>
           <input type="url" value={item.poster ?? ''} onChange={(e) => updateItem(item.id, { poster: e.target.value || undefined })} placeholder="Poster-URL (valfri)…" className={INPUT} />

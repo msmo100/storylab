@@ -45,7 +45,7 @@ export function CarouselBlock({ block }: Props) {
               )}
               {item.caption && (
                 <p
-                  className="text-center text-sm text-gray-500 dark:text-gray-400 py-2"
+                  className="text-center text-sm text-gray-500 py-2"
                   style={{ fontFamily: block.styles?.fontFamily, fontSize: block.styles?.fontSize ? `${block.styles.fontSize}px` : undefined }}
                 >{item.caption}</p>
               )}
@@ -59,7 +59,7 @@ export function CarouselBlock({ block }: Props) {
             <button
               key={i}
               onClick={() => setCurrent(i)}
-              className={`w-1.5 h-1.5 rounded-full transition-colors ${i === current ? 'bg-gray-700 dark:bg-gray-300' : 'bg-gray-300 dark:bg-gray-600'}`}
+              className={`w-1.5 h-1.5 rounded-full transition-colors ${i === current ? 'bg-gray-700' : 'bg-gray-300'}`}
             />
           ))}
         </div>
