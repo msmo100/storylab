@@ -38,7 +38,7 @@ export function RenderView() {
   useEffect(() => {
     const channel = new BroadcastChannel('gp-storylab-preview');
     channel.onmessage = (e) => {
-      if (e.data?.type === 'update' && e.data.article) setLiveArticle(e.data.article);
+      if (e.data?.type === 'update' && e.data.article && e.data.projectId === projectId) setLiveArticle(e.data.article);
     };
     return () => channel.close();
   }, []);

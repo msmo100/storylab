@@ -56,12 +56,12 @@ export function BuilderView() {
   }, []);
 
   useEffect(() => {
-    const id = setTimeout(() => channelRef.current?.postMessage({ type: 'update', article }), 150);
+    const id = setTimeout(() => channelRef.current?.postMessage({ type: 'update', article, projectId }), 150);
     return () => clearTimeout(id);
-  }, [article]);
+  }, [article, projectId]);
 
   useEffect(() => {
-    const id = setTimeout(() => channelRef.current?.postMessage({ type: 'update', article }), 100);
+    const id = setTimeout(() => channelRef.current?.postMessage({ type: 'update', article, projectId }), 100);
     return () => clearTimeout(id);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [device]);

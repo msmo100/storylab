@@ -1,4 +1,5 @@
-import { motion } from 'framer-motion';
+import { motion, useInView } from 'framer-motion';
+import { useRef } from 'react';
 import type { ChatBlock as ChatBlockType } from '../../types';
 
 interface Props { block: ChatBlockType }
@@ -9,8 +10,12 @@ export function ChatBlock({ block }: Props) {
   const fontFamily = block.styles?.fontFamily;
   const fontSize = block.styles?.fontSize ? `${block.styles.fontSize}px` : undefined;
 
+  const containerRef = useRef<HTMLDivElement>(null);
+  const inView = useInView(containerRef, { once: true, amount: 0.1 });
+
   const messageList = (
     <div
+      ref={containerRef}
       className="flex flex-col gap-1 p-3 overflow-y-auto flex-1"
       style={{ backgroundColor: block.styles?.backgroundColor ?? '#ffffff', fontFamily, fontSize }}
     >
@@ -23,8 +28,7 @@ export function ChatBlock({ block }: Props) {
         <motion.div
           key={msg.id}
           initial={msg.animate ? { opacity: 0, y: 8 } : false}
-          whileInView={msg.animate ? { opacity: 1, y: 0 } : undefined}
-          viewport={{ once: true }}
+          animate={msg.animate ? (inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 8 }) : undefined}
           transition={{ duration: 0.3, delay: msg.animationDelay ?? 0 }}
           className={`flex flex-col ${msg.role === 'sender' ? 'items-end' : 'items-start'}`}
         >

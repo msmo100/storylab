@@ -38,7 +38,6 @@ export function CarouselBlock({ block }: Props) {
                   poster={item.poster}
                   autoPlay muted loop playsInline
                   className="w-full h-auto block"
-                  style={{ maxHeight: '80vh', objectFit: 'cover' }}
                 />
               ) : (
                 <img src={item.src} alt={item.caption ?? ''} className="w-full h-auto block" />
@@ -52,6 +51,26 @@ export function CarouselBlock({ block }: Props) {
             </div>
           ))}
         </div>
+        {items.length > 1 && (
+          <>
+            <button
+              onClick={() => setCurrent((c) => Math.max(c - 1, 0))}
+              disabled={current === 0}
+              className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 disabled:opacity-20 text-white rounded-full w-9 h-9 flex items-center justify-center transition-colors"
+              aria-label="Previous"
+            >
+              ‹
+            </button>
+            <button
+              onClick={() => setCurrent((c) => Math.min(c + 1, items.length - 1))}
+              disabled={current === items.length - 1}
+              className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 disabled:opacity-20 text-white rounded-full w-9 h-9 flex items-center justify-center transition-colors"
+              aria-label="Next"
+            >
+              ›
+            </button>
+          </>
+        )}
       </div>
       {items.length > 1 && (
         <div className="flex justify-center gap-1.5 mt-3">
