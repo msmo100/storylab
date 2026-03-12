@@ -404,8 +404,8 @@ function ScrollyMediaEditor({ block }: { block: ScrollyMediaBlock }) {
 
       {block.slides.map((slide, i) => (
         <div key={slide.id} className="border border-gray-100 dark:border-gray-700 rounded-lg overflow-hidden">
-          <div className="flex items-center gap-2 px-3 py-2 bg-gray-50 dark:bg-gray-750">
-            <span className="text-xs text-gray-500 w-4">{i + 1}</span>
+          <div className="flex items-center gap-2 px-3 py-2 bg-gray-50 dark:bg-gray-700">
+            <span className="text-xs text-gray-500 dark:text-gray-400 w-4">{i + 1}</span>
             <button onClick={() => setExpandedSlide(expandedSlide === slide.id ? null : slide.id)}
               className="flex-1 text-left text-sm font-medium text-gray-800 dark:text-gray-200 truncate">
               {slide.headline ?? `Sektion ${i + 1}`}

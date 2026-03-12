@@ -40,7 +40,7 @@ const BLOCK_COLORS: Record<Block['type'], string> = {
 };
 
 export function BlockCard({ block, isSelected, onSelect }: Props) {
-  const { removeBlock, duplicateBlock } = useBuilderStore();
+  const { removeBlock } = useBuilderStore();
   const [expanded, setExpanded] = useState(false);
 
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
@@ -82,18 +82,7 @@ export function BlockCard({ block, isSelected, onSelect }: Props) {
 
           <span className="flex-1" />
 
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => duplicateBlock(block.id)}
-            aria-label="Duplicera block"
-            title="Duplicera"
-            className="flex-shrink-0 opacity-0 group-hover/row:opacity-100 transition-opacity"
-          >
-            ⎘
-          </Button>
-
-          <Button className="flex-shrink-0" variant="ghost" size="sm" onClick={onSelect} aria-pressed={isSelected}>
+<Button className="flex-shrink-0" variant="ghost" size="sm" onClick={onSelect} aria-pressed={isSelected}>
             Stil
           </Button>
           <Button
