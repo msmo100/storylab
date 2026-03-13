@@ -25,11 +25,6 @@ const baseBlockSchema = z.object({
   styles: blockStyleSchema,
 });
 
-const textBlockSchema = baseBlockSchema.extend({
-  type: z.literal('text'),
-  content: z.string(),
-});
-
 const imageBlockSchema = baseBlockSchema.extend({
   type: z.literal('image'),
   src: z.string(),
@@ -117,7 +112,6 @@ const carouselBlockSchema = baseBlockSchema.extend({
 });
 
 export const blockSchema = z.discriminatedUnion('type', [
-  textBlockSchema,
   imageBlockSchema,
   videoBlockSchema,
   quoteBlockSchema,

@@ -12,12 +12,6 @@ type BlockOption = {
 
 const BLOCK_OPTIONS: BlockOption[] = [
   {
-    label: 'Text',
-    description: 'Ett stycke brödtext',
-    emoji: '¶',
-    defaultBlock: { type: 'text', animation: 'fade', animationDelay: 0, content: '' },
-  },
-  {
     label: 'Bild',
     description: 'Ett heltäckande foto med valfri bildtext',
     emoji: '⬜',

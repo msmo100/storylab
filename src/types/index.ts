@@ -1,4 +1,4 @@
-export type BlockType = 'text' | 'image' | 'video' | 'quote' | 'hero' | 'sticky' | 'timeline' | 'chat' | 'carousel' | 'scrollymedia';
+export type BlockType = 'image' | 'video' | 'quote' | 'hero' | 'sticky' | 'timeline' | 'chat' | 'carousel' | 'scrollymedia';
 
 export interface BlockStyle {
   textColor?: string;
@@ -35,11 +35,6 @@ export interface BaseBlock {
   maxWidth?: string;
   /** Per-block style overrides. */
   styles?: BlockStyle;
-}
-
-export interface TextBlock extends BaseBlock {
-  type: 'text';
-  content: string;
 }
 
 export interface ImageBlock extends BaseBlock {
@@ -161,7 +156,6 @@ export interface ScrollyMediaBlock extends BaseBlock {
 }
 
 export type Block =
-  | TextBlock
   | ImageBlock
   | VideoBlock
   | QuoteBlock
@@ -174,7 +168,6 @@ export type Block =
 
 // Distributive Omit — correctly strips 'id' from each union member
 export type BlockWithoutId =
-  | Omit<TextBlock, 'id'>
   | Omit<ImageBlock, 'id'>
   | Omit<VideoBlock, 'id'>
   | Omit<QuoteBlock, 'id'>

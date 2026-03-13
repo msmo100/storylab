@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useBuilderStore } from '../../store/builderStore';
 import type {
-  Block, TextBlock, ImageBlock, VideoBlock, QuoteBlock,
+  Block, ImageBlock, VideoBlock, QuoteBlock,
   HeroBlock, StickyBlock, TimelineBlock, TimelineEntry, TimelineDotStyle,
   ChatBlock, ChatMessage, CarouselBlock, CarouselItem,
   ScrollyMediaBlock, ScrollySlide,
@@ -41,7 +41,6 @@ export function BlockEditor({ block }: Props) {
         </div>
       )}
 
-      {block.type === 'text' && <TextEditor block={block} />}
       {block.type === 'image' && <ImageEditor block={block} />}
       {block.type === 'video' && <VideoEditor block={block} />}
       {block.type === 'quote' && <QuoteEditor block={block} />}
@@ -51,25 +50,6 @@ export function BlockEditor({ block }: Props) {
       {block.type === 'chat' && <ChatEditor block={block} />}
       {block.type === 'carousel' && <CarouselEditor block={block} />}
       {block.type === 'scrollymedia' && <ScrollyMediaEditor block={block} />}
-    </div>
-  );
-}
-
-// ─── Text ─────────────────────────────────────────────────────────────────────
-
-function TextEditor({ block }: { block: TextBlock }) {
-  const { updateBlock } = useBuilderStore();
-  return (
-    <div className={SECTION}>
-      <div>
-        <label className={LABEL}>Innehåll (HTML)</label>
-        <textarea
-          rows={6}
-          value={block.content}
-          onChange={(e) => updateBlock(block.id, { content: e.target.value })}
-          className={cn(INPUT, 'resize-none font-mono text-xs')}
-        />
-      </div>
     </div>
   );
 }

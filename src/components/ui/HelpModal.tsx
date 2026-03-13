@@ -129,9 +129,9 @@ function OverviewSection() {
         <Li><strong>+ Block</strong> — lägg till ett block (visas bara om artikeln är tom)</Li>
         <Li><strong>Redigera</strong> — öppnar innehållsredigeraren för blocket</Li>
         <Li><strong>Stil</strong> — öppnar stilpanelen (färg, typsnitt, storlek m.m.)</Li>
-        <Li><strong>⎘</strong> — duplicerar blocket</Li>
         <Li><strong>✕</strong> — tar bort blocket permanent</Li>
-        <Li><strong>↩ / ↪</strong> — ångra / gör om (även ⌘Z / ⌘⇧Z)</Li>
+        <Li><strong>Ångra / Gör om</strong> — pilikoner i sidhuvudet (även ⌘Z / ⌘⇧Z)</Li>
+        <Li><strong>Mobil / iPad / Desktop</strong> — byter förhandsgranskningens bredd</Li>
         <Li><strong>Kopiera inbäddningskod</strong> — kopierar iframe-koden för CMS:et</Li>
         <Li><strong>Öppna ↗</strong> — öppnar förhandsgranskningen i ett nytt fönster</Li>
       </ul>
@@ -146,9 +146,6 @@ function BlocksSection() {
     <>
       <H2>Tillgängliga blocktyper</H2>
       <P>Varje projekt innehåller exakt ett block. Välj den typ som passar din berättelse bäst.</P>
-
-      <H3><Badge color="bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300">Text</Badge></H3>
-      <P>Ett stycke brödtext i HTML-format. Stöder taggar som <code className="bg-gray-100 dark:bg-gray-800 px-1 rounded text-xs">&lt;p&gt;</code>, <code className="bg-gray-100 dark:bg-gray-800 px-1 rounded text-xs">&lt;strong&gt;</code>, <code className="bg-gray-100 dark:bg-gray-800 px-1 rounded text-xs">&lt;a&gt;</code> m.fl. Passar för ingress eller faktaruta.</P>
 
       <H3><Badge color="bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300">Bild</Badge></H3>
       <P>Ett heltäckande foto med valfri bildtext. Ange en URL till bilden. Bilden skalas automatiskt till full bredd.</P>
@@ -238,7 +235,7 @@ function EmbedSection() {
         Koden är anpassad efter blocktypen.
       </P>
 
-      <H2>Vanliga block (Text, Bild, Hero m.fl.)</H2>
+      <H2>Vanliga block (Bild, Hero m.fl.)</H2>
       <P>
         En enkel iframe vars höjd anpassas automatiskt via <code className="bg-gray-100 dark:bg-gray-800 px-1 rounded text-xs">postMessage</code>.
         CMS:et behöver tillåta iframes och köra det medföljande skriptblocket.
@@ -264,8 +261,8 @@ function EmbedSection() {
       <div className="grid grid-cols-2 gap-x-6 gap-y-1.5 text-sm text-gray-600 dark:text-gray-400 mb-4">
         <span className="font-mono bg-gray-100 dark:bg-gray-800 rounded px-1.5 py-0.5 text-xs">⌘S</span><span>Spara manuellt</span>
         <span className="font-mono bg-gray-100 dark:bg-gray-800 rounded px-1.5 py-0.5 text-xs">⌘Z</span><span>Ångra</span>
-        <span className="font-mono bg-gray-100 dark:bg-gray-800 rounded px-1.5 py-0.5 text-xs">⌘⇧Z</span><span>Gör om</span>
-        <span className="font-mono bg-gray-100 dark:bg-gray-800 rounded px-1.5 py-0.5 text-xs">Esc</span><span>Stäng stilpanelen</span>
+        <span className="font-mono bg-gray-100 dark:bg-gray-800 rounded px-1.5 py-0.5 text-xs">⌘⇧Z / Ctrl+Y</span><span>Gör om</span>
+        <span className="font-mono bg-gray-100 dark:bg-gray-800 rounded px-1.5 py-0.5 text-xs">Esc</span><span>Avmarkera block / stäng stilpanelen</span>
       </div>
     </>
   );

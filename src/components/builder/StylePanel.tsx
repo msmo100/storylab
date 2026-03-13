@@ -6,14 +6,14 @@ const INPUT = 'w-full rounded-lg border border-gray-200 dark:border-gray-600 bg-
 const LABEL = 'block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1';
 
 // Which style controls apply to each block type
-const SUPPORTS_MAX_WIDTH      = ['text', 'image', 'video', 'quote', 'timeline', 'chat', 'carousel', 'scrollymedia'];
-const SUPPORTS_TEXT_COLOR     = ['text', 'quote', 'timeline'];
-const SUPPORTS_BG_COLOR       = ['text', 'quote', 'timeline', 'chat'];
+const SUPPORTS_MAX_WIDTH      = ['image', 'video', 'quote', 'timeline', 'chat', 'carousel', 'scrollymedia'];
+const SUPPORTS_TEXT_COLOR     = ['quote', 'timeline'];
+const SUPPORTS_BG_COLOR       = ['quote', 'timeline', 'chat'];
 const SUPPORTS_ACCENT         = ['quote', 'timeline', 'chat'];
-const SUPPORTS_FONT           = ['text', 'quote', 'hero', 'sticky', 'timeline', 'chat', 'carousel', 'image', 'scrollymedia'];
-const SUPPORTS_FONT_SIZE      = ['text', 'quote', 'hero', 'sticky', 'timeline', 'chat', 'carousel', 'image', 'scrollymedia'];
-const SUPPORTS_LINE_HEIGHT    = ['text', 'quote'];
-const SUPPORTS_LETTER_SPACING = ['text', 'quote'];
+const SUPPORTS_FONT           = ['quote', 'hero', 'sticky', 'timeline', 'chat', 'carousel', 'image', 'scrollymedia'];
+const SUPPORTS_FONT_SIZE      = ['quote', 'hero', 'sticky', 'timeline', 'chat', 'carousel', 'image', 'scrollymedia'];
+const SUPPORTS_LINE_HEIGHT    = ['quote'];
+const SUPPORTS_LETTER_SPACING = ['quote'];
 const SUPPORTS_BORDER_RADIUS  = ['image', 'video', 'quote', 'carousel'];
 const SUPPORTS_BOX_SHADOW     = ['image', 'quote'];
 const SUPPORTS_OBJECT_POS     = ['image', 'video', 'hero', 'sticky'];

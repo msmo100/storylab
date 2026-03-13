@@ -1,6 +1,5 @@
 import { motion, useReducedMotion } from 'framer-motion';
 import type { AnimationPreset, Block } from '../../types';
-import { TextBlock } from './TextBlock';
 import { ImageBlock } from './ImageBlock';
 import { VideoBlock } from './VideoBlock';
 import { QuoteBlock } from './QuoteBlock';
@@ -65,7 +64,6 @@ export function AnimatedBlock({ block }: Props) {
       variants={variants}
       transition={{ duration: 0.55, delay: prefersReducedMotion ? 0 : (block.animationDelay ?? 0), ease: [0.25, 0, 0.25, 1] }}
     >
-      {block.type === 'text' && <TextBlock block={block} />}
       {block.type === 'image' && <ImageBlock block={block} />}
       {block.type === 'video' && <VideoBlock block={block} />}
       {block.type === 'quote' && <QuoteBlock block={block} />}

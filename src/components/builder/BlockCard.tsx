@@ -14,7 +14,6 @@ interface Props {
 }
 
 const BLOCK_LABELS: Record<Block['type'], string> = {
-  text: 'Text',
   image: 'Bild',
   video: 'Video',
   quote: 'Citat',
@@ -27,7 +26,6 @@ const BLOCK_LABELS: Record<Block['type'], string> = {
 };
 
 const BLOCK_COLORS: Record<Block['type'], string> = {
-  text: 'bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300',
   image: 'bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300',
   video: 'bg-purple-100 text-purple-800 dark:bg-purple-900/40 dark:text-purple-300',
   quote: 'bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300',
