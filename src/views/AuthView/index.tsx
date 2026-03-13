@@ -11,13 +11,14 @@ export function AuthView() {
   const [tab, setTab] = useState<Tab>('signin');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [rememberMe, setRememberMe] = useState(true);
   const { signIn, signUp, error, pendingConfirmation, enterGuestMode } = useAuthStore();
   const { startGuestSession } = useBuilderStore();
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (tab === 'signin') {
-      await signIn(email, password);
+      await signIn(email, password, rememberMe);
     } else {
       await signUp(email, password);
     }
@@ -88,6 +89,18 @@ export function AuthView() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
+
+          {tab === 'signin' && (
+            <label className="flex items-center gap-2 cursor-pointer select-none">
+              <input
+                type="checkbox"
+                checked={rememberMe}
+                onChange={(e) => setRememberMe(e.target.checked)}
+                className="rounded border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100 focus:ring-gray-400"
+              />
+              <span className="text-sm text-gray-600 dark:text-gray-400">Håll mig inloggad</span>
+            </label>
+          )}
 
           {error && (
             <p className="text-xs text-red-600 dark:text-red-400">{error}</p>
