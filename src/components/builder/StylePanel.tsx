@@ -18,6 +18,38 @@ const SUPPORTS_BORDER_RADIUS  = ['image', 'video', 'quote', 'carousel'];
 const SUPPORTS_BOX_SHADOW     = ['image', 'quote'];
 const SUPPORTS_OBJECT_POS     = ['image', 'video', 'hero', 'sticky'];
 
+const GP_PALETTE = [
+  { name: 'Blue',      colors: ['#0A324B', '#0A5582', '#4A728A', '#80A3B9', '#CDDDE8', '#E8EFF5'] },
+  { name: 'Green',     colors: ['#024B3A', '#006950', '#408877', '#78B0A2', '#C0DAD4', '#ECF3F2'] },
+  { name: 'Graphite',  colors: ['#183D45', '#305158', '#5B757B', '#97A8AB', '#CED6D8', '#E8EDEE'] },
+  { name: 'Plum',      colors: ['#672F55', '#EDD3E7', '#F3ECF3'] },
+];
+
+function ColorSwatches({ onSelect, current }: { onSelect: (hex: string) => void; current?: string }) {
+  return (
+    <div className="flex flex-col gap-1 mb-2">
+      {GP_PALETTE.map((family) => (
+        <div key={family.name} className="flex gap-1">
+          {family.colors.map((hex) => (
+            <button
+              key={hex}
+              type="button"
+              title={hex}
+              onClick={() => onSelect(hex)}
+              style={{ backgroundColor: hex }}
+              className={`w-6 h-6 rounded flex-shrink-0 border transition-transform hover:scale-110 ${
+                current?.toLowerCase() === hex.toLowerCase()
+                  ? 'border-gray-900 dark:border-white ring-1 ring-gray-900 dark:ring-white'
+                  : 'border-black/10 dark:border-white/10'
+              }`}
+            />
+          ))}
+        </div>
+      ))}
+    </div>
+  );
+}
+
 const FONT_PRESETS = [
   { label: 'Standard',        value: undefined,                     stack: 'inherit' },
   { label: 'Playfair',        value: "'Playfair Display', serif",   stack: "'Playfair Display', serif" },
@@ -78,6 +110,7 @@ export function StylePanel({ block, onClose }: Props) {
         {SUPPORTS_TEXT_COLOR.includes(t) && (
           <div>
             <label className={LABEL}>Textfärg</label>
+            <ColorSwatches onSelect={(hex) => setStyle({ textColor: hex })} current={block.styles?.textColor} />
             <div className="flex gap-2">
               <input type="color" value={block.styles?.textColor ?? '#000000'} onChange={(e) => setStyle({ textColor: e.target.value })} className="h-8 w-10 rounded cursor-pointer border border-gray-200 dark:border-gray-600" />
               <input type="text" value={block.styles?.textColor ?? ''} onChange={(e) => setStyle({ textColor: e.target.value || undefined })} placeholder="#000000" className={INPUT} />
@@ -90,6 +123,7 @@ export function StylePanel({ block, onClose }: Props) {
         {SUPPORTS_BG_COLOR.includes(t) && (
           <div>
             <label className={LABEL}>Bakgrundsfärg</label>
+            <ColorSwatches onSelect={(hex) => setStyle({ backgroundColor: hex })} current={block.styles?.backgroundColor} />
             <div className="flex gap-2">
               <input type="color" value={block.styles?.backgroundColor ?? '#ffffff'} onChange={(e) => setStyle({ backgroundColor: e.target.value })} className="h-8 w-10 rounded cursor-pointer border border-gray-200 dark:border-gray-600" />
               <input type="text" value={block.styles?.backgroundColor ?? ''} onChange={(e) => setStyle({ backgroundColor: e.target.value || undefined })} placeholder="#ffffff" className={INPUT} />
@@ -102,6 +136,7 @@ export function StylePanel({ block, onClose }: Props) {
         {SUPPORTS_ACCENT.includes(t) && (
           <div>
             <label className={LABEL}>Accentfärg</label>
+            <ColorSwatches onSelect={(hex) => setStyle({ accentColor: hex })} current={block.styles?.accentColor} />
             <div className="flex gap-2">
               <input type="color" value={block.styles?.accentColor ?? '#6366f1'} onChange={(e) => setStyle({ accentColor: e.target.value })} className="h-8 w-10 rounded cursor-pointer border border-gray-200 dark:border-gray-600" />
               <input type="text" value={block.styles?.accentColor ?? ''} onChange={(e) => setStyle({ accentColor: e.target.value || undefined })} placeholder="#6366f1" className={INPUT} />
