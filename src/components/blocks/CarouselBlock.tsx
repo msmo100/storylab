@@ -10,16 +10,13 @@ export function CarouselBlock({ block }: Props) {
   const [current, setCurrent] = useState(0);
   const startX = useRef(0);
   const containerRef = useRef<HTMLDivElement>(null);
-  const [slideW, setSlideW] = useState(0);
+  const [containerW, setContainerW] = useState(0);
   const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
 
   useEffect(() => {
     function measure() {
       if (!containerRef.current) return;
-      const w = containerRef.current.offsetWidth;
-      // Mobile (<640px): show 90% so 10% of next peeks; desktop: 85%
-      const pct = w < 640 ? 0.9 : 0.85;
-      setSlideW(w * pct);
+      setContainerW(containerRef.current.offsetWidth);
     }
     measure();
     const ro = new ResizeObserver(measure);
@@ -27,15 +24,28 @@ export function CarouselBlock({ block }: Props) {
     return () => ro.disconnect();
   }, []);
 
+  // Desktop (≥640px) with ≥3 items: show 3 slides, active in center
+  // Mobile or <3 items: show 1 slide + 10% peek of next
+  const isDesktop = containerW >= 640 && items.length >= 3;
+  const slideW = containerW === 0 ? 0
+    : isDesktop
+      ? (containerW - 2 * GAP) / 3
+      : containerW * 0.9;
+
+  // Desktop: center the active slide, clamped so we never over-scroll
+  // Mobile: simple left-offset
+  const rawOffset = current * (slideW + GAP);
+  const translateX = containerW === 0 ? 0
+    : isDesktop
+      ? -Math.max(0, Math.min((items.length - 3) * (slideW + GAP), rawOffset - (slideW + GAP)))
+      : -rawOffset;
+
   // Play only the current slide's video; pause all others
   useEffect(() => {
     videoRefs.current.forEach((vid, i) => {
       if (!vid) return;
-      if (i === current) {
-        vid.play().catch(() => {});
-      } else {
-        vid.pause();
-      }
+      if (i === current) vid.play().catch(() => {});
+      else vid.pause();
     });
   }, [current]);
 
@@ -44,20 +54,15 @@ export function CarouselBlock({ block }: Props) {
   function prev() { setCurrent((c) => Math.max(c - 1, 0)); }
   function next() { setCurrent((c) => Math.min(c + 1, items.length - 1)); }
 
-  function onTouchStart(e: React.TouchEvent) {
-    startX.current = e.touches[0].clientX;
-  }
+  function onTouchStart(e: React.TouchEvent) { startX.current = e.touches[0].clientX; }
   function onTouchEnd(e: React.TouchEvent) {
     const dx = e.changedTouches[0].clientX - startX.current;
     if (dx < -40) next();
     if (dx > 40)  prev();
   }
 
-  const translateX = slideW > 0 ? -(current * (slideW + GAP)) : 0;
-
   return (
     <div style={{ maxWidth: block.maxWidth ?? '100%', margin: '0 auto' }}>
-      {/* Clip container — overflow hidden so peeking slides are cut at the edge */}
       <div
         ref={containerRef}
         className="relative overflow-hidden"
@@ -72,8 +77,11 @@ export function CarouselBlock({ block }: Props) {
           {items.map((item, i) => (
             <div
               key={item.id}
-              className="flex-shrink-0"
-              style={{ width: slideW > 0 ? `${slideW}px` : '85%' }}
+              className="flex-shrink-0 transition-opacity duration-300"
+              style={{
+                width: slideW > 0 ? `${slideW}px` : isDesktop ? '33%' : '90%',
+                opacity: isDesktop && i !== current ? 0.55 : 1,
+              }}
             >
               {item.src.match(/\.(mp4|webm|mov)$/i) ? (
                 <video
