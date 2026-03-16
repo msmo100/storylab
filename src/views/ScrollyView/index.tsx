@@ -178,7 +178,7 @@ function Slide({
   const localProgress = useTransform(scrollYProgress, [slotStart, slotEnd], [0, 1]);
 
   const opacity = useTransform(localProgress, [0, 0.35], [isFirst ? 1 : 0, 1]);
-  const bgY = useTransform(localProgress, [0, 1], ['0%', '-8%']);
+  const bgY = '0%';
 
   const headlineY = useTransform(localProgress, [0, 1], [isFirst ? '0px' : '60vh', '-60vh']);
   const headlineOpacity = useTransform(localProgress, [0, 0.18], [isFirst ? 1 : 0, 1]);
@@ -200,14 +200,14 @@ function Slide({
             poster={slide.backgroundPoster}
             autoPlay muted loop playsInline
             className="absolute inset-0 w-full object-cover"
-            style={{ height: '110%', top: '-5%' }}
+            style={{ height: '100%', top: '0' }}
           />
         ) : (
           <img
             src={slide.backgroundSrc || 'https://placehold.co/1920x1080/111827/111827'}
             alt=""
             className="absolute inset-0 w-full object-cover"
-            style={{ height: '110%', top: '-5%' }}
+            style={{ height: '100%', top: '0' }}
           />
         )}
       </motion.div>
