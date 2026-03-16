@@ -111,8 +111,8 @@ export function BuilderView() {
   } else if (embedSrc) {
     const iframeId = `sl-${projectId}`;
     embedCode =
-      `<iframe id="${iframeId}" src="${embedSrc}" width="100%" frameborder="0" allow="autoplay" style="border:none;display:block;width:100%;"></iframe>\n` +
-      `<script>(function(){var f=document.getElementById('${iframeId}');window.addEventListener('message',function(e){if(e.data&&e.data.type==='storylab-resize'&&f&&e.source===f.contentWindow)f.style.height=e.data.height+'px';});})();<\/script>`;
+      `<iframe id="${iframeId}" src="${embedSrc}" width="100%" frameborder="0" scrolling="no" allow="autoplay" style="border:none;display:block;width:100%;height:200px;overflow:hidden;"></iframe>\n` +
+      `<script>(function(){var f=document.getElementById('${iframeId}');window.addEventListener('message',function(e){if(e.data&&e.data.type==='storylab-resize'&&f&&e.source===f.contentWindow){f.style.setProperty('height',e.data.height+'px','important');f.style.setProperty('overflow','hidden','important');}});})();<\/script>`;
   }
 
   function copyEmbedCode() {

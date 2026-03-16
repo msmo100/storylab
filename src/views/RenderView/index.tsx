@@ -51,11 +51,16 @@ export function RenderView() {
   const contentRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (!isEmbedded) return;
-    const observer = new ResizeObserver(() => {
-      const h = contentRef.current?.scrollHeight;
+    // Suppress internal scrollbar
+    document.documentElement.style.overflow = 'hidden';
+    document.body.style.overflow = 'hidden';
+    function send() {
+      const h = document.documentElement.scrollHeight || document.body.scrollHeight;
       if (h) window.parent.postMessage({ type: 'storylab-resize', height: h }, '*');
-    });
-    if (contentRef.current) observer.observe(contentRef.current);
+    }
+    const observer = new ResizeObserver(send);
+    observer.observe(document.body);
+    send(); // fire immediately on mount
     return () => observer.disconnect();
   }, [isEmbedded]);
 
@@ -76,7 +81,7 @@ export function RenderView() {
   }
 
   return (
-    <div ref={contentRef} className="bg-white min-h-screen">
+    <div ref={contentRef} className={isEmbedded ? 'bg-white' : 'bg-white min-h-screen'}>
       {article.blocks.map((block) => (
         <AnimatedBlock key={block.id} block={block} />
       ))}
