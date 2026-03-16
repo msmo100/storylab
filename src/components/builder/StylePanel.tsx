@@ -50,16 +50,29 @@ function ColorSwatches({ onSelect, current }: { onSelect: (hex: string) => void;
   );
 }
 
+const GP_FONTS = ['GP Sans', 'GP Serif'] as const;
+
+const GP_WEIGHTS = [
+  { label: 'Light',      value: '300' },
+  { label: 'Book',       value: '350' },
+  { label: 'Regular',    value: '400' },
+  { label: 'Medium',     value: '500' },
+  { label: 'SemiBold',   value: '600' },
+  { label: 'Bold',       value: '700' },
+  { label: 'ExtraBold',  value: '800' },
+  { label: 'Black',      value: '900' },
+];
+
 const FONT_PRESETS = [
   { label: 'Standard',        value: undefined,                     stack: 'inherit' },
+  { label: 'GP Sans',         value: 'GP Sans',                     stack: "'GP Sans', sans-serif" },
+  { label: 'GP Serif',        value: 'GP Serif',                    stack: "'GP Serif', serif" },
   { label: 'Playfair',        value: "'Playfair Display', serif",   stack: "'Playfair Display', serif" },
   { label: 'Merriweather',    value: 'Merriweather, serif',         stack: 'Merriweather, serif' },
   { label: 'Lora',            value: 'Lora, serif',                 stack: 'Lora, serif' },
   { label: 'Space Grotesk',   value: "'Space Grotesk', sans-serif", stack: "'Space Grotesk', sans-serif" },
   { label: 'Georgia',         value: 'Georgia, serif',              stack: 'Georgia, serif' },
-  { label: 'Times New Roman', value: "'Times New Roman', serif",    stack: "'Times New Roman', serif" },
   { label: 'Arial',           value: 'Arial, sans-serif',           stack: 'Arial, sans-serif' },
-  { label: 'Courier New',     value: "'Courier New', monospace",    stack: "'Courier New', monospace" },
 ];
 
 interface Props {
@@ -83,6 +96,7 @@ export function StylePanel({ block, onClose }: Props) {
   const t = block.type;
   const currentFont = block.styles?.fontFamily;
   const isPreset = FONT_PRESETS.some((p) => p.value === currentFont);
+  const isGPFont = GP_FONTS.some((f) => currentFont === f);
 
   return (
     <div className="flex flex-col w-72 flex-shrink-0 border-l border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 overflow-y-auto">
@@ -169,6 +183,32 @@ export function StylePanel({ block, onClose }: Props) {
                 );
               })}
             </div>
+            {/* GP font weight + italic controls */}
+            {isGPFont && (
+              <div className="flex flex-col gap-2">
+                <select
+                  value={block.styles?.fontWeight ?? '400'}
+                  onChange={(e) => setStyle({ fontWeight: e.target.value })}
+                  className={INPUT}
+                  style={{ fontFamily: currentFont, fontWeight: block.styles?.fontWeight ?? '400' }}
+                >
+                  {GP_WEIGHTS.map((w) => (
+                    <option key={w.value} value={w.value} style={{ fontWeight: w.value }}>
+                      {w.label}
+                    </option>
+                  ))}
+                </select>
+                <label className="flex items-center gap-2 cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    checked={block.styles?.fontStyle === 'italic'}
+                    onChange={(e) => setStyle({ fontStyle: e.target.checked ? 'italic' : 'normal' })}
+                    className="rounded"
+                  />
+                  <span className="text-xs text-gray-500 dark:text-gray-400 italic">Kursiv</span>
+                </label>
+              </div>
+            )}
             {!isPreset && currentFont && (
               <input
                 type="text"

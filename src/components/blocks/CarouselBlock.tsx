@@ -97,6 +97,8 @@ export function CarouselBlock({ block }: Props) {
                   className="text-center text-sm text-gray-500 py-2"
                   style={{
                     fontFamily: block.styles?.fontFamily,
+                    fontWeight: block.styles?.fontWeight,
+                    fontStyle: block.styles?.fontStyle,
                     fontSize: block.styles?.fontSize ? `${block.styles.fontSize}px` : undefined,
                   }}
                 >

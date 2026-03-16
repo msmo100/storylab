@@ -1,5 +1,41 @@
 @import "tailwindcss";
 
+/* ─── GP Fonts ────────────────────────────────────────────────────────────── */
+
+@font-face { font-family: 'GP Sans'; src: url('/fonts/GothiaGPSans-Light.otf') format('opentype'); font-weight: 300; font-style: normal; }
+@font-face { font-family: 'GP Sans'; src: url('/fonts/GothiaGPSans-LightItalic.otf') format('opentype'); font-weight: 300; font-style: italic; }
+@font-face { font-family: 'GP Sans'; src: url('/fonts/GothiaGPSans-Book.otf') format('opentype'); font-weight: 350; font-style: normal; }
+@font-face { font-family: 'GP Sans'; src: url('/fonts/GothiaGPSans-BookItalic.otf') format('opentype'); font-weight: 350; font-style: italic; }
+@font-face { font-family: 'GP Sans'; src: url('/fonts/GothiaGPSans-Regular.otf') format('opentype'); font-weight: 400; font-style: normal; }
+@font-face { font-family: 'GP Sans'; src: url('/fonts/GothiaGPSans-RegularItalic.otf') format('opentype'); font-weight: 400; font-style: italic; }
+@font-face { font-family: 'GP Sans'; src: url('/fonts/GothiaGPSans-Medium.otf') format('opentype'); font-weight: 500; font-style: normal; }
+@font-face { font-family: 'GP Sans'; src: url('/fonts/GothiaGPSans-MediumItalic.otf') format('opentype'); font-weight: 500; font-style: italic; }
+@font-face { font-family: 'GP Sans'; src: url('/fonts/GothiaGPSans-SemiBold.otf') format('opentype'); font-weight: 600; font-style: normal; }
+@font-face { font-family: 'GP Sans'; src: url('/fonts/GothiaGPSans-SemiBoldItalic.otf') format('opentype'); font-weight: 600; font-style: italic; }
+@font-face { font-family: 'GP Sans'; src: url('/fonts/GothiaGPSans-Bold.otf') format('opentype'); font-weight: 700; font-style: normal; }
+@font-face { font-family: 'GP Sans'; src: url('/fonts/GothiaGPSans-BoldItalic.otf') format('opentype'); font-weight: 700; font-style: italic; }
+@font-face { font-family: 'GP Sans'; src: url('/fonts/GothiaGPSans-ExtraBold.otf') format('opentype'); font-weight: 800; font-style: normal; }
+@font-face { font-family: 'GP Sans'; src: url('/fonts/GothiaGPSans-ExtraBoldItalic.otf') format('opentype'); font-weight: 800; font-style: italic; }
+@font-face { font-family: 'GP Sans'; src: url('/fonts/GothiaGPSans-Black.otf') format('opentype'); font-weight: 900; font-style: normal; }
+@font-face { font-family: 'GP Sans'; src: url('/fonts/GothiaGPSans-BlackItalic.otf') format('opentype'); font-weight: 900; font-style: italic; }
+
+@font-face { font-family: 'GP Serif'; src: url('/fonts/GothiaGPSerif-Light.otf') format('opentype'); font-weight: 300; font-style: normal; }
+@font-face { font-family: 'GP Serif'; src: url('/fonts/GothiaGPSerif-LightItalic.otf') format('opentype'); font-weight: 300; font-style: italic; }
+@font-face { font-family: 'GP Serif'; src: url('/fonts/GothiaGPSerif-Book.otf') format('opentype'); font-weight: 350; font-style: normal; }
+@font-face { font-family: 'GP Serif'; src: url('/fonts/GothiaGPSerif-BookItalic.otf') format('opentype'); font-weight: 350; font-style: italic; }
+@font-face { font-family: 'GP Serif'; src: url('/fonts/GothiaGPSerif-Regular.otf') format('opentype'); font-weight: 400; font-style: normal; }
+@font-face { font-family: 'GP Serif'; src: url('/fonts/GothiaGPSerif-RegularItalic.otf') format('opentype'); font-weight: 400; font-style: italic; }
+@font-face { font-family: 'GP Serif'; src: url('/fonts/GothiaGPSerif-Medium.otf') format('opentype'); font-weight: 500; font-style: normal; }
+@font-face { font-family: 'GP Serif'; src: url('/fonts/GothiaGPSerif-MediumItalic.otf') format('opentype'); font-weight: 500; font-style: italic; }
+@font-face { font-family: 'GP Serif'; src: url('/fonts/GothiaGPSerif-SemiBold.otf') format('opentype'); font-weight: 600; font-style: normal; }
+@font-face { font-family: 'GP Serif'; src: url('/fonts/GothiaGPSerif-SemiBoldItalic.otf') format('opentype'); font-weight: 600; font-style: italic; }
+@font-face { font-family: 'GP Serif'; src: url('/fonts/GothiaGPSerif-Bold.otf') format('opentype'); font-weight: 700; font-style: normal; }
+@font-face { font-family: 'GP Serif'; src: url('/fonts/GothiaGPSerif-BoldItalic.otf') format('opentype'); font-weight: 700; font-style: italic; }
+@font-face { font-family: 'GP Serif'; src: url('/fonts/GothiaGPSerif-ExtraBold.otf') format('opentype'); font-weight: 800; font-style: normal; }
+@font-face { font-family: 'GP Serif'; src: url('/fonts/GothiaGPSerif-ExtraBoldItalic.otf') format('opentype'); font-weight: 800; font-style: italic; }
+@font-face { font-family: 'GP Serif'; src: url('/fonts/GothiaGPSerif-Black.otf') format('opentype'); font-weight: 900; font-style: normal; }
+@font-face { font-family: 'GP Serif'; src: url('/fonts/GothiaGPSerif-BlackItalic.otf') format('opentype'); font-weight: 900; font-style: italic; }
+
 /* Class-based dark mode — toggled via .dark on <html> */
 @variant dark (&:where(.dark, .dark *));
 

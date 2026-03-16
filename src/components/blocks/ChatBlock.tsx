@@ -8,6 +8,8 @@ export function ChatBlock({ block }: Props) {
   const { messages, showPhoneFrame, showContactHeader, showInputBar, showNames } = block;
   const senderColor = block.styles?.accentColor ?? '#3b82f6';
   const fontFamily = block.styles?.fontFamily;
+  const fontWeight = block.styles?.fontWeight;
+  const fontStyle = block.styles?.fontStyle;
   const fontSize = block.styles?.fontSize ? `${block.styles.fontSize}px` : undefined;
 
   const containerRef = useRef<HTMLDivElement>(null);
@@ -17,7 +19,7 @@ export function ChatBlock({ block }: Props) {
     <div
       ref={containerRef}
       className="flex flex-col gap-1 p-3 overflow-y-auto flex-1"
-      style={{ backgroundColor: block.styles?.backgroundColor ?? '#ffffff', fontFamily, fontSize }}
+      style={{ backgroundColor: block.styles?.backgroundColor ?? '#ffffff', fontFamily, fontWeight, fontStyle, fontSize }}
     >
       {showContactHeader && (
         <div className="text-center text-xs text-gray-400 py-2">

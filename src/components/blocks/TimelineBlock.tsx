@@ -15,7 +15,7 @@ export function TimelineBlock({ block }: Props) {
   const lineWidth = block.lineWidth ?? 2;
   const accentColor = block.styles?.accentColor;
   return (
-    <div style={{ maxWidth: block.maxWidth ?? '720px', margin: '0 auto', padding: '2rem 1.5rem', backgroundColor: block.styles?.backgroundColor, color: block.styles?.textColor, fontFamily: block.styles?.fontFamily, fontSize: block.styles?.fontSize ? `${block.styles.fontSize}px` : undefined }}>
+    <div style={{ maxWidth: block.maxWidth ?? '720px', margin: '0 auto', padding: '2rem 1.5rem', backgroundColor: block.styles?.backgroundColor, color: block.styles?.textColor, fontFamily: block.styles?.fontFamily, fontWeight: block.styles?.fontWeight, fontStyle: block.styles?.fontStyle, fontSize: block.styles?.fontSize ? `${block.styles.fontSize}px` : undefined }}>
       <div className="relative">
         <div
           className={accentColor ? undefined : 'absolute top-0 bottom-0 bg-gray-200'}

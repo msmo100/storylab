@@ -54,7 +54,7 @@ export function StickyBlock({ block }: Props) {
             >
               <p
                 className="text-white text-center font-semibold drop-shadow-lg max-w-3xl"
-                style={{ fontSize: block.styles?.fontSize ? `${block.styles.fontSize}px` : 'clamp(1.5rem, 4vw, 3rem)', lineHeight: 1.3, fontFamily: block.styles?.fontFamily }}
+                style={{ fontSize: block.styles?.fontSize ? `${block.styles.fontSize}px` : 'clamp(1.5rem, 4vw, 3rem)', lineHeight: 1.3, fontFamily: block.styles?.fontFamily, fontWeight: block.styles?.fontWeight, fontStyle: block.styles?.fontStyle }}
               >
                 {text}
               </p>

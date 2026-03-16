@@ -37,13 +37,13 @@ export function HeroBlock({ block }: Props) {
         {block.heading && (
           <h1
             className="text-white font-bold drop-shadow-lg"
-            style={{ fontSize: block.styles?.fontSize ? `${block.styles.fontSize}px` : 'clamp(2rem, 6vw, 4.5rem)', lineHeight: 1.1, fontFamily: block.styles?.fontFamily }}
+            style={{ fontSize: block.styles?.fontSize ? `${block.styles.fontSize}px` : 'clamp(2rem, 6vw, 4.5rem)', lineHeight: 1.1, fontFamily: block.styles?.fontFamily, fontWeight: block.styles?.fontWeight, fontStyle: block.styles?.fontStyle }}
           >
             {block.heading}
           </h1>
         )}
         {block.subheading && (
-          <p className="text-white/80 mt-4 text-xl max-w-2xl drop-shadow" style={{ fontFamily: block.styles?.fontFamily }}>
+          <p className="text-white/80 mt-4 text-xl max-w-2xl drop-shadow" style={{ fontFamily: block.styles?.fontFamily, fontWeight: block.styles?.fontWeight, fontStyle: block.styles?.fontStyle }}>
             {block.subheading}
           </p>
         )}

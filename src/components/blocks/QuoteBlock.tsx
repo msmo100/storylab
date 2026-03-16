@@ -19,6 +19,8 @@ export function QuoteBlock({ block }: Props) {
         className="text-xl leading-relaxed italic"
         style={{
           fontFamily: block.styles?.fontFamily,
+          fontWeight: block.styles?.fontWeight,
+          fontStyle: block.styles?.fontStyle,
           fontSize: block.styles?.fontSize ? `${block.styles.fontSize}px` : undefined,
           lineHeight: block.styles?.lineHeight,
           letterSpacing: block.styles?.letterSpacing ? `${block.styles.letterSpacing}em` : undefined,

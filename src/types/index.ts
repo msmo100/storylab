@@ -5,6 +5,10 @@ export interface BlockStyle {
   accentColor?: string;
   backgroundColor?: string;
   fontFamily?: string;
+  /** CSS font-weight value, e.g. "400", "700". */
+  fontWeight?: string;
+  /** CSS font-style value, e.g. "normal", "italic". */
+  fontStyle?: string;
   /** Font size as a numeric string in px, e.g. "16". */
   fontSize?: string;
   /** Line height as a unitless string, e.g. "1.5". */
