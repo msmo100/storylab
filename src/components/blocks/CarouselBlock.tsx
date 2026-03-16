@@ -10,13 +10,16 @@ export function CarouselBlock({ block }: Props) {
   const [current, setCurrent] = useState(0);
   const startX = useRef(0);
   const containerRef = useRef<HTMLDivElement>(null);
-  const [containerW, setContainerW] = useState(0);
+  const [slideW, setSlideW] = useState(0);
   const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
 
   useEffect(() => {
     function measure() {
       if (!containerRef.current) return;
-      setContainerW(containerRef.current.offsetWidth);
+      const w = containerRef.current.offsetWidth;
+      // Mobile (<640px): show 90% so 10% of next peeks; desktop: 85%
+      const pct = w < 640 ? 0.9 : 0.85;
+      setSlideW(w * pct);
     }
     measure();
     const ro = new ResizeObserver(measure);
@@ -24,21 +27,7 @@ export function CarouselBlock({ block }: Props) {
     return () => ro.disconnect();
   }, []);
 
-  // Desktop (≥480px) with ≥3 items: show 3 slides, active in center
-  // Mobile or <3 items: show 1 slide + 10% peek of next
-  const isDesktop = containerW >= 480 && items.length >= 3;
-  const slideW = containerW === 0 ? 0
-    : isDesktop
-      ? (containerW - 2 * GAP) / 3
-      : containerW * 0.9;
-
-  // Desktop: center the active slide, clamped so we never over-scroll
-  // Mobile: simple left-offset
-  const rawOffset = current * (slideW + GAP);
-  const translateX = containerW === 0 ? 0
-    : isDesktop
-      ? -Math.max(0, Math.min((items.length - 3) * (slideW + GAP), rawOffset - (slideW + GAP)))
-      : -rawOffset;
+  const translateX = slideW > 0 ? -(current * (slideW + GAP)) : 0;
 
   // Play only the current slide's video; pause all others
   useEffect(() => {
@@ -77,11 +66,8 @@ export function CarouselBlock({ block }: Props) {
           {items.map((item, i) => (
             <div
               key={item.id}
-              className="flex-shrink-0 transition-opacity duration-300"
-              style={{
-                width: slideW > 0 ? `${slideW}px` : isDesktop ? '33%' : '90%',
-                opacity: isDesktop && i !== current ? 0.55 : 1,
-              }}
+              className="flex-shrink-0"
+              style={{ width: slideW > 0 ? `${slideW}px` : '85%' }}
             >
               {item.src.match(/\.(mp4|webm|mov)$/i) ? (
                 <video
