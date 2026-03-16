@@ -11,6 +11,7 @@ export function CarouselBlock({ block }: Props) {
   const startX = useRef(0);
   const containerRef = useRef<HTMLDivElement>(null);
   const [slideW, setSlideW] = useState(0);
+  const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
 
   useEffect(() => {
     function measure() {
@@ -25,6 +26,18 @@ export function CarouselBlock({ block }: Props) {
     if (containerRef.current) ro.observe(containerRef.current);
     return () => ro.disconnect();
   }, []);
+
+  // Play only the current slide's video; pause all others
+  useEffect(() => {
+    videoRefs.current.forEach((vid, i) => {
+      if (!vid) return;
+      if (i === current) {
+        vid.play().catch(() => {});
+      } else {
+        vid.pause();
+      }
+    });
+  }, [current]);
 
   if (items.length === 0) return null;
 
@@ -56,7 +69,7 @@ export function CarouselBlock({ block }: Props) {
           className="flex transition-transform duration-300"
           style={{ gap: `${GAP}px`, transform: `translateX(${translateX}px)` }}
         >
-          {items.map((item) => (
+          {items.map((item, i) => (
             <div
               key={item.id}
               className="flex-shrink-0"
@@ -64,9 +77,10 @@ export function CarouselBlock({ block }: Props) {
             >
               {item.src.match(/\.(mp4|webm|mov)$/i) ? (
                 <video
+                  ref={(el) => { videoRefs.current[i] = el; }}
                   src={item.src}
                   poster={item.poster}
-                  autoPlay muted loop playsInline
+                  muted loop playsInline
                   className="w-full h-auto block"
                   style={{ borderRadius: block.styles?.borderRadius }}
                 />
