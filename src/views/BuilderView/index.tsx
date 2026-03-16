@@ -100,7 +100,7 @@ export function BuilderView() {
     const wId = `sl-w-${projectId}`;
     const fId = `sl-f-${projectId}`;
     embedCode =
-      `<div id="${wId}" style="height:${n * 100}vh;position:relative;">\n` +
+      `<div id="${wId}" style="height:${n * 100}vh;position:relative;width:100vw;margin-left:calc(50% - 50vw);margin-right:calc(50% - 50vw);">\n` +
       `  <iframe id="${fId}" src="${embedSrc}" style="position:sticky;top:0;height:100vh;width:100%;border:none;display:block;" allow="autoplay"></iframe>\n` +
       `</div>\n` +
       `<script>(function(){` +
