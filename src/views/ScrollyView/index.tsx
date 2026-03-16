@@ -138,9 +138,6 @@ function ScrollyContent({
           scrollYProgress={scrollYProgress}
         />
       ))}
-      {slides.length > 1 && (
-        <SlideDots total={slides.length} scrollYProgress={scrollYProgress} />
-      )}
     </>
   );
 
@@ -249,40 +246,3 @@ function Slide({
   );
 }
 
-// ─── Progress dots ─────────────────────────────────────────────────────────────
-
-function SlideDots({
-  total,
-  scrollYProgress,
-}: {
-  total: number;
-  scrollYProgress: MotionValue<number>;
-}) {
-  const [active, setActive] = useState(0);
-
-  useEffect(() => {
-    return scrollYProgress.on('change', (v) => {
-      setActive(Math.min(total - 1, Math.floor(v * total)));
-    });
-  }, [scrollYProgress, total]);
-
-  return (
-    <div
-      className="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-2"
-      style={{ zIndex: total + 1 }}
-    >
-      {Array.from({ length: total }).map((_, i) => (
-        <div
-          key={i}
-          style={{
-            width: 6, height: 6,
-            borderRadius: '50%',
-            background: 'white',
-            opacity: i === active ? 1 : 0.35,
-            transition: 'opacity 0.3s',
-          }}
-        />
-      ))}
-    </div>
-  );
-}
