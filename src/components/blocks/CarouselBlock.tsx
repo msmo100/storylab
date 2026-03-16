@@ -10,16 +10,13 @@ export function CarouselBlock({ block }: Props) {
   const [current, setCurrent] = useState(0);
   const startX = useRef(0);
   const containerRef = useRef<HTMLDivElement>(null);
-  const [slideW, setSlideW] = useState(0);
   const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
+  const [containerW, setContainerW] = useState(0);
 
   useEffect(() => {
     function measure() {
       if (!containerRef.current) return;
-      const w = containerRef.current.offsetWidth;
-      // Mobile (<640px): show 90% so 10% of next peeks; desktop: 85%
-      const pct = w < 640 ? 0.9 : 0.85;
-      setSlideW(w * pct);
+      setContainerW(containerRef.current.offsetWidth);
     }
     measure();
     const ro = new ResizeObserver(measure);
@@ -27,7 +24,13 @@ export function CarouselBlock({ block }: Props) {
     return () => ro.disconnect();
   }, []);
 
-  const translateX = slideW > 0 ? -(current * (slideW + GAP)) : 0;
+  // Slide takes up 80% on desktop, 88% on mobile — adjacent slides peek ~10%/6% each side
+  const slidePct = containerW < 640 ? 0.88 : 0.80;
+  const slideW = containerW > 0 ? containerW * slidePct : 0;
+
+  // Center the active slide; both sides peek symmetrically
+  const centerOffset = containerW > 0 ? (containerW - slideW) / 2 : 0;
+  const translateX = slideW > 0 ? -(current * (slideW + GAP)) + centerOffset : 0;
 
   // Play only the current slide's video; pause all others
   useEffect(() => {
@@ -67,7 +70,12 @@ export function CarouselBlock({ block }: Props) {
             <div
               key={item.id}
               className="flex-shrink-0"
-              style={{ width: slideW > 0 ? `${slideW}px` : '85%' }}
+              style={{
+                width: slideW > 0 ? `${slideW}px` : '80%',
+                transform: i === current ? 'scale(1)' : 'scale(0.9)',
+                transition: 'transform 300ms ease',
+                transformOrigin: 'center center',
+              }}
             >
               {item.src.match(/\.(mp4|webm|mov)$/i) ? (
                 <video
