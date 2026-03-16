@@ -24,9 +24,9 @@ export function CarouselBlock({ block }: Props) {
     return () => ro.disconnect();
   }, []);
 
-  // Desktop (≥640px) with ≥3 items: show 3 slides, active in center
+  // Desktop (≥480px) with ≥3 items: show 3 slides, active in center
   // Mobile or <3 items: show 1 slide + 10% peek of next
-  const isDesktop = containerW >= 640 && items.length >= 3;
+  const isDesktop = containerW >= 480 && items.length >= 3;
   const slideW = containerW === 0 ? 0
     : isDesktop
       ? (containerW - 2 * GAP) / 3
