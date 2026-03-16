@@ -3,12 +3,13 @@ import type { TimelineBlock as TimelineBlockType, TimelineDotStyle } from '../..
 
 interface Props { block: TimelineBlockType }
 
-function Dot({ style }: { style: TimelineDotStyle }) {
+function Dot({ style, color }: { style: TimelineDotStyle; color?: string }) {
   if (style === 'none') return null;
+  const c = color ?? '#9ca3af'; // gray-400 fallback
   const base = 'w-3 h-3 rounded-full flex-shrink-0';
-  if (style === 'ring') return <div className={`${base} border-2 border-gray-400`} />;
-  if (style === 'diamond') return <div className="w-3 h-3 flex-shrink-0 bg-gray-400 rotate-45" />;
-  return <div className={`${base} bg-gray-400`} />;
+  if (style === 'ring') return <div className={base} style={{ border: `2px solid ${c}` }} />;
+  if (style === 'diamond') return <div className="w-3 h-3 flex-shrink-0 rotate-45" style={{ backgroundColor: c }} />;
+  return <div className={base} style={{ backgroundColor: c }} />;
 }
 
 export function TimelineBlock({ block }: Props) {
@@ -32,17 +33,17 @@ export function TimelineBlock({ block }: Props) {
               className="flex gap-4 pl-6"
             >
               <div className="absolute left-0 mt-1">
-                <Dot style={entry.dotStyle ?? 'filled'} />
+                <Dot style={entry.dotStyle ?? 'filled'} color={accentColor} />
               </div>
               <div>
                 {entry.title && (
-                  <h3 className="font-semibold text-gray-900 mb-0.5">{entry.title}</h3>
+                  <h3 className="font-semibold mb-0.5" style={{ color: block.styles?.textColor ?? '#111827' }}>{entry.title}</h3>
                 )}
                 {entry.time && (
-                  <p className="text-xs text-gray-400 mb-1">{entry.time}</p>
+                  <p className="text-xs mb-1" style={{ color: block.styles?.textColor ? `${block.styles.textColor}99` : '#9ca3af' }}>{entry.time}</p>
                 )}
                 {entry.text && (
-                  <p className="text-gray-600 text-sm leading-relaxed">{entry.text}</p>
+                  <p className="text-sm leading-relaxed" style={{ color: block.styles?.textColor ? `${block.styles.textColor}cc` : '#4b5563' }}>{entry.text}</p>
                 )}
               </div>
             </motion.div>
