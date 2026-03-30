@@ -226,12 +226,12 @@ function Slide({
               style={{
                 opacity: headlineOpacity, y: headlineY, fontSize: 'clamp(1.75rem, 5vw, 3.5rem)',
                 fontFamily: styles?.fontFamily,
-                fontWeight: styles?.fontWeight ?? undefined,
+                fontWeight: styles?.fontWeight ?? '700',
                 fontStyle: styles?.fontStyle,
                 letterSpacing: styles?.letterSpacing ? `${styles.letterSpacing}em` : undefined,
                 lineHeight: styles?.lineHeight ?? undefined,
               }}
-              className="text-white font-bold leading-tight drop-shadow-lg"
+              className="text-white leading-tight drop-shadow-lg"
             >
               {slide.headline}
             </motion.h2>
@@ -241,12 +241,12 @@ function Slide({
               style={{
                 opacity: subOpacity, y: subY, fontSize: 'clamp(1rem, 2.5vw, 1.375rem)',
                 fontFamily: styles?.fontFamily,
-                fontWeight: styles?.fontWeight ?? undefined,
+                fontWeight: styles?.fontWeight ?? '500',
                 fontStyle: styles?.fontStyle,
                 letterSpacing: styles?.letterSpacing ? `${styles.letterSpacing}em` : undefined,
                 lineHeight: styles?.lineHeight ?? undefined,
               }}
-              className="text-white/80 font-medium drop-shadow mt-4"
+              className="text-white/80 drop-shadow mt-4"
             >
               {slide.subheadline}
             </motion.p>
@@ -256,7 +256,7 @@ function Slide({
               style={{
                 opacity: bodyOpacity, y: bodyY, fontSize: 'clamp(0.9rem, 2vw, 1.125rem)',
                 fontFamily: styles?.fontFamily,
-                fontWeight: styles?.fontWeight ?? undefined,
+                fontWeight: styles?.fontWeight ?? '400',
                 fontStyle: styles?.fontStyle,
                 letterSpacing: styles?.letterSpacing ? `${styles.letterSpacing}em` : undefined,
                 lineHeight: styles?.lineHeight ?? undefined,
