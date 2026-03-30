@@ -88,7 +88,10 @@ export function CarouselBlock({ block }: Props) {
               }}
             >
               {item.src.match(/\.(mp4|webm|mov)$/i) ? (
-                <div className="relative">
+                <div
+                  className="relative cursor-pointer"
+                  onClick={i === current ? togglePlayPause : undefined}
+                >
                   <video
                     ref={(el) => { videoRefs.current[i] = el; }}
                     src={item.src}
@@ -97,14 +100,12 @@ export function CarouselBlock({ block }: Props) {
                     className="w-full h-auto block"
                     style={{ borderRadius: block.styles?.borderRadius }}
                   />
-                  {i === current && (
-                    <button
-                      onClick={togglePlayPause}
-                      className="absolute bottom-2 right-2 bg-black/50 hover:bg-black/70 text-white rounded-full w-9 h-9 flex items-center justify-center transition-colors z-10"
-                      aria-label={paused ? 'Spela' : 'Pausa'}
-                    >
-                      {paused ? '▶' : '⏸'}
-                    </button>
+                  {i === current && paused && (
+                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white" width="52" height="52" style={{ filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.5))' }}>
+                        <path d="M8 5v14l11-7z"/>
+                      </svg>
+                    </div>
                   )}
                 </div>
               ) : (
