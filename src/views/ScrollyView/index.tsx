@@ -8,7 +8,7 @@ import {
 } from 'framer-motion';
 import { useBuilderStore } from '../../store/builderStore';
 import { getProject } from '../../services/projectService';
-import type { Article, ScrollyMediaBlock, ScrollySlide } from '../../types';
+import type { Article, BlockStyle, ScrollyMediaBlock, ScrollySlide } from '../../types';
 
 // ─── URL params ───────────────────────────────────────────────────────────────
 
@@ -82,7 +82,7 @@ export function ScrollyView() {
     return <Shell><span style={{ color: '#555', fontSize: '0.875rem' }}>Inga sektioner tillagda.</span></Shell>;
   }
 
-  return <ScrollyContent slides={slides} isEmbedded={isEmbedded} />;
+  return <ScrollyContent slides={slides} isEmbedded={isEmbedded} styles={scrollyBlock?.styles} />;
 }
 
 function Shell({ children }: { children: React.ReactNode }) {
@@ -98,9 +98,11 @@ function Shell({ children }: { children: React.ReactNode }) {
 function ScrollyContent({
   slides,
   isEmbedded,
+  styles,
 }: {
   slides: ScrollySlide[];
   isEmbedded: boolean;
+  styles?: BlockStyle;
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -136,6 +138,7 @@ function ScrollyContent({
           index={i}
           total={slides.length}
           scrollYProgress={scrollYProgress}
+          styles={styles}
         />
       ))}
     </>
@@ -165,11 +168,13 @@ function Slide({
   index,
   total,
   scrollYProgress,
+  styles,
 }: {
   slide: ScrollySlide;
   index: number;
   total: number;
   scrollYProgress: MotionValue<number>;
+  styles?: BlockStyle;
 }) {
   const isFirst = index === 0;
 
@@ -218,7 +223,14 @@ function Slide({
         <div className="text-center max-w-3xl w-full">
           {slide.headline && (
             <motion.h2
-              style={{ opacity: headlineOpacity, y: headlineY, fontSize: 'clamp(1.75rem, 5vw, 3.5rem)' }}
+              style={{
+                opacity: headlineOpacity, y: headlineY, fontSize: 'clamp(1.75rem, 5vw, 3.5rem)',
+                fontFamily: styles?.fontFamily,
+                fontWeight: styles?.fontWeight ?? undefined,
+                fontStyle: styles?.fontStyle,
+                letterSpacing: styles?.letterSpacing ? `${styles.letterSpacing}em` : undefined,
+                lineHeight: styles?.lineHeight ?? undefined,
+              }}
               className="text-white font-bold leading-tight drop-shadow-lg"
             >
               {slide.headline}
@@ -226,7 +238,14 @@ function Slide({
           )}
           {slide.subheadline && (
             <motion.p
-              style={{ opacity: subOpacity, y: subY, fontSize: 'clamp(1rem, 2.5vw, 1.375rem)' }}
+              style={{
+                opacity: subOpacity, y: subY, fontSize: 'clamp(1rem, 2.5vw, 1.375rem)',
+                fontFamily: styles?.fontFamily,
+                fontWeight: styles?.fontWeight ?? undefined,
+                fontStyle: styles?.fontStyle,
+                letterSpacing: styles?.letterSpacing ? `${styles.letterSpacing}em` : undefined,
+                lineHeight: styles?.lineHeight ?? undefined,
+              }}
               className="text-white/80 font-medium drop-shadow mt-4"
             >
               {slide.subheadline}
@@ -234,7 +253,14 @@ function Slide({
           )}
           {slide.body && (
             <motion.p
-              style={{ opacity: bodyOpacity, y: bodyY, fontSize: 'clamp(0.9rem, 2vw, 1.125rem)' }}
+              style={{
+                opacity: bodyOpacity, y: bodyY, fontSize: 'clamp(0.9rem, 2vw, 1.125rem)',
+                fontFamily: styles?.fontFamily,
+                fontWeight: styles?.fontWeight ?? undefined,
+                fontStyle: styles?.fontStyle,
+                letterSpacing: styles?.letterSpacing ? `${styles.letterSpacing}em` : undefined,
+                lineHeight: styles?.lineHeight ?? undefined,
+              }}
               className="text-white/65 leading-relaxed drop-shadow mt-6 max-w-xl mx-auto"
             >
               {slide.body}

@@ -57,7 +57,7 @@ export function ChatBlock({ block }: Props) {
   const inputBar = showInputBar ? (
     <div className="border-t border-gray-200 bg-white px-3 py-2 flex gap-2 items-center">
       <div className="flex-1 rounded-full bg-gray-100 px-4 py-1.5 text-sm text-gray-400">
-        iMessage
+        Meddelande
       </div>
     </div>
   ) : null;
