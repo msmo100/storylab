@@ -12,6 +12,7 @@ export function CarouselBlock({ block }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
   const [containerW, setContainerW] = useState(0);
+  const [paused, setPaused] = useState(false);
 
   useEffect(() => {
     function measure() {
@@ -32,14 +33,23 @@ export function CarouselBlock({ block }: Props) {
   const centerOffset = containerW > 0 ? (containerW - slideW) / 2 : 0;
   const translateX = slideW > 0 ? -(current * (slideW + GAP)) + centerOffset : 0;
 
+  // Reset paused state when switching slides
+  useEffect(() => { setPaused(false); }, [current]);
+
   // Play only the current slide's video; pause all others
   useEffect(() => {
     videoRefs.current.forEach((vid, i) => {
       if (!vid) return;
-      if (i === current) vid.play().catch(() => {});
-      else vid.pause();
+      if (i === current) {
+        if (paused) vid.pause();
+        else vid.play().catch(() => {});
+      } else {
+        vid.pause();
+      }
     });
-  }, [current]);
+  }, [current, paused]);
+
+  function togglePlayPause() { setPaused((p) => !p); }
 
   if (items.length === 0) return null;
 
@@ -78,14 +88,25 @@ export function CarouselBlock({ block }: Props) {
               }}
             >
               {item.src.match(/\.(mp4|webm|mov)$/i) ? (
-                <video
-                  ref={(el) => { videoRefs.current[i] = el; }}
-                  src={item.src}
-                  poster={item.poster}
-                  muted loop playsInline
-                  className="w-full h-auto block"
-                  style={{ borderRadius: block.styles?.borderRadius }}
-                />
+                <div className="relative">
+                  <video
+                    ref={(el) => { videoRefs.current[i] = el; }}
+                    src={item.src}
+                    poster={item.poster}
+                    muted loop playsInline
+                    className="w-full h-auto block"
+                    style={{ borderRadius: block.styles?.borderRadius }}
+                  />
+                  {i === current && (
+                    <button
+                      onClick={togglePlayPause}
+                      className="absolute bottom-2 right-2 bg-black/50 hover:bg-black/70 text-white rounded-full w-9 h-9 flex items-center justify-center transition-colors z-10"
+                      aria-label={paused ? 'Spela' : 'Pausa'}
+                    >
+                      {paused ? '▶' : '⏸'}
+                    </button>
+                  )}
+                </div>
               ) : (
                 <img
                   src={item.src}
