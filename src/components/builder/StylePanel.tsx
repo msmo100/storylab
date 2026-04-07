@@ -1,4 +1,3 @@
-import { useRef } from 'react';
 import { useBuilderStore } from '../../store/builderStore';
 import type { Block, BlockStyle } from '../../types';
 import { Button } from '../ui/Button';
@@ -17,7 +16,6 @@ const SUPPORTS_LINE_HEIGHT    = ['quote'];
 const SUPPORTS_LETTER_SPACING = ['quote'];
 const SUPPORTS_BORDER_RADIUS  = ['video', 'quote', 'carousel'];
 const SUPPORTS_BOX_SHADOW     = ['quote'];
-const SUPPORTS_OBJECT_POS     = ['video', 'sticky'];
 
 const GP_PALETTE = [
   { name: 'Blue',      colors: ['#0A324B', '#0A5582', '#4A728A', '#80A3B9', '#CDDDE8', '#E8EFF5'] },
@@ -271,130 +269,6 @@ export function StylePanel({ block, onClose }: Props) {
           </div>
         )}
 
-      </div>
-    </div>
-  );
-}
-
-// ─── Focal point picker ───────────────────────────────────────────────────────
-
-const GRID: { label: string; value: string }[][] = [
-  [{ label: '↖', value: 'top left' },    { label: '↑', value: 'top center' },    { label: '↗', value: 'top right' }],
-  [{ label: '←', value: 'center left' }, { label: '·', value: 'center center' }, { label: '→', value: 'center right' }],
-  [{ label: '↙', value: 'bottom left' }, { label: '↓', value: 'bottom center' }, { label: '↘', value: 'bottom right' }],
-];
-
-/** Convert an object-position string to { x, y } percentages 0–100. */
-function posToPercent(pos: string): { x: number; y: number } {
-  const parts = pos.trim().split(/\s+/);
-  const parse = (v: string, axis: 'x' | 'y') => {
-    if (v.endsWith('%')) return parseFloat(v);
-    const kw: Record<string, number> = { left: 0, right: 100, top: 0, bottom: 100, center: 50 };
-    if (v in kw) return kw[v];
-    return 50;
-  };
-  const a = parse(parts[0] ?? 'center', 'x');
-  const b = parse(parts[1] ?? parts[0] ?? 'center', 'y');
-  // keyword order can be vertical-then-horizontal or horizontal-then-vertical;
-  // treat first token as x if it's left/right/a %, second as y
-  const firstIsX = ['left', 'right'].includes(parts[0]) || (parts[0]?.endsWith('%') && !['top', 'bottom'].includes(parts[0]));
-  return firstIsX || parts.length === 1 ? { x: a, y: b } : { x: b, y: a };
-}
-
-function getPreviewSrc(block: Block): string | null {
-  if (block.type === 'sticky' && block.backgroundType === 'image') return block.backgroundSrc || null;
-  return null;
-}
-
-interface FocalPointPickerProps {
-  block: Block;
-  current?: string;
-  onSelect: (pos: string) => void;
-}
-
-function FocalPointPicker({ block, current, onSelect }: FocalPointPickerProps) {
-  const src = getPreviewSrc(block);
-  const previewRef = useRef<HTMLDivElement>(null);
-  const pos = current ?? 'center center';
-  const { x, y } = posToPercent(pos);
-
-  function handlePreviewClick(e: React.MouseEvent<HTMLDivElement>) {
-    const rect = e.currentTarget.getBoundingClientRect();
-    const px = Math.round(((e.clientX - rect.left) / rect.width) * 100);
-    const py = Math.round(((e.clientY - rect.top) / rect.height) * 100);
-    onSelect(`${px}% ${py}%`);
-  }
-
-  const isGridMatch = GRID.flat().some((g) => g.value === pos);
-
-  return (
-    <div className="flex flex-col gap-3">
-      {/* 3×3 quick grid */}
-      <div className="grid grid-cols-3 gap-0.5 w-fit">
-        {GRID.map((row, ri) =>
-          row.map((cell) => {
-            const active = pos === cell.value;
-            return (
-              <button
-                key={cell.value}
-                onClick={() => onSelect(cell.value)}
-                title={cell.value}
-                className={`w-9 h-9 flex items-center justify-center text-base rounded transition-colors ${
-                  active
-                    ? 'bg-gray-800 dark:bg-gray-100 text-white dark:text-gray-900'
-                    : 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
-                }`}
-              >
-                {cell.label}
-              </button>
-            );
-          })
-        )}
-      </div>
-
-      {/* Clickable image preview */}
-      {src && (
-        <div
-          ref={previewRef}
-          onClick={handlePreviewClick}
-          className="relative w-full h-28 rounded-lg overflow-hidden cursor-crosshair border border-gray-200 dark:border-gray-600 select-none"
-          title="Klicka för att välja fokuspunkt"
-        >
-          <img
-            src={src}
-            alt=""
-            draggable={false}
-            className="w-full h-full object-cover pointer-events-none"
-            style={{ objectPosition: pos }}
-          />
-          {/* Focal point dot */}
-          <div
-            className="absolute w-5 h-5 -translate-x-1/2 -translate-y-1/2 pointer-events-none"
-            style={{ left: `${x}%`, top: `${y}%` }}
-          >
-            <div className="w-5 h-5 rounded-full border-2 border-white shadow-md bg-white/30 ring-1 ring-black/30" />
-          </div>
-        </div>
-      )}
-
-      {/* Raw value display / manual override */}
-      <div className="flex items-center gap-2">
-        <input
-          type="text"
-          value={pos === 'center center' && !current ? '' : pos}
-          onChange={(e) => onSelect(e.target.value || 'center center')}
-          placeholder="center center"
-          className={`${INPUT} text-xs`}
-        />
-        {current && (
-          <button
-            onClick={() => onSelect('center center')}
-            title="Återställ"
-            className="text-xs text-gray-400 hover:text-red-500 flex-shrink-0"
-          >
-            ✕
-          </button>
-        )}
       </div>
     </div>
   );

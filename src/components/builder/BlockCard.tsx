@@ -10,7 +10,6 @@ import { cn } from '../../utils/cn';
 interface Props {
   block: Block;
   isSelected: boolean;
-  onSelect: () => void;
 }
 
 const BLOCK_LABELS: Record<Block['type'], string> = {
@@ -33,7 +32,7 @@ const BLOCK_COLORS: Record<Block['type'], string> = {
   scrollymedia: 'bg-violet-100 text-violet-800 dark:bg-violet-900/40 dark:text-violet-300',
 };
 
-export function BlockCard({ block, isSelected, onSelect }: Props) {
+export function BlockCard({ block, isSelected }: Props) {
   const { removeBlock } = useBuilderStore();
   const [expanded] = useState(true);
 

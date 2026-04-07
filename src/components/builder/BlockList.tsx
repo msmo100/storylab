@@ -52,7 +52,6 @@ export function BlockList({ selectedBlockId, onSelect }: Props) {
               key={block.id}
               block={block}
               isSelected={selectedBlockId === block.id}
-              onSelect={() => onSelect(block.id)}
             />
           ))}
         </div>

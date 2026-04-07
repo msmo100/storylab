@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 import { useBuilderStore } from '../../store/builderStore';
 import type {
   Block, VideoBlock, QuoteBlock,
