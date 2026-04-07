@@ -222,7 +222,7 @@ export function BuilderView() {
         </header>
 
         <main className="flex-1 overflow-y-auto px-4 py-4">
-          <BlockList selectedBlockId={selectedBlockId} onSelect={setSelectedBlockId} />
+          <BlockList selectedBlockId={selectedBlockId} />
         </main>
 
         <footer className="flex-shrink-0 border-t border-gray-100 dark:border-gray-700 px-4 py-2.5 flex items-center justify-between text-xs text-gray-400 dark:text-gray-500">

@@ -16,10 +16,9 @@ import { BlockCard } from './BlockCard';
 
 interface Props {
   selectedBlockId: string | null;
-  onSelect: (id: string) => void;
 }
 
-export function BlockList({ selectedBlockId, onSelect }: Props) {
+export function BlockList({ selectedBlockId }: Props) {
   const { article, reorderBlocks } = useBuilderStore();
   const { blocks } = article;
 
