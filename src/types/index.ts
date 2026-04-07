@@ -1,4 +1,4 @@
-export type BlockType = 'image' | 'video' | 'quote' | 'hero' | 'sticky' | 'timeline' | 'chat' | 'carousel' | 'scrollymedia';
+export type BlockType = 'video' | 'quote' | 'sticky' | 'timeline' | 'chat' | 'carousel' | 'scrollymedia';
 
 export interface BlockStyle {
   textColor?: string;
@@ -41,13 +41,6 @@ export interface BaseBlock {
   styles?: BlockStyle;
 }
 
-export interface ImageBlock extends BaseBlock {
-  type: 'image';
-  src: string;
-  alt: string;
-  caption?: string;
-}
-
 export interface VideoBlock extends BaseBlock {
   type: 'video';
   src: string;
@@ -58,15 +51,6 @@ export interface QuoteBlock extends BaseBlock {
   type: 'quote';
   text: string;
   attribution?: string;
-}
-
-/** Full-viewport opening section with a background image or video and overlaid heading. */
-export interface HeroBlock extends BaseBlock {
-  type: 'hero';
-  backgroundType: 'image' | 'video';
-  backgroundSrc: string;
-  heading: string;
-  subheading?: string;
 }
 
 /**
@@ -145,6 +129,8 @@ export interface ScrollySlide {
   backgroundPoster?: string;
   /** Dark overlay opacity 0–1, default 0.5 */
   overlayOpacity?: number;
+  /** CSS object-position for the background image, e.g. "top center" or "30% 60%" */
+  objectPosition?: string;
   headline?: string;
   subheadline?: string;
   body?: string;
@@ -160,10 +146,8 @@ export interface ScrollyMediaBlock extends BaseBlock {
 }
 
 export type Block =
-  | ImageBlock
   | VideoBlock
   | QuoteBlock
-  | HeroBlock
   | StickyBlock
   | TimelineBlock
   | ChatBlock
@@ -172,10 +156,8 @@ export type Block =
 
 // Distributive Omit — correctly strips 'id' from each union member
 export type BlockWithoutId =
-  | Omit<ImageBlock, 'id'>
   | Omit<VideoBlock, 'id'>
   | Omit<QuoteBlock, 'id'>
-  | Omit<HeroBlock, 'id'>
   | Omit<StickyBlock, 'id'>
   | Omit<TimelineBlock, 'id'>
   | Omit<ChatBlock, 'id'>

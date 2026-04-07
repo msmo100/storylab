@@ -14,10 +14,8 @@ interface Props {
 }
 
 const BLOCK_LABELS: Record<Block['type'], string> = {
-  image: 'Bild',
   video: 'Video',
   quote: 'Citat',
-  hero: 'Hero',
   sticky: 'Klistrad',
   timeline: 'Tidslinje',
   chat: 'Chatt',
@@ -26,10 +24,8 @@ const BLOCK_LABELS: Record<Block['type'], string> = {
 };
 
 const BLOCK_COLORS: Record<Block['type'], string> = {
-  image: 'bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300',
   video: 'bg-purple-100 text-purple-800 dark:bg-purple-900/40 dark:text-purple-300',
   quote: 'bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300',
-  hero: 'bg-rose-100 text-rose-800 dark:bg-rose-900/40 dark:text-rose-300',
   sticky: 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/40 dark:text-indigo-300',
   timeline: 'bg-cyan-100 text-cyan-800 dark:bg-cyan-900/40 dark:text-cyan-300',
   chat: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300',
@@ -39,7 +35,7 @@ const BLOCK_COLORS: Record<Block['type'], string> = {
 
 export function BlockCard({ block, isSelected, onSelect }: Props) {
   const { removeBlock } = useBuilderStore();
-  const [expanded, setExpanded] = useState(false);
+  const [expanded] = useState(true);
 
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: block.id,
@@ -80,18 +76,6 @@ export function BlockCard({ block, isSelected, onSelect }: Props) {
 
           <span className="flex-1" />
 
-<Button className="flex-shrink-0" variant="ghost" size="sm" onClick={onSelect} aria-pressed={isSelected}>
-            Stil
-          </Button>
-          <Button
-            className="flex-shrink-0"
-            variant="ghost"
-            size="sm"
-            onClick={() => setExpanded((v) => !v)}
-            aria-expanded={expanded}
-          >
-            {expanded ? 'Stäng' : 'Redigera'}
-          </Button>
           <Button
             className="flex-shrink-0"
             variant="danger"

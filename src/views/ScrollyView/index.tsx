@@ -212,7 +212,7 @@ function Slide({
             src={slide.backgroundSrc || 'https://placehold.co/1920x1080/111827/111827'}
             alt=""
             className="absolute inset-0 w-full object-cover"
-            style={{ height: '100%', top: '0' }}
+            style={{ height: '100%', top: '0', objectPosition: slide.objectPosition ?? 'center center' }}
           />
         )}
       </motion.div>

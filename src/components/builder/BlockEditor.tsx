@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useBuilderStore } from '../../store/builderStore';
 import type {
-  Block, ImageBlock, VideoBlock, QuoteBlock,
-  HeroBlock, StickyBlock, TimelineBlock, TimelineEntry, TimelineDotStyle,
+  Block, VideoBlock, QuoteBlock,
+  StickyBlock, TimelineBlock, TimelineEntry, TimelineDotStyle,
   ChatBlock, ChatMessage, CarouselBlock, CarouselItem,
   ScrollyMediaBlock, ScrollySlide,
 } from '../../types';
@@ -41,37 +41,13 @@ export function BlockEditor({ block }: Props) {
         </div>
       )}
 
-      {block.type === 'image' && <ImageEditor block={block} />}
       {block.type === 'video' && <VideoEditor block={block} />}
       {block.type === 'quote' && <QuoteEditor block={block} />}
-      {block.type === 'hero' && <HeroEditor block={block} />}
       {block.type === 'sticky' && <StickyEditor block={block} />}
       {block.type === 'timeline' && <TimelineEditor block={block} />}
       {block.type === 'chat' && <ChatEditor block={block} />}
       {block.type === 'carousel' && <CarouselEditor block={block} />}
       {block.type === 'scrollymedia' && <ScrollyMediaEditor block={block} />}
-    </div>
-  );
-}
-
-// ─── Image ────────────────────────────────────────────────────────────────────
-
-function ImageEditor({ block }: { block: ImageBlock }) {
-  const { updateBlock } = useBuilderStore();
-  return (
-    <div className={SECTION}>
-      <div>
-        <label className={LABEL}>Bild-URL</label>
-        <input type="url" value={block.src} onChange={(e) => updateBlock(block.id, { src: e.target.value })} placeholder="https://…" className={INPUT} />
-      </div>
-      <div>
-        <label className={LABEL}>Alt-text</label>
-        <input type="text" value={block.alt} onChange={(e) => updateBlock(block.id, { alt: e.target.value })} placeholder="Beskrivning…" className={INPUT} />
-      </div>
-      <div>
-        <label className={LABEL}>Bildtext (valfri)</label>
-        <input type="text" value={block.caption ?? ''} onChange={(e) => updateBlock(block.id, { caption: e.target.value || undefined })} placeholder="Bildtext…" className={INPUT} />
-      </div>
     </div>
   );
 }
@@ -117,42 +93,6 @@ function QuoteEditor({ block }: { block: QuoteBlock }) {
   );
 }
 
-// ─── Hero ─────────────────────────────────────────────────────────────────────
-
-function HeroEditor({ block }: { block: HeroBlock }) {
-  const { updateBlock } = useBuilderStore();
-  return (
-    <div className={SECTION}>
-      <div>
-        <label className={LABEL}>Bakgrundstyp</label>
-        <div className="flex gap-2">
-          {(['image', 'video'] as const).map((t) => (
-            <button key={t} onClick={() => updateBlock(block.id, { backgroundType: t })}
-              className={cn('px-3 py-1 rounded-md text-xs font-medium border transition-colors',
-                block.backgroundType === t
-                  ? 'bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 border-transparent'
-                  : 'border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-400')}>
-              {t === 'image' ? 'Bild' : 'Video'}
-            </button>
-          ))}
-        </div>
-      </div>
-      <div>
-        <label className={LABEL}>Bakgrunds-URL</label>
-        <input type="url" value={block.backgroundSrc} onChange={(e) => updateBlock(block.id, { backgroundSrc: e.target.value })} placeholder="https://…" className={INPUT} />
-      </div>
-      <div>
-        <label className={LABEL}>Rubrik</label>
-        <input type="text" value={block.heading} onChange={(e) => updateBlock(block.id, { heading: e.target.value })} placeholder="Rubrik…" className={INPUT} />
-      </div>
-      <div>
-        <label className={LABEL}>Underrubrik (valfri)</label>
-        <input type="text" value={block.subheading ?? ''} onChange={(e) => updateBlock(block.id, { subheading: e.target.value || undefined })} placeholder="Underrubrik…" className={INPUT} />
-      </div>
-    </div>
-  );
-}
-
 // ─── Sticky ───────────────────────────────────────────────────────────────────
 
 function StickyEditor({ block }: { block: StickyBlock }) {
@@ -178,6 +118,12 @@ function StickyEditor({ block }: { block: StickyBlock }) {
         <label className={LABEL}>Bakgrunds-URL</label>
         <input type="url" value={block.backgroundSrc} onChange={(e) => upd({ backgroundSrc: e.target.value })} placeholder="https://…" className={INPUT} />
       </div>
+      {block.backgroundType === 'image' && (
+        <div>
+          <label className={LABEL}>Fokuspunkt</label>
+          <FocalPointPicker src={block.backgroundSrc} current={block.styles?.objectPosition} onSelect={(pos) => upd({ styles: { ...block.styles, objectPosition: pos } })} />
+        </div>
+      )}
       <div>
         <label className={LABEL}>Textöverlägg</label>
         {block.overlays.map((text, i) => (
@@ -452,6 +398,16 @@ function ScrollyMediaEditor({ block }: { block: ScrollyMediaBlock }) {
                 <label className={LABEL}>{slide.backgroundType === 'video' ? 'Video-URL' : 'Bild-URL'}</label>
                 <input type="url" value={slide.backgroundSrc} onChange={(e) => updateSlide(slide.id, { backgroundSrc: e.target.value })} placeholder="https://…" className={INPUT} />
               </div>
+              {slide.backgroundType === 'image' && (
+                <div>
+                  <label className={LABEL}>Fokuspunkt</label>
+                  <FocalPointPicker
+                    src={slide.backgroundSrc}
+                    current={slide.objectPosition}
+                    onSelect={(pos) => updateSlide(slide.id, { objectPosition: pos })}
+                  />
+                </div>
+              )}
               {slide.backgroundType === 'video' && (
                 <div>
                   <label className={LABEL}>Poster-bild (valfri)</label>
@@ -484,6 +440,92 @@ function ScrollyMediaEditor({ block }: { block: ScrollyMediaBlock }) {
         className="w-full rounded-lg border border-dashed border-gray-300 dark:border-gray-600 py-2 text-xs text-gray-400 hover:border-gray-400 hover:text-gray-600 dark:hover:border-gray-500 dark:hover:text-gray-300 transition-colors">
         + Lägg till sektion
       </button>
+    </div>
+  );
+}
+
+// ─── Focal point picker ───────────────────────────────────────────────────────
+
+const GRID_POS: { label: string; value: string }[][] = [
+  [{ label: '↖', value: 'top left' },    { label: '↑', value: 'top center' },    { label: '↗', value: 'top right' }],
+  [{ label: '←', value: 'center left' }, { label: '·', value: 'center center' }, { label: '→', value: 'center right' }],
+  [{ label: '↙', value: 'bottom left' }, { label: '↓', value: 'bottom center' }, { label: '↘', value: 'bottom right' }],
+];
+
+function posToPercent(pos: string): { x: number; y: number } {
+  const parts = pos.trim().split(/\s+/);
+  const kw: Record<string, number> = { left: 0, right: 100, top: 0, bottom: 100, center: 50 };
+  const parse = (v: string) => v.endsWith('%') ? parseFloat(v) : (kw[v] ?? 50);
+  const a = parse(parts[0] ?? 'center');
+  const b = parse(parts[1] ?? parts[0] ?? 'center');
+  const firstIsX = ['left', 'right'].includes(parts[0]) || parts[0]?.endsWith('%');
+  return firstIsX || parts.length === 1 ? { x: a, y: b } : { x: b, y: a };
+}
+
+interface FocalPointPickerProps {
+  src?: string;
+  current?: string;
+  onSelect: (pos: string) => void;
+}
+
+function FocalPointPicker({ src, current, onSelect }: FocalPointPickerProps) {
+  const pos = current ?? 'center center';
+  const { x, y } = posToPercent(pos);
+
+  function handlePreviewClick(e: React.MouseEvent<HTMLDivElement>) {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const px = Math.round(((e.clientX - rect.left) / rect.width) * 100);
+    const py = Math.round(((e.clientY - rect.top) / rect.height) * 100);
+    onSelect(`${px}% ${py}%`);
+  }
+
+  return (
+    <div className="flex flex-col gap-2">
+      {/* 3×3 quick grid */}
+      <div className="grid grid-cols-3 gap-0.5 w-fit">
+        {GRID_POS.map((row) =>
+          row.map((cell) => {
+            const active = pos === cell.value;
+            return (
+              <button
+                key={cell.value}
+                onClick={() => onSelect(cell.value)}
+                title={cell.value}
+                className={`w-9 h-9 flex items-center justify-center text-base rounded transition-colors ${
+                  active
+                    ? 'bg-gray-800 dark:bg-gray-100 text-white dark:text-gray-900'
+                    : 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
+                }`}
+              >
+                {cell.label}
+              </button>
+            );
+          })
+        )}
+      </div>
+
+      {/* Clickable image preview */}
+      {src && (
+        <div
+          onClick={handlePreviewClick}
+          className="relative w-full h-28 rounded-lg overflow-hidden cursor-crosshair border border-gray-200 dark:border-gray-600 select-none"
+          title="Klicka för att välja fokuspunkt"
+        >
+          <img
+            src={src}
+            alt=""
+            draggable={false}
+            className="w-full h-full object-cover pointer-events-none"
+            style={{ objectPosition: pos }}
+          />
+          <div
+            className="absolute w-5 h-5 -translate-x-1/2 -translate-y-1/2 pointer-events-none"
+            style={{ left: `${x}%`, top: `${y}%` }}
+          >
+            <div className="w-5 h-5 rounded-full border-2 border-white shadow-md bg-white/30 ring-1 ring-black/30" />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

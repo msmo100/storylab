@@ -25,13 +25,6 @@ const baseBlockSchema = z.object({
   styles: blockStyleSchema,
 });
 
-const imageBlockSchema = baseBlockSchema.extend({
-  type: z.literal('image'),
-  src: z.string(),
-  alt: z.string(),
-  caption: z.string().optional(),
-});
-
 const videoBlockSchema = baseBlockSchema.extend({
   type: z.literal('video'),
   src: z.string(),
@@ -42,14 +35,6 @@ const quoteBlockSchema = baseBlockSchema.extend({
   type: z.literal('quote'),
   text: z.string(),
   attribution: z.string().optional(),
-});
-
-const heroBlockSchema = baseBlockSchema.extend({
-  type: z.literal('hero'),
-  backgroundType: z.enum(['image', 'video']),
-  backgroundSrc: z.string(),
-  heading: z.string(),
-  subheading: z.string().optional(),
 });
 
 const stickyBlockSchema = baseBlockSchema.extend({
@@ -112,10 +97,8 @@ const carouselBlockSchema = baseBlockSchema.extend({
 });
 
 export const blockSchema = z.discriminatedUnion('type', [
-  imageBlockSchema,
   videoBlockSchema,
   quoteBlockSchema,
-  heroBlockSchema,
   stickyBlockSchema,
 
   timelineBlockSchema,

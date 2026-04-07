@@ -61,6 +61,20 @@ export function BuilderView() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [article.updatedAt, published]);
 
+  // Auto-select the block so the Style panel is always open when a block exists.
+  // Also re-runs when article.id changes (project switch) to validate the selection.
+  useEffect(() => {
+    if (article.blocks.length > 0) {
+      setSelectedBlockId((prev) => {
+        const valid = prev && article.blocks.some((b) => b.id === prev);
+        return valid ? prev : article.blocks[0].id;
+      });
+    } else {
+      setSelectedBlockId(null);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [article.blocks.length, article.id]);
+
   const selectedBlock = article.blocks.find((b) => b.id === selectedBlockId) ?? null;
 
   useEffect(() => {
@@ -218,15 +232,26 @@ export function BuilderView() {
               <button
                 onClick={togglePublished}
                 title={published ? 'Publicerad — autospar avstängt. Klicka för att avpublicera.' : 'Ej publicerad — autospar aktivt. Klicka för att publicera.'}
-                className={cn(
-                  'flex items-center gap-1.5 rounded-md px-2 py-0.5 border transition-colors',
-                  published
-                    ? 'text-green-700 dark:text-green-400 bg-green-50 dark:bg-green-950 border-green-200 dark:border-green-800'
-                    : 'text-gray-400 dark:text-gray-500 border-transparent hover:text-gray-600 dark:hover:text-gray-300 hover:border-gray-200 dark:hover:border-gray-700'
-                )}
+                className="flex items-center gap-2 group"
+                aria-pressed={published}
               >
-                <span className={cn('w-1.5 h-1.5 rounded-full flex-shrink-0', published ? 'bg-green-500' : 'bg-gray-300 dark:bg-gray-600')} />
-                Publicerad
+                {/* Toggle track */}
+                <span className={cn(
+                  'relative inline-flex h-5 w-9 flex-shrink-0 rounded-full border-2 border-transparent transition-colors duration-200',
+                  published ? 'bg-green-500' : 'bg-gray-200 dark:bg-gray-700'
+                )}>
+                  {/* Toggle thumb */}
+                  <span className={cn(
+                    'pointer-events-none inline-block h-4 w-4 rounded-full bg-white shadow transform transition-transform duration-200',
+                    published ? 'translate-x-4' : 'translate-x-0'
+                  )} />
+                </span>
+                <span className={cn(
+                  'font-medium transition-colors',
+                  published ? 'text-green-700 dark:text-green-400' : 'text-gray-500 dark:text-gray-400 group-hover:text-gray-700 dark:group-hover:text-gray-300'
+                )}>
+                  Publicerad
+                </span>
               </button>
             )}
           </div>

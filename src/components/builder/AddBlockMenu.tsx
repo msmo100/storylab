@@ -12,12 +12,6 @@ type BlockOption = {
 
 const BLOCK_OPTIONS: BlockOption[] = [
   {
-    label: 'Bild',
-    description: 'Ett heltäckande foto med valfri bildtext',
-    emoji: '⬜',
-    defaultBlock: { type: 'image', animation: 'fade', animationDelay: 0, src: '', alt: '', caption: '' },
-  },
-  {
     label: 'Video',
     description: 'En video som spelas upp automatiskt i vyport',
     emoji: '▶',
@@ -28,19 +22,6 @@ const BLOCK_OPTIONS: BlockOption[] = [
     description: 'Ett lyftat citat med valfri källa',
     emoji: '❝',
     defaultBlock: { type: 'quote', animation: 'slide-up', animationDelay: 0, text: '', attribution: '' },
-  },
-  {
-    label: 'Hero',
-    description: 'Helskärmsöppning med bakgrund',
-    emoji: '◼',
-    defaultBlock: {
-      type: 'hero',
-      animation: 'none',
-      backgroundType: 'image',
-      backgroundSrc: '',
-      heading: '',
-      subheading: '',
-    },
   },
   {
     label: 'Klistrad sektion',

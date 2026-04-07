@@ -1,9 +1,7 @@
 import { motion, useReducedMotion } from 'framer-motion';
 import type { AnimationPreset, Block } from '../../types';
-import { ImageBlock } from './ImageBlock';
 import { VideoBlock } from './VideoBlock';
 import { QuoteBlock } from './QuoteBlock';
-import { HeroBlock } from './HeroBlock';
 import { StickyBlock } from './StickyBlock';
 import { ScrollyMediaBlock } from './ScrollyMediaBlock';
 import { TimelineBlock } from './TimelineBlock';
@@ -47,7 +45,6 @@ export function AnimatedBlock({ block }: Props) {
   const prefersReducedMotion = useReducedMotion();
 
   // These blocks manage their own scroll-driven animations internally
-  if (block.type === 'hero') return <HeroBlock block={block} />;
   if (block.type === 'sticky') return <StickyBlock block={block} />;
   if (block.type === 'scrollymedia') return <ScrollyMediaBlock block={block} />;
 
@@ -64,7 +61,6 @@ export function AnimatedBlock({ block }: Props) {
       variants={variants}
       transition={{ duration: 0.55, delay: prefersReducedMotion ? 0 : (block.animationDelay ?? 0), ease: [0.25, 0, 0.25, 1] }}
     >
-      {block.type === 'image' && <ImageBlock block={block} />}
       {block.type === 'video' && <VideoBlock block={block} />}
       {block.type === 'quote' && <QuoteBlock block={block} />}
       {block.type === 'timeline' && <TimelineBlock block={block} />}
