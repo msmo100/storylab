@@ -25,11 +25,43 @@ export function BuilderView() {
   const [helpOpen, setHelpOpen] = useState(false);
   const [selectedBlockId, setSelectedBlockId] = useState<string | null>(null);
 
-  const selectedBlock = article.blocks.find((b) => b.id === selectedBlockId) ?? null;
-
   const projectId = new URLSearchParams(
     window.location.hash.replace(/^#\/edit\??/, '')
   ).get('id');
+
+  const [published, setPublished] = useState(() => {
+    if (!projectId) return false;
+    return localStorage.getItem(`sl-pub-${projectId}`) === 'true';
+  });
+
+  function togglePublished() {
+    const next = !published;
+    setPublished(next);
+    if (projectId) localStorage.setItem(`sl-pub-${projectId}`, String(next));
+  }
+
+  // Track unsaved changes while in published (manual-save) mode
+  const lastSavedUpdatedAtRef = useRef(article.updatedAt);
+  const [unsavedChanges, setUnsavedChanges] = useState(false);
+
+  useEffect(() => {
+    if (saveStatus === 'saved') {
+      lastSavedUpdatedAtRef.current = article.updatedAt;
+      setUnsavedChanges(false);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [saveStatus]);
+
+  useEffect(() => {
+    if (published && article.updatedAt !== lastSavedUpdatedAtRef.current) {
+      setUnsavedChanges(true);
+    } else if (!published) {
+      setUnsavedChanges(false);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [article.updatedAt, published]);
+
+  const selectedBlock = article.blocks.find((b) => b.id === selectedBlockId) ?? null;
 
   useEffect(() => {
     if (projectId) loadProject(projectId);
@@ -68,12 +100,12 @@ export function BuilderView() {
 
   const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   useEffect(() => {
-    if (!projectId || guestMode) return;
+    if (!projectId || guestMode || published) return;
     if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
     saveTimerRef.current = setTimeout(() => saveProject(), 1000);
     return () => { if (saveTimerRef.current) clearTimeout(saveTimerRef.current); };
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [article, guestMode]);
+  }, [article, guestMode, published]);
 
   function handleBack() {
     if (guestMode) { exitGuestMode(); window.location.hash = '#/auth'; }
@@ -180,11 +212,39 @@ export function BuilderView() {
         </main>
 
         <footer className="flex-shrink-0 border-t border-gray-100 dark:border-gray-700 px-4 py-2.5 flex items-center justify-between text-xs text-gray-400 dark:text-gray-500">
-          <span>{blockCount} block</span>
+          <div className="flex items-center gap-3">
+            <span>{blockCount} block</span>
+            {!guestMode && projectId && (
+              <button
+                onClick={togglePublished}
+                title={published ? 'Publicerad — autospar avstängt. Klicka för att avpublicera.' : 'Ej publicerad — autospar aktivt. Klicka för att publicera.'}
+                className={cn(
+                  'flex items-center gap-1.5 rounded-md px-2 py-0.5 border transition-colors',
+                  published
+                    ? 'text-green-700 dark:text-green-400 bg-green-50 dark:bg-green-950 border-green-200 dark:border-green-800'
+                    : 'text-gray-400 dark:text-gray-500 border-transparent hover:text-gray-600 dark:hover:text-gray-300 hover:border-gray-200 dark:hover:border-gray-700'
+                )}
+              >
+                <span className={cn('w-1.5 h-1.5 rounded-full flex-shrink-0', published ? 'bg-green-500' : 'bg-gray-300 dark:bg-gray-600')} />
+                Publicerad
+              </button>
+            )}
+          </div>
           {guestMode ? (
             <span className="text-amber-500 dark:text-amber-400">Gästläge — sparas ej</span>
           ) : (
-            <SaveIndicator status={saveStatus} updatedAt={article.updatedAt} />
+            <div className="flex items-center gap-2">
+              {published && (
+                <button
+                  onClick={() => { if (projectId && !guestMode) saveProject(); }}
+                  disabled={saveStatus === 'saving'}
+                  className="text-xs px-2.5 py-1 rounded-md bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 hover:bg-gray-700 dark:hover:bg-gray-300 disabled:opacity-50 transition-colors font-medium"
+                >
+                  {saveStatus === 'saving' ? 'Sparar…' : 'Spara'}
+                </button>
+              )}
+              <SaveIndicator status={saveStatus} updatedAt={article.updatedAt} published={published} unsavedChanges={unsavedChanges} />
+            </div>
           )}
         </footer>
       </div>
@@ -249,9 +309,11 @@ export function BuilderView() {
   );
 }
 
-function SaveIndicator({ status, updatedAt }: { status: SaveStatus; updatedAt: string }) {
+function SaveIndicator({ status, updatedAt, published, unsavedChanges }: { status: SaveStatus; updatedAt: string; published?: boolean; unsavedChanges?: boolean }) {
   if (status === 'saving') return <span>Sparar…</span>;
   if (status === 'error') return <span className="text-red-500 dark:text-red-400">Kunde inte spara</span>;
+  if (published && unsavedChanges) return <span className="text-amber-500 dark:text-amber-400">Osparade ändringar</span>;
   if (status === 'saved') return <span className="text-green-600 dark:text-green-400">Sparad</span>;
+  if (published) return <span title="Autospar är avstängt">Manuellt sparläge</span>;
   return <span>Sparad {new Date(updatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>;
 }
