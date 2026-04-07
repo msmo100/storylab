@@ -326,7 +326,7 @@ export function BuilderView() {
 
       {/* ── Right: Style panel ─────────────────────────────────── */}
       {selectedBlock && (
-        <StylePanel block={selectedBlock} onClose={() => setSelectedBlockId(null)} />
+        <StylePanel block={selectedBlock} />
       )}
 
       <HelpModal open={helpOpen} onClose={() => setHelpOpen(false)} />

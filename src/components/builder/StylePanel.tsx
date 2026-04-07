@@ -1,6 +1,5 @@
 import { useBuilderStore } from '../../store/builderStore';
 import type { Block, BlockStyle } from '../../types';
-import { Button } from '../ui/Button';
 
 const INPUT = 'w-full rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-gray-400';
 const LABEL = 'block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1';
@@ -76,10 +75,9 @@ const FONT_PRESETS = [
 
 interface Props {
   block: Block;
-  onClose: () => void;
 }
 
-export function StylePanel({ block, onClose }: Props) {
+export function StylePanel({ block }: Props) {
   const { updateBlock } = useBuilderStore();
 
   function setStyle(updates: Partial<BlockStyle>) {
@@ -99,9 +97,8 @@ export function StylePanel({ block, onClose }: Props) {
 
   return (
     <div className="flex flex-col w-72 flex-shrink-0 border-l border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 overflow-y-auto">
-      <header className="flex-shrink-0 flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-gray-700">
+      <header className="flex-shrink-0 px-4 py-3 border-b border-gray-200 dark:border-gray-700">
         <span className="text-sm font-semibold text-gray-800 dark:text-gray-200">Stil</span>
-        <Button variant="ghost" size="sm" onClick={onClose}>✕</Button>
       </header>
 
       <div className="px-4 py-4 flex flex-col gap-4">
