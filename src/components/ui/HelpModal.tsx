@@ -111,32 +111,46 @@ function OverviewSection() {
       <H2>Vad är GP StoryLab?</H2>
       <P>
         GP StoryLab är ett verktyg för att skapa visuella, interaktiva berättelser som kan bäddas in i GP:s CMS.
-        Varje projekt är ett <strong>block</strong> — du väljer en typ när du skapar projektet och redigerar
+        Varje projekt innehåller ett <strong>block</strong> — du väljer typ när du skapar projektet och redigerar
         det direkt i byggaren.
       </P>
 
       <H2>Skapa ett projekt</H2>
       <ol className="list-decimal list-inside mb-4 space-y-2 text-gray-600 dark:text-gray-400">
         <li>Klicka på <strong>+ Nytt projekt</strong> i dashboarden.</li>
-        <li>Projektet öppnas i byggaren. Klicka på <strong>+ Block</strong> och välj en typ.</li>
-        <li>Klicka på <strong>Redigera</strong> på blocket för att lägga till innehåll.</li>
-        <li>Förhandsgranskningen uppdateras direkt i realtid.</li>
+        <li>Projektet öppnas i byggaren. Klicka på <strong>+ Block</strong> och välj en blocktyp.</li>
+        <li>Innehållsredigeraren och stilpanelen öppnas automatiskt till vänster och höger.</li>
+        <li>Förhandsgranskningen i mitten uppdateras direkt i realtid.</li>
         <li>Projektet sparas automatiskt en sekund efter varje ändring.</li>
       </ol>
 
       <H2>Byggaren</H2>
       <ul className="list-disc list-inside mb-4 space-y-1.5 text-gray-600 dark:text-gray-400">
-        <Li><strong>+ Block</strong> — lägg till ett block (visas bara om artikeln är tom)</Li>
-        <Li><strong>Redigera</strong> — öppnar innehållsredigeraren för blocket</Li>
-        <Li><strong>Stil</strong> — öppnar stilpanelen (färg, typsnitt, storlek m.m.)</Li>
-        <Li><strong>✕</strong> — tar bort blocket permanent</Li>
+        <Li><strong>+ Block</strong> — lägg till ett block (visas bara om projektet är tomt)</Li>
+        <Li><strong>✕ på blocket</strong> — tar bort blocket permanent</Li>
+        <Li><strong>Vänster panel</strong> — innehållsredigeraren (alltid öppen när ett block finns)</Li>
+        <Li><strong>Höger panel (Stil)</strong> — typsnitt, färger, storlekar m.m. (alltid öppen)</Li>
         <Li><strong>Ångra / Gör om</strong> — pilikoner i sidhuvudet (även ⌘Z / ⌘⇧Z)</Li>
         <Li><strong>Mobil / iPad / Desktop</strong> — byter förhandsgranskningens bredd</Li>
         <Li><strong>Kopiera inbäddningskod</strong> — kopierar iframe-koden för CMS:et</Li>
         <Li><strong>Öppna ↗</strong> — öppnar förhandsgranskningen i ett nytt fönster</Li>
       </ul>
 
-      <Tip>Projektet har ett block — du byter blocktyp genom att ta bort det befintliga och lägga till ett nytt.</Tip>
+      <H2>Publicerad-läge</H2>
+      <P>
+        Växla på <strong>Publicerad</strong>-knappen (nedan till höger i byggaren) för att stänga av
+        autospar. I publicerat läge måste du klicka <strong>Spara</strong> manuellt för att skicka upp
+        ändringar — ett amber-varningsmeddelande visas om du gjort ändringar som inte sparats än.
+      </P>
+
+      <H2>Mappar i dashboarden</H2>
+      <P>
+        Klicka på <strong>+ Ny mapp</strong> i dashboarden för att skapa en mapp och samla relaterade projekt
+        — t.ex. alla delar av en och samma artikel. Tilldela ett projekt till en mapp via mappikonen
+        som visas när du hovrar över projektkortet.
+      </P>
+
+      <Tip>Byta blocktyp? Ta bort det befintliga blocket och lägg till ett nytt via + Block.</Tip>
     </>
   );
 }
@@ -145,24 +159,19 @@ function BlocksSection() {
   return (
     <>
       <H2>Tillgängliga blocktyper</H2>
-      <P>Varje projekt innehåller exakt ett block. Välj den typ som passar din berättelse bäst.</P>
-
-      <H3><Badge color="bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300">Bild</Badge></H3>
-      <P>Ett heltäckande foto med valfri bildtext. Ange en URL till bilden. Bilden skalas automatiskt till full bredd.</P>
+      <P>Varje projekt innehåller ett block. Välj den typ som passar din berättelse bäst.</P>
 
       <H3><Badge color="bg-purple-100 text-purple-800 dark:bg-purple-900/40 dark:text-purple-300">Video</Badge></H3>
-      <P>En video som spelas upp automatiskt och ljudlöst när den rullas in i vyport (autoplay). Stöder MP4 och WebM. Lämplig för korta klipp utan ljud.</P>
+      <P>En video som spelas upp automatiskt och ljudlöst när den rullas in i vyport. Stöder MP4 och WebM. Lämplig för korta klipp utan ljud.</P>
 
       <H3><Badge color="bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300">Citat</Badge></H3>
-      <P>Ett lyft citat med valfri källa. Visar citattexten i kursiv med en accentlinje på vänster sida. Passar för intervjusvar eller viktiga konstateranden.</P>
-
-      <H3><Badge color="bg-rose-100 text-rose-800 dark:bg-rose-900/40 dark:text-rose-300">Hero</Badge></H3>
-      <P>En helskärmsöppning med bakgrundsbild eller -video, rubrik och underrubrik. Bakgrunden har en inbyggd parallaxeffekt när användaren scrollar. Passar som ingångsbild för en artikel.</P>
+      <P>Ett lyft citat med valfri källa. Visar citattexten med en accentlinje på vänster sida. Passar för intervjusvar eller viktiga konstateranden.</P>
 
       <H3><Badge color="bg-indigo-100 text-indigo-800 dark:bg-indigo-900/40 dark:text-indigo-300">Klistrad sektion</Badge></H3>
       <P>
         Bakgrunden sitter fast (sticky) medan en serie textöverlägg tonar in och ut när användaren scrollar.
         Lägg till flera överläggsmeningar för att bygga upp en berättelse mot en stabil bakgrundsbild eller -video.
+        Fokuspunkten för bakgrundsbilden ställs in direkt i redigeraren.
       </P>
 
       <H3><Badge color="bg-cyan-100 text-cyan-800 dark:bg-cyan-900/40 dark:text-cyan-300">Tidslinje</Badge></H3>
@@ -176,6 +185,13 @@ function BlocksSection() {
 
       <H3><Badge color="bg-pink-100 text-pink-800 dark:bg-pink-900/40 dark:text-pink-300">Karusell</Badge></H3>
       <P>Svepbara bilder eller videor i en horisontell rad. Stöder touch-svep och klickbara punktindikatorer. Fungerar med både bild-URLer och video-URLer.</P>
+
+      <H3><Badge color="bg-teal-100 text-teal-800 dark:bg-teal-900/40 dark:text-teal-300">Bildspel</Badge></H3>
+      <P>
+        Ett interaktivt bildgalleri. Klicka på en miniatyrbild för att visa den som huvudbild.
+        Upp till 7 bilder visas i ett rutnät — fler bilder ger en horisontell sveprad.
+        Varje bild har valfri bildtext och fokuspunktsväljare.
+      </P>
 
       <H3><Badge color="bg-violet-100 text-violet-800 dark:bg-violet-900/40 dark:text-violet-300">ScrollyMedia</Badge></H3>
       <P>Scrollytelling med bilder/video som bakgrund. Varje sektion fyller hela vyportens höjd. Bäddas in separat med en sticky iframe. Se fliken <em>ScrollyMedia</em> för detaljer.</P>
@@ -235,7 +251,7 @@ function EmbedSection() {
         Koden är anpassad efter blocktypen.
       </P>
 
-      <H2>Vanliga block (Bild, Hero m.fl.)</H2>
+      <H2>Vanliga block (Video, Citat, Tidslinje m.fl.)</H2>
       <P>
         En enkel iframe vars höjd anpassas automatiskt via <code className="bg-gray-100 dark:bg-gray-800 px-1 rounded text-xs">postMessage</code>.
         CMS:et behöver tillåta iframes och köra det medföljande skriptblocket.
@@ -262,7 +278,7 @@ function EmbedSection() {
         <span className="font-mono bg-gray-100 dark:bg-gray-800 rounded px-1.5 py-0.5 text-xs">⌘S</span><span>Spara manuellt</span>
         <span className="font-mono bg-gray-100 dark:bg-gray-800 rounded px-1.5 py-0.5 text-xs">⌘Z</span><span>Ångra</span>
         <span className="font-mono bg-gray-100 dark:bg-gray-800 rounded px-1.5 py-0.5 text-xs">⌘⇧Z / Ctrl+Y</span><span>Gör om</span>
-        <span className="font-mono bg-gray-100 dark:bg-gray-800 rounded px-1.5 py-0.5 text-xs">Esc</span><span>Avmarkera block / stäng stilpanelen</span>
+        <span className="font-mono bg-gray-100 dark:bg-gray-800 rounded px-1.5 py-0.5 text-xs">Esc</span><span>Stäng dialoger och menyer</span>
       </div>
     </>
   );
