@@ -5,7 +5,7 @@ const INPUT = 'w-full rounded-lg border border-gray-200 dark:border-gray-600 bg-
 const LABEL = 'block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1';
 
 // Which style controls apply to each block type
-const SUPPORTS_MAX_WIDTH      = ['video', 'quote', 'timeline', 'chat', 'carousel', 'scrollymedia'];
+const SUPPORTS_MAX_WIDTH      = ['video', 'quote', 'timeline', 'chat', 'carousel', 'scrollymedia', 'bildspel'];
 const SUPPORTS_TEXT_COLOR     = ['quote', 'timeline'];
 const SUPPORTS_BG_COLOR       = ['quote', 'timeline', 'chat'];
 const SUPPORTS_ACCENT         = ['quote', 'timeline', 'chat'];

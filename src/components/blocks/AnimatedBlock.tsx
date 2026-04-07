@@ -7,6 +7,7 @@ import { ScrollyMediaBlock } from './ScrollyMediaBlock';
 import { TimelineBlock } from './TimelineBlock';
 import { ChatBlock } from './ChatBlock';
 import { CarouselBlock } from './CarouselBlock';
+import { BildspelBlock } from './BildspelBlock';
 
 type Variants = {
   hidden: Record<string, number | string>;
@@ -66,6 +67,7 @@ export function AnimatedBlock({ block }: Props) {
       {block.type === 'timeline' && <TimelineBlock block={block} />}
       {block.type === 'chat' && <ChatBlock block={block} />}
       {block.type === 'carousel' && <CarouselBlock block={block} />}
+      {block.type === 'bildspel' && <BildspelBlock block={block} />}
     </motion.div>
   );
 }

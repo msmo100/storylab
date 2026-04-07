@@ -79,6 +79,17 @@ const BLOCK_OPTIONS: BlockOption[] = [
       slides: [],
     },
   },
+  {
+    label: 'Bildspel',
+    description: 'Bildgalleri med en stor huvudbild och klickbara miniatyrer',
+    emoji: '🖼',
+    defaultBlock: {
+      type: 'bildspel',
+      animation: 'fade',
+      animationDelay: 0,
+      images: [],
+    },
+  },
 ];
 
 export function AddBlockMenu() {

@@ -1,4 +1,4 @@
-export type BlockType = 'video' | 'quote' | 'sticky' | 'timeline' | 'chat' | 'carousel' | 'scrollymedia';
+export type BlockType = 'video' | 'quote' | 'sticky' | 'timeline' | 'chat' | 'carousel' | 'scrollymedia' | 'bildspel';
 
 export interface BlockStyle {
   textColor?: string;
@@ -136,6 +136,21 @@ export interface ScrollySlide {
   body?: string;
 }
 
+/** A single image in a Bildspel (gallery) block. */
+export interface BildspelImage {
+  id: string;
+  src: string;
+  caption?: string;
+  /** CSS object-position for cropping, e.g. "top center" */
+  objectPosition?: string;
+}
+
+/** Interactive gallery: one large main image with clickable thumbnails below. */
+export interface BildspelBlock extends BaseBlock {
+  type: 'bildspel';
+  images: BildspelImage[];
+}
+
 /**
  * Standalone scrollytelling block.
  * Gets its own sticky-wrapper iframe embed — separate from the article.
@@ -152,7 +167,8 @@ export type Block =
   | TimelineBlock
   | ChatBlock
   | CarouselBlock
-  | ScrollyMediaBlock;
+  | ScrollyMediaBlock
+  | BildspelBlock;
 
 // Distributive Omit — correctly strips 'id' from each union member
 export type BlockWithoutId =
@@ -162,7 +178,8 @@ export type BlockWithoutId =
   | Omit<TimelineBlock, 'id'>
   | Omit<ChatBlock, 'id'>
   | Omit<CarouselBlock, 'id'>
-  | Omit<ScrollyMediaBlock, 'id'>;
+  | Omit<ScrollyMediaBlock, 'id'>
+  | Omit<BildspelBlock, 'id'>;
 
 export interface Article {
   id: string;

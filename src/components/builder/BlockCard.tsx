@@ -20,6 +20,7 @@ const BLOCK_LABELS: Record<Block['type'], string> = {
   chat: 'Chatt',
   carousel: 'Karusell',
   scrollymedia: 'ScrollyMedia',
+  bildspel: 'Bildspel',
 };
 
 const BLOCK_COLORS: Record<Block['type'], string> = {
@@ -30,6 +31,7 @@ const BLOCK_COLORS: Record<Block['type'], string> = {
   chat: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300',
   carousel: 'bg-pink-100 text-pink-800 dark:bg-pink-900/40 dark:text-pink-300',
   scrollymedia: 'bg-violet-100 text-violet-800 dark:bg-violet-900/40 dark:text-violet-300',
+  bildspel: 'bg-teal-100 text-teal-800 dark:bg-teal-900/40 dark:text-teal-300',
 };
 
 export function BlockCard({ block, isSelected }: Props) {

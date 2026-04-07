@@ -96,14 +96,26 @@ const carouselBlockSchema = baseBlockSchema.extend({
   items: z.array(carouselItemSchema),
 });
 
+const bildspelImageSchema = z.object({
+  id: z.string(),
+  src: z.string(),
+  caption: z.string().optional(),
+  objectPosition: z.string().optional(),
+});
+
+const bildspelBlockSchema = baseBlockSchema.extend({
+  type: z.literal('bildspel'),
+  images: z.array(bildspelImageSchema),
+});
+
 export const blockSchema = z.discriminatedUnion('type', [
   videoBlockSchema,
   quoteBlockSchema,
   stickyBlockSchema,
-
   timelineBlockSchema,
   chatBlockSchema,
   carouselBlockSchema,
+  bildspelBlockSchema,
 ]);
 
 export const articleSchema = z.object({

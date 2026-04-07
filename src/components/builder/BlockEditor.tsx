@@ -5,6 +5,7 @@ import type {
   StickyBlock, TimelineBlock, TimelineEntry, TimelineDotStyle,
   ChatBlock, ChatMessage, CarouselBlock, CarouselItem,
   ScrollyMediaBlock, ScrollySlide,
+  BildspelBlock, BildspelImage,
 } from '../../types';
 import { AnimationSelect } from './AnimationSelect';
 import { generateId } from '../../utils/generateId';
@@ -48,6 +49,7 @@ export function BlockEditor({ block }: Props) {
       {block.type === 'chat' && <ChatEditor block={block} />}
       {block.type === 'carousel' && <CarouselEditor block={block} />}
       {block.type === 'scrollymedia' && <ScrollyMediaEditor block={block} />}
+      {block.type === 'bildspel' && <BildspelEditor block={block} />}
     </div>
   );
 }
@@ -439,6 +441,75 @@ function ScrollyMediaEditor({ block }: { block: ScrollyMediaBlock }) {
       <button onClick={addSlide}
         className="w-full rounded-lg border border-dashed border-gray-300 dark:border-gray-600 py-2 text-xs text-gray-400 hover:border-gray-400 hover:text-gray-600 dark:hover:border-gray-500 dark:hover:text-gray-300 transition-colors">
         + Lägg till sektion
+      </button>
+    </div>
+  );
+}
+
+// ─── Bildspel ─────────────────────────────────────────────────────────────────
+
+function BildspelEditor({ block }: { block: BildspelBlock }) {
+  const { updateBlock } = useBuilderStore();
+  const upd = (u: Partial<BildspelBlock>) => updateBlock(block.id, u);
+
+  function addImage() {
+    const img: BildspelImage = { id: generateId(), src: '' };
+    upd({ images: [...block.images, img] });
+  }
+  function updateImage(id: string, u: Partial<BildspelImage>) {
+    upd({ images: block.images.map((img) => img.id === id ? { ...img, ...u } : img) });
+  }
+  function removeImage(id: string) {
+    upd({ images: block.images.filter((img) => img.id !== id) });
+  }
+
+  return (
+    <div className={SECTION}>
+      {block.images.map((img, i) => (
+        <div key={img.id} className="border border-gray-100 dark:border-gray-700 rounded-lg p-2.5 flex flex-col gap-2">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-medium text-gray-400 dark:text-gray-500">
+              {i === 0 ? 'Huvudbild' : `Miniatyr ${i}`}
+            </span>
+            <button onClick={() => removeImage(img.id)} className="text-xs text-red-500 px-2 py-0.5 hover:bg-red-50 dark:hover:bg-red-950 rounded">✕</button>
+          </div>
+          <div>
+            <label className={LABEL}>Bild-URL</label>
+            <input
+              type="url"
+              value={img.src}
+              onChange={(e) => updateImage(img.id, { src: e.target.value })}
+              placeholder="https://…/bild.jpg"
+              className={INPUT}
+            />
+          </div>
+          <div>
+            <label className={LABEL}>Bildtext (valfri)</label>
+            <input
+              type="text"
+              value={img.caption ?? ''}
+              onChange={(e) => updateImage(img.id, { caption: e.target.value || undefined })}
+              placeholder="Bildtext…"
+              className={INPUT}
+            />
+          </div>
+          {img.src && (
+            <div>
+              <label className={LABEL}>Fokuspunkt</label>
+              <FocalPointPicker
+                src={img.src}
+                current={img.objectPosition}
+                onSelect={(pos) => updateImage(img.id, { objectPosition: pos })}
+              />
+            </div>
+          )}
+        </div>
+      ))}
+      <button
+        onClick={addImage}
+        className="w-full rounded-lg border border-dashed border-gray-300 dark:border-gray-600 py-2 text-xs text-gray-400 hover:border-gray-400 hover:text-gray-600 dark:hover:border-gray-500 dark:hover:text-gray-300 transition-colors"
+      >
+        + Lägg till bild
       </button>
     </div>
   );
