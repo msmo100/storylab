@@ -78,7 +78,7 @@ export function BildspelBlock({ block }: Props) {
           </div>
         ) : (
           // 3-column grid for ≤ 7 images
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: '0.25rem', marginTop: '0.25rem' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0.25rem', marginTop: '0.25rem' }}>
             {images.map((img, i) => (
               <button
                 key={img.id}
