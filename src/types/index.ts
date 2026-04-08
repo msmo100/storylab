@@ -25,6 +25,8 @@ export interface BlockStyle {
   borderRadius?: string;
   /** CSS object-position value for image/video cropping, e.g. "top center". */
   objectPosition?: string;
+  /** Fixed slide height for carousel (px), e.g. "500px". Images/videos rendered with object-fit: cover. */
+  slideHeight?: string;
 }
 
 export type AnimationPreset = 'none' | 'fade' | 'slide-up' | 'slide-left' | 'zoom';

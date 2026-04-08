@@ -41,7 +41,7 @@ export function RenderView() {
       if (e.data?.type === 'update' && e.data.article && e.data.projectId === projectId) setLiveArticle(e.data.article);
     };
     return () => channel.close();
-  }, []);
+  }, [projectId]);
 
   const isEmbedded = !isPreview && window !== window.parent;
 

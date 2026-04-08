@@ -98,8 +98,13 @@ export function CarouselBlock({ block }: Props) {
                     src={item.src}
                     poster={item.poster}
                     muted={muted} loop playsInline
-                    className="w-full h-auto block"
-                    style={{ borderRadius: block.styles?.borderRadius }}
+                    className="w-full block"
+                    style={{
+                      borderRadius: block.styles?.borderRadius,
+                      ...(block.styles?.slideHeight
+                        ? { height: block.styles.slideHeight, objectFit: 'cover' }
+                        : { height: 'auto' }),
+                    }}
                   />
                   {/* Mute/unmute button */}
                   {i === current && (
@@ -131,8 +136,13 @@ export function CarouselBlock({ block }: Props) {
                 <img
                   src={item.src}
                   alt={item.caption ?? ''}
-                  className="w-full h-auto block"
-                  style={{ borderRadius: block.styles?.borderRadius }}
+                  className="w-full block"
+                  style={{
+                    borderRadius: block.styles?.borderRadius,
+                    ...(block.styles?.slideHeight
+                      ? { height: block.styles.slideHeight, objectFit: 'cover' }
+                      : { height: 'auto' }),
+                  }}
                 />
               )}
               {item.caption && (

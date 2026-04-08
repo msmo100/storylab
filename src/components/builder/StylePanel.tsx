@@ -15,6 +15,7 @@ const SUPPORTS_LINE_HEIGHT    = ['quote'];
 const SUPPORTS_LETTER_SPACING = ['quote'];
 const SUPPORTS_BORDER_RADIUS  = ['video', 'quote', 'carousel'];
 const SUPPORTS_BOX_SHADOW     = ['quote'];
+const SUPPORTS_SLIDE_HEIGHT   = ['carousel', 'bildspel'];
 
 const GP_PALETTE = [
   { name: 'Blue',      colors: ['#0A324B', '#0A5582', '#4A728A', '#80A3B9', '#CDDDE8', '#E8EFF5'] },
@@ -247,6 +248,23 @@ export function StylePanel({ block }: Props) {
           <div>
             <label className={LABEL}>Teckenavstånd (em)</label>
             <input type="number" min={-0.1} max={0.5} step={0.01} value={block.styles?.letterSpacing ?? ''} onChange={(e) => setStyle({ letterSpacing: e.target.value || undefined })} placeholder="0" className={INPUT} />
+          </div>
+        )}
+
+        {/* Slide height (carousel) */}
+        {SUPPORTS_SLIDE_HEIGHT.includes(t) && (
+          <div>
+            <label className={LABEL}>Bildhöjd (t.ex. 500px)</label>
+            <input
+              type="text"
+              value={block.styles?.slideHeight ?? ''}
+              onChange={(e) => setStyle({ slideHeight: e.target.value || undefined })}
+              placeholder="Auto (bildproportion)"
+              className={INPUT}
+            />
+            <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
+              Fixad höjd med object-fit: cover. Rekommenderas för inbäddning i CMS.
+            </p>
           </div>
         )}
 

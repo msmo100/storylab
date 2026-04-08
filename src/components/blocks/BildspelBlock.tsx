@@ -20,7 +20,7 @@ export function BildspelBlock({ block }: Props) {
     <div style={{ maxWidth: block.maxWidth ?? '100%', margin: '0 auto' }}>
       {/* ── Main image ── */}
       <div
-        style={{ position: 'relative', width: '100%', height: '70vh', overflow: 'hidden', background: '#111' }}
+        style={{ position: 'relative', width: '100%', height: block.styles?.slideHeight ?? '70vh', overflow: 'hidden', background: '#111' }}
       >
         <img
           key={active.id}
